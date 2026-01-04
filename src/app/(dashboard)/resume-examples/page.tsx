@@ -49,9 +49,15 @@ const experienceLevelColors: Record<string, string> = {
   Executive: 'bg-amber-100 text-amber-700',
 };
 
+interface OccupationItem {
+  id: string;
+  title: string;
+  industry: string;
+}
+
 export default function ResumeExamplesPage() {
   const [examples, setExamples] = useState<ResumeExample[]>([]);
-  const [occupations, setOccupations] = useState<string[]>([]);
+  const [occupations, setOccupations] = useState<OccupationItem[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -73,12 +79,17 @@ export default function ResumeExamplesPage() {
 
       const response = await api.getResumeExamples(params);
       if (response.success && response.data) {
-        setExamples(response.data.examples);
-        if (response.data.occupations.length > 0) {
-          setOccupations(response.data.occupations);
+        setExamples(response.data.examples || []);
+        const occs = response.data.occupations || [];
+        if (occs.length > 0) {
+          setOccupations(occs);
         }
-        if (response.data.industries.length > 0) {
+        // Use industries from response if available, otherwise extract from occupations
+        if (response.data.industries?.length > 0) {
           setIndustries(response.data.industries);
+        } else if (occs.length > 0) {
+          const uniqueIndustries = [...new Set(occs.map((o: OccupationItem) => o.industry))];
+          setIndustries(uniqueIndustries);
         }
       }
     } catch (error) {
@@ -162,7 +173,7 @@ export default function ResumeExamplesPage() {
               >
                 <option value="">All Occupations</option>
                 {occupations.map((occ) => (
-                  <option key={occ} value={occ}>{occ}</option>
+                  <option key={occ.id} value={occ.id}>{occ.title}</option>
                 ))}
               </select>
 
@@ -231,7 +242,7 @@ export default function ResumeExamplesPage() {
                   <p className="text-sm text-slate-500 mb-3">{example.occupation}</p>
                   <p className="text-sm text-slate-600 line-clamp-2 mb-4">{example.summary}</p>
                   <div className="flex flex-wrap gap-2">
-                    {example.skills.slice(0, 3).map((skill, idx) => (
+                    {(example.skills || []).slice(0, 3).map((skill, idx) => (
                       <span
                         key={idx}
                         className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full"
@@ -239,8 +250,8 @@ export default function ResumeExamplesPage() {
                         {skill}
                       </span>
                     ))}
-                    {example.skills.length > 3 && (
-                      <span className="text-xs text-slate-400">+{example.skills.length - 3} more</span>
+                    {(example.skills || []).length > 3 && (
+                      <span className="text-xs text-slate-400">+{(example.skills || []).length - 3} more</span>
                     )}
                   </div>
                 </CardContent>
@@ -286,15 +297,15 @@ export default function ResumeExamplesPage() {
                     Professional Summary
                   </h3>
                   <p className="text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    {selectedExample.previewContent.summary}
+                    {selectedExample.previewContent?.summary || selectedExample.summary}
                   </p>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="mt-2"
-                    onClick={() => copyBullet(selectedExample.previewContent.summary)}
+                    onClick={() => copyBullet(selectedExample.previewContent?.summary || selectedExample.summary || '')}
                   >
-                    {copiedBullet === selectedExample.previewContent.summary ? (
+                    {copiedBullet === (selectedExample.previewContent?.summary || selectedExample.summary) ? (
                       <>
                         <Check className="h-4 w-4 mr-1" />
                         Copied
@@ -315,7 +326,7 @@ export default function ResumeExamplesPage() {
                     Experience Examples
                   </h3>
                   <div className="space-y-4">
-                    {selectedExample.previewContent.experience.map((exp, idx) => (
+                    {(selectedExample.previewContent?.experience || []).map((exp, idx) => (
                       <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <div className="flex items-center justify-between mb-2">
                           <div>
@@ -324,7 +335,7 @@ export default function ResumeExamplesPage() {
                           </div>
                         </div>
                         <ul className="space-y-2">
-                          {exp.bullets.map((bullet, bulletIdx) => (
+                          {(exp.bullets || []).map((bullet, bulletIdx) => (
                             <li
                               key={bulletIdx}
                               className="flex items-start gap-2 group/bullet"
@@ -360,7 +371,7 @@ export default function ResumeExamplesPage() {
                     Key Highlights
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {selectedExample.highlights.map((highlight, idx) => (
+                    {(selectedExample.highlights || []).map((highlight, idx) => (
                       <span
                         key={idx}
                         className="bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full text-sm"
@@ -378,7 +389,7 @@ export default function ResumeExamplesPage() {
                     Skills Featured
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {selectedExample.skills.map((skill, idx) => (
+                    {(selectedExample.skills || []).map((skill, idx) => (
                       <span
                         key={idx}
                         className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-sm"

@@ -78,31 +78,72 @@ export default function ResumesPage() {
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">My Resumes</h1>
-            <p className="text-slate-500 mt-1">
-              Manage and customize your resumes for different job applications
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/resume-builder">
+        {/* Header Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 p-8 text-white">
+          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5" />
+                <span className="text-white/80 text-sm font-medium">Document Management</span>
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
+                My Resumes
+              </h1>
+              <p className="text-white/80 text-lg max-w-2xl">
+                Manage and customize your resumes for different job applications.
+                Upload, edit, and create tailored versions for each opportunity.
+              </p>
+            </div>
+            <div className="mt-6 lg:mt-0 flex flex-wrap gap-3">
+              <Link href="/resume-builder">
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  leftIcon={<Plus className="h-5 w-5" />}
+                >
+                  Create New
+                </Button>
+              </Link>
               <Button
-                variant="gradient"
+                variant="ghost"
                 size="lg"
-                leftIcon={<Plus className="h-5 w-5" />}
+                leftIcon={<Upload className="h-5 w-5" />}
+                onClick={() => setShowUploader(true)}
+                className="text-white border-white/30 hover:bg-white/10"
               >
-                Create New
+                Upload Resume
               </Button>
-            </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Search & Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search resumes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
+          <div className="flex gap-2">
             <Button
-              variant="outline"
-              size="lg"
-              leftIcon={<Upload className="h-5 w-5" />}
-              onClick={() => setShowUploader(!showUploader)}
+              variant={viewMode === 'list' ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
             >
-              Upload
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+            >
+              <LayoutGrid className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -121,42 +162,6 @@ export default function ResumesPage() {
             </CardContent>
           </Card>
         )}
-
-        {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search resumes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-3 rounded-xl transition-all duration-200 ${
-                viewMode === 'list'
-                  ? 'bg-indigo-100 text-indigo-600'
-                  : 'bg-white text-slate-400 hover:text-slate-600 border border-slate-200'
-              }`}
-            >
-              <List className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-3 rounded-xl transition-all duration-200 ${
-                viewMode === 'grid'
-                  ? 'bg-indigo-100 text-indigo-600'
-                  : 'bg-white text-slate-400 hover:text-slate-600 border border-slate-200'
-              }`}
-            >
-              <LayoutGrid className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
 
         {/* Content */}
         {isLoading ? (
