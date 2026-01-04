@@ -768,6 +768,410 @@ class ApiClient {
     });
     return response.data;
   }
+
+  // Job Tracker endpoints
+  async getJobApplications(params?: { status?: string; search?: string }) {
+    const response = await this.client.get<ApiResponse<{
+      applications: JobApplication[];
+      grouped: Record<string, JobApplication[]>;
+      stats: {
+        total: number;
+        wishlist: number;
+        applied: number;
+        interviewing: number;
+        offers: number;
+        rejected: number;
+        accepted: number;
+      };
+    }>>('/job-tracker', { params });
+    return response.data;
+  }
+
+  async getJobApplication(id: string) {
+    const response = await this.client.get<ApiResponse<JobApplication>>(`/job-tracker/${id}`);
+    return response.data;
+  }
+
+  async createJobApplication(data: Partial<JobApplication>) {
+    const response = await this.client.post<ApiResponse<JobApplication>>('/job-tracker', data);
+    return response.data;
+  }
+
+  async updateJobApplication(id: string, data: Partial<JobApplication>) {
+    const response = await this.client.put<ApiResponse<JobApplication>>(`/job-tracker/${id}`, data);
+    return response.data;
+  }
+
+  async updateJobApplicationStatus(id: string, status: string, statusOrder?: number) {
+    const response = await this.client.patch<ApiResponse<JobApplication>>(`/job-tracker/${id}/status`, {
+      status,
+      statusOrder,
+    });
+    return response.data;
+  }
+
+  async reorderJobApplications(applications: Array<{ id: string; statusOrder: number; status?: string }>) {
+    const response = await this.client.post<ApiResponse<void>>('/job-tracker/reorder', { applications });
+    return response.data;
+  }
+
+  async deleteJobApplication(id: string) {
+    const response = await this.client.delete<ApiResponse<void>>(`/job-tracker/${id}`);
+    return response.data;
+  }
+
+  async addJobActivity(id: string, data: { type?: string; description: string }) {
+    const response = await this.client.post<ApiResponse<JobActivity>>(`/job-tracker/${id}/activity`, data);
+    return response.data;
+  }
+
+  async getJobTrackerStats() {
+    const response = await this.client.get<ApiResponse<{
+      totalApplications: number;
+      statusCounts: Record<string, number>;
+      responseRate: number;
+      recentActivity: Array<JobActivity & { jobApplication: { jobTitle: string; companyName: string } }>;
+      upcomingInterviews: JobApplication[];
+      upcomingDeadlines: JobApplication[];
+    }>>('/job-tracker/stats');
+    return response.data;
+  }
+
+  // Career Tools endpoints
+  async getCareerDashboardStats() {
+    const response = await this.client.get<ApiResponse<CareerDashboardStats>>('/career/dashboard-stats');
+    return response.data;
+  }
+
+  async getResumePerformanceScore(resumeId: string, versionId?: string) {
+    const url = versionId
+      ? `/career/performance-score/${resumeId}/version/${versionId}`
+      : `/career/performance-score/${resumeId}`;
+    const response = await this.client.get<ApiResponse<ResumePerformanceScore>>(url);
+    return response.data;
+  }
+
+  async analyzeSkillGap(data: {
+    currentSkills: string[];
+    targetRole: string;
+    experienceLevel?: string;
+    industry?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<SkillGapAnalysis>>('/career/skill-gap', data);
+    return response.data;
+  }
+
+  async getResumeExamples(params?: { occupation?: string; industry?: string }) {
+    const response = await this.client.get<ApiResponse<{
+      examples: ResumeExample[];
+      occupations: string[];
+      industries: string[];
+    }>>('/career/examples', { params });
+    return response.data;
+  }
+
+  // A/B Testing endpoints
+  async getABTests(status?: string) {
+    const response = await this.client.get<ApiResponse<ABTest[]>>('/ab-tests', {
+      params: status ? { status } : undefined,
+    });
+    return response.data;
+  }
+
+  async getABTest(id: string) {
+    const response = await this.client.get<ApiResponse<ABTest & { stats: ABTestStats }>>(`/ab-tests/${id}`);
+    return response.data;
+  }
+
+  async createABTest(data: {
+    name: string;
+    description?: string;
+    targetJobTitle?: string;
+    targetCompany?: string;
+    goal?: string;
+    variants: Array<{
+      name?: string;
+      resumeVersionId?: string;
+      customContent?: any;
+    }>;
+  }) {
+    const response = await this.client.post<ApiResponse<ABTest>>('/ab-tests', data);
+    return response.data;
+  }
+
+  async updateABTest(id: string, data: {
+    name?: string;
+    description?: string;
+    targetJobTitle?: string;
+    targetCompany?: string;
+    goal?: string;
+  }) {
+    const response = await this.client.put<ApiResponse<ABTest>>(`/ab-tests/${id}`, data);
+    return response.data;
+  }
+
+  async updateABTestStatus(id: string, status: string, winningVariantId?: string) {
+    const response = await this.client.patch<ApiResponse<ABTest>>(`/ab-tests/${id}/status`, {
+      status,
+      winningVariantId,
+    });
+    return response.data;
+  }
+
+  async deleteABTest(id: string) {
+    const response = await this.client.delete<ApiResponse<void>>(`/ab-tests/${id}`);
+    return response.data;
+  }
+
+  async addABTestVariant(testId: string, data: {
+    name?: string;
+    resumeVersionId?: string;
+    customContent?: any;
+  }) {
+    const response = await this.client.post<ApiResponse<ABTestVariant>>(`/ab-tests/${testId}/variants`, data);
+    return response.data;
+  }
+
+  async removeABTestVariant(testId: string, variantId: string) {
+    const response = await this.client.delete<ApiResponse<void>>(`/ab-tests/${testId}/variants/${variantId}`);
+    return response.data;
+  }
+
+  async updateABTestVariantMetrics(testId: string, variantId: string, data: {
+    applications?: number;
+    responses?: number;
+    interviews?: number;
+  }) {
+    const response = await this.client.patch<ApiResponse<ABTestVariant>>(
+      `/ab-tests/${testId}/variants/${variantId}/metrics`,
+      data
+    );
+    return response.data;
+  }
+
+  async getABTestAnalytics(id: string) {
+    const response = await this.client.get<ApiResponse<ABTestAnalytics>>(`/ab-tests/${id}/analytics`);
+    return response.data;
+  }
+}
+
+// Types for Job Tracker
+export interface JobApplication {
+  id: string;
+  userId: string;
+  jobTitle: string;
+  companyName: string;
+  location?: string;
+  salary?: string;
+  jobUrl?: string;
+  jobDescription?: string;
+  status: 'WISHLIST' | 'APPLIED' | 'SCREENING' | 'INTERVIEWING' | 'OFFER' | 'REJECTED' | 'ACCEPTED' | 'WITHDRAWN';
+  statusOrder: number;
+  appliedAt?: string;
+  deadline?: string;
+  interviewDate?: string;
+  interviewType?: string;
+  interviewNotes?: string;
+  resumeVersionId?: string;
+  coverLetterId?: string;
+  notes?: string;
+  contactName?: string;
+  contactEmail?: string;
+  nextFollowUp?: string;
+  offerAmount?: string;
+  offerDeadline?: string;
+  source?: string;
+  priority: number;
+  color?: string;
+  activities?: JobActivity[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface JobActivity {
+  id: string;
+  jobApplicationId: string;
+  type: string;
+  description: string;
+  oldValue?: string;
+  newValue?: string;
+  createdAt: string;
+}
+
+// Types for Career Tools
+export interface CareerDashboardStats {
+  resumeStats: {
+    totalResumes: number;
+    totalVersions: number;
+    averageAtsScore: number;
+    recentResumes: Array<{
+      id: string;
+      title: string;
+      updatedAt: string;
+      versionsCount: number;
+    }>;
+  };
+  applicationStats: {
+    total: number;
+    byStatus: Record<string, number>;
+    responseRate: number;
+    avgTimeToResponse: number;
+    thisWeek: number;
+    thisMonth: number;
+  };
+  interviewStats: {
+    upcoming: number;
+    completed: number;
+    successRate: number;
+  };
+  coverLetterStats: {
+    total: number;
+    recentCount: number;
+  };
+  skillsOverview: {
+    topSkills: string[];
+    skillGaps: string[];
+  };
+  weeklyActivity: Array<{
+    date: string;
+    applications: number;
+    interviews: number;
+  }>;
+}
+
+export interface ResumePerformanceScore {
+  overall: number;
+  categories: {
+    content: { score: number; feedback: string[] };
+    formatting: { score: number; feedback: string[] };
+    keywords: { score: number; feedback: string[] };
+    impact: { score: number; feedback: string[] };
+    completeness: { score: number; feedback: string[] };
+  };
+  improvements: string[];
+  strengths: string[];
+}
+
+export interface SkillGapAnalysis {
+  targetRole: string;
+  currentSkillsMatched: string[];
+  missingSkills: Array<{
+    skill: string;
+    importance: 'critical' | 'important' | 'nice-to-have';
+    learningResources: Array<{
+      title: string;
+      type: string;
+      url?: string;
+      duration?: string;
+    }>;
+  }>;
+  overallReadiness: number;
+  recommendations: string[];
+  learningPath: Array<{
+    phase: string;
+    duration: string;
+    skills: string[];
+    milestones: string[];
+  }>;
+}
+
+export interface ResumeExample {
+  id: string;
+  occupation: string;
+  industry: string;
+  experienceLevel: string;
+  title: string;
+  summary: string;
+  highlights: string[];
+  skills: string[];
+  previewContent: {
+    summary: string;
+    experience: Array<{
+      title: string;
+      company: string;
+      bullets: string[];
+    }>;
+  };
+}
+
+// Types for A/B Testing
+export interface ABTestVariant {
+  id: string;
+  testId: string;
+  name: string;
+  resumeVersionId?: string;
+  customContent?: any;
+  shareToken?: string;
+  views: number;
+  downloads: number;
+  applications: number;
+  responses: number;
+  interviews: number;
+  responseRate: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ABTest {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  targetJobTitle?: string;
+  targetCompany?: string;
+  status: 'DRAFT' | 'RUNNING' | 'PAUSED' | 'COMPLETED';
+  goal: string;
+  variants: ABTestVariant[];
+  startedAt?: string;
+  endedAt?: string;
+  winningVariantId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ABTestStats {
+  totalViews: number;
+  totalDownloads: number;
+  totalResponses: number;
+  avgResponseRate: number;
+}
+
+export interface ABTestAnalytics {
+  test: {
+    id: string;
+    name: string;
+    status: string;
+    goal: string;
+    startedAt?: string;
+    endedAt?: string;
+  };
+  variants: Array<{
+    id: string;
+    name: string;
+    views: number;
+    downloads: number;
+    applications: number;
+    responses: number;
+    interviews: number;
+    responseRate: number;
+    conversionRate: number;
+  }>;
+  timeline: Array<{
+    date: string;
+    variants: Array<{
+      variantName: string;
+      views: number;
+      downloads: number;
+      responses: number;
+    }>;
+  }>;
+  bestPerformer: {
+    id: string;
+    name: string;
+    responseRate: number;
+    conversionRate: number;
+  };
+  totalSamples: number;
 }
 
 export const api = new ApiClient();

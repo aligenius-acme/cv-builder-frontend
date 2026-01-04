@@ -21,6 +21,10 @@ import {
   DollarSign,
   Search,
   PenTool,
+  Kanban,
+  FlaskConical,
+  GraduationCap,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -35,10 +39,11 @@ export default function Navbar() {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Resumes', href: '/resumes', icon: FileText },
     { name: 'Builder', href: '/resume-builder', icon: PenTool },
-    { name: 'Cover Letters', href: '/cover-letters', icon: Briefcase },
+    { name: 'Tracker', href: '/job-tracker', icon: Kanban },
+    { name: 'A/B Test', href: '/ab-testing', icon: FlaskConical },
+    { name: 'Skills', href: '/skill-gap', icon: GraduationCap },
+    { name: 'Examples', href: '/resume-examples', icon: BookOpen },
     { name: 'Jobs', href: '/jobs', icon: Search },
-    { name: 'Interview', href: '/interview-prep', icon: MessageSquare },
-    { name: 'Salary', href: '/salary-analyzer', icon: DollarSign },
   ];
 
   const userNavigation = [

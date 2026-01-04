@@ -19,8 +19,15 @@ import {
   Zap,
   Upload,
   ChevronRight,
+  Kanban,
+  Calendar,
+  CheckCircle,
+  Clock,
+  BarChart3,
+  GraduationCap,
+  Send,
 } from 'lucide-react';
-import api from '@/lib/api';
+import api, { CareerDashboardStats } from '@/lib/api';
 import { Resume, CoverLetter } from '@/types';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -29,6 +36,7 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
+  const [careerStats, setCareerStats] = useState<CareerDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showUploader, setShowUploader] = useState(false);
 
@@ -38,9 +46,10 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     try {
-      const [resumesRes, coverLettersRes] = await Promise.all([
+      const [resumesRes, coverLettersRes, careerStatsRes] = await Promise.all([
         api.getResumes(),
         api.getCoverLetters().catch(() => ({ success: true, data: [] })),
+        api.getCareerDashboardStats().catch(() => ({ success: false, data: null })),
       ]);
 
       if (resumesRes.success && resumesRes.data) {
@@ -48,6 +57,9 @@ export default function DashboardPage() {
       }
       if (coverLettersRes.success && coverLettersRes.data) {
         setCoverLetters(coverLettersRes.data);
+      }
+      if (careerStatsRes.success && careerStatsRes.data) {
+        setCareerStats(careerStatsRes.data);
       }
     } catch (error) {
       toast.error('Failed to load data');
@@ -75,7 +87,7 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="h-5 w-5" />
-                  <span className="text-white/80 text-sm font-medium">AI-Powered Resume Builder</span>
+                  <span className="text-white/80 text-sm font-medium">AI-Powered Career Hub</span>
                 </div>
                 <h1 className="text-3xl lg:text-4xl font-bold mb-2">
                   Welcome back, {user?.firstName || 'there'}!
@@ -83,7 +95,7 @@ export default function DashboardPage() {
                 <p className="text-white/80 text-lg max-w-xl">
                   {resumes.length === 0
                     ? 'Upload your first resume and let AI help you land your dream job.'
-                    : 'Your AI-powered resume toolkit is ready. Create tailored versions for any job.'}
+                    : 'Your AI-powered career toolkit is ready. Track applications and optimize your job search.'}
                 </p>
               </div>
               <div className="mt-6 lg:mt-0 flex flex-wrap gap-3">
@@ -126,50 +138,146 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Career Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card variant="gradient" hover className="group">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500 mb-1">Total Resumes</p>
-                  <p className="text-4xl font-bold text-slate-900">{resumes.length}</p>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                  <FileText className="h-5 w-5 text-white" />
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-                  <FileText className="h-7 w-7 text-white" />
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{resumes.length}</p>
+                  <p className="text-xs font-medium text-slate-500">Resumes</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card variant="gradient" hover className="group">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500 mb-1">Cover Letters</p>
-                  <p className="text-4xl font-bold text-slate-900">{coverLetters.length}</p>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                  <Target className="h-5 w-5 text-white" />
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                  <Briefcase className="h-7 w-7 text-white" />
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{totalVersions}</p>
+                  <p className="text-xs font-medium text-slate-500">Versions</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card variant="gradient" hover className="group">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500 mb-1">Tailored Versions</p>
-                  <p className="text-4xl font-bold text-slate-900">{totalVersions}</p>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                  <Briefcase className="h-5 w-5 text-white" />
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
-                  <Target className="h-7 w-7 text-white" />
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{coverLetters.length}</p>
+                  <p className="text-xs font-medium text-slate-500">Cover Letters</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="gradient" hover className="group">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                  <Send className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {careerStats?.applicationStats.total || 0}
+                  </p>
+                  <p className="text-xs font-medium text-slate-500">Applications</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="gradient" hover className="group">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                  <Calendar className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {careerStats?.interviewStats.upcoming || 0}
+                  </p>
+                  <p className="text-xs font-medium text-slate-500">Interviews</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="gradient" hover className="group">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {careerStats?.applicationStats.responseRate || 0}%
+                  </p>
+                  <p className="text-xs font-medium text-slate-500">Response Rate</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Application Tracker Summary */}
+        {careerStats && careerStats.applicationStats.total > 0 && (
+          <Card variant="elevated">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Kanban className="h-5 w-5 text-indigo-600" />
+                Application Pipeline
+              </CardTitle>
+              <Link href="/job-tracker">
+                <Button variant="ghost" size="sm" rightIcon={<ChevronRight className="h-4 w-4" />}>
+                  Open Tracker
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                {[
+                  { key: 'WISHLIST', label: 'Wishlist', color: 'bg-slate-100 text-slate-600' },
+                  { key: 'APPLIED', label: 'Applied', color: 'bg-blue-100 text-blue-600' },
+                  { key: 'SCREENING', label: 'Screening', color: 'bg-indigo-100 text-indigo-600' },
+                  { key: 'INTERVIEWING', label: 'Interviewing', color: 'bg-purple-100 text-purple-600' },
+                  { key: 'OFFER', label: 'Offers', color: 'bg-amber-100 text-amber-600' },
+                  { key: 'ACCEPTED', label: 'Accepted', color: 'bg-green-100 text-green-600' },
+                  { key: 'REJECTED', label: 'Rejected', color: 'bg-red-100 text-red-600' },
+                ].map(({ key, label, color }) => (
+                  <div
+                    key={key}
+                    className={`${color} rounded-xl p-3 text-center transition-transform hover:scale-105`}
+                  >
+                    <p className="text-2xl font-bold">
+                      {careerStats.applicationStats.byStatus[key] || 0}
+                    </p>
+                    <p className="text-xs font-medium opacity-80">{label}</p>
+                  </div>
+                ))}
+              </div>
+              {careerStats.applicationStats.thisWeek > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  <span>
+                    <strong>{careerStats.applicationStats.thisWeek}</strong> applications this week
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -256,8 +364,30 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions & Tools */}
           <div className="space-y-6">
+            {/* Job Tracker Quick Access */}
+            <Card variant="elevated" hover>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <Kanban className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900 mb-1">Job Tracker</h3>
+                    <p className="text-sm text-slate-500 mb-4">
+                      Track your job applications with our Kanban board.
+                    </p>
+                    <Link href="/job-tracker">
+                      <Button variant="primary" size="sm" className="w-full">
+                        Open Tracker
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card variant="elevated" hover>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -285,29 +415,43 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card variant="elevated" hover className={!isPro ? 'relative' : ''}>
-              {!isPro && (
-                <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
-                  <Link href="/subscription">
-                    <Button variant="gradient" leftIcon={<Crown className="h-4 w-4" />}>
-                      Unlock with Pro
-                    </Button>
-                  </Link>
-                </div>
-              )}
+            {/* Skill Gap Analyzer */}
+            <Card variant="elevated" hover>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                    <Briefcase className="h-6 w-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <GraduationCap className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 mb-1">Cover Letters</h3>
+                    <h3 className="font-semibold text-slate-900 mb-1">Skill Gap Analyzer</h3>
                     <p className="text-sm text-slate-500 mb-4">
-                      Generate professional cover letters tailored to each application.
+                      Identify missing skills for your target role.
                     </p>
-                    <Link href="/cover-letters">
+                    <Link href="/skill-gap">
                       <Button variant="primary" size="sm" className="w-full">
-                        Create Cover Letter
+                        Analyze Skills
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Resume Examples */}
+            <Card variant="elevated" hover>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <BarChart3 className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900 mb-1">Resume Examples</h3>
+                    <p className="text-sm text-slate-500 mb-4">
+                      Browse professional resume examples by industry.
+                    </p>
+                    <Link href="/resume-examples">
+                      <Button variant="primary" size="sm" className="w-full">
+                        Browse Examples
                       </Button>
                     </Link>
                   </div>
