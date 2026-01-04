@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Download, FileText, Eye, Check } from 'lucide-react';
+import { X, Download, FileText, Eye, Check, EyeOff, User, Shield } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
+import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 import { ResumeTemplate } from '@/types';
 import { downloadBlob, cn } from '@/lib/utils';
@@ -35,12 +37,17 @@ export default function DownloadModal({
   versionNumber,
   companyName,
 }: DownloadModalProps) {
+  const { user } = useAuthStore();
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState('professional');
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [anonymize, setAnonymize] = useState(false);
+
+  // B2B feature - only available for org users or business plan
+  const canAnonymize = user?.organizationId || user?.planType === 'BUSINESS';
 
   useEffect(() => {
     if (isOpen) {
@@ -95,10 +102,11 @@ export default function DownloadModal({
   const handleDownload = async (format: 'pdf' | 'docx') => {
     try {
       setIsDownloading(true);
-      const blob = await api.downloadVersion(resumeId, versionId, format, selectedTemplate);
-      const filename = `resume-${companyName || 'tailored'}-v${versionNumber}.${format}`;
+      const blob = await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize);
+      const prefix = anonymize ? 'anonymous-resume' : 'resume';
+      const filename = `${prefix}-${companyName || 'tailored'}-v${versionNumber}.${format}`;
       downloadBlob(blob, filename);
-      toast.success(`Downloaded ${format.toUpperCase()}`);
+      toast.success(`Downloaded ${anonymize ? 'anonymized ' : ''}${format.toUpperCase()}`);
       onClose();
     } catch (error) {
       toast.error('Failed to download resume');
@@ -224,12 +232,50 @@ export default function DownloadModal({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between p-4 border-t bg-gray-50">
-            <p className="text-sm text-gray-500">
-              Selected: <span className="font-medium text-gray-900">
-                {templates.find(t => t.id === selectedTemplate)?.name || 'Professional'}
-              </span>
-            </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border-t bg-gray-50">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <p className="text-sm text-gray-500">
+                Template: <span className="font-medium text-gray-900">
+                  {templates.find(t => t.id === selectedTemplate)?.name || 'Professional'}
+                </span>
+              </p>
+
+              {/* Anonymization Toggle */}
+              {canAnonymize && (
+                <div className="flex items-center gap-3 pl-4 border-l border-gray-300">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={anonymize}
+                        onChange={(e) => setAnonymize(e.target.checked)}
+                        className="sr-only"
+                      />
+                      <div className={cn(
+                        'w-10 h-6 rounded-full transition-colors duration-200',
+                        anonymize ? 'bg-indigo-600' : 'bg-gray-300'
+                      )}>
+                        <div className={cn(
+                          'absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200',
+                          anonymize ? 'translate-x-5' : 'translate-x-1'
+                        )} />
+                      </div>
+                    </div>
+                    <span className="flex items-center gap-1.5 text-sm text-gray-700">
+                      <EyeOff className="h-4 w-4" />
+                      Anonymize
+                    </span>
+                  </label>
+                  {anonymize && (
+                    <Badge variant="info" size="sm" className="animate-fade-in">
+                      <Shield className="h-3 w-3 mr-1" />
+                      Private
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={onClose}>
                 Cancel

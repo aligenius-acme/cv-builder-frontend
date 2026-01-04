@@ -112,6 +112,16 @@ class ApiClient {
     return response.data;
   }
 
+  async verifyEmail(token: string) {
+    const response = await this.client.post<ApiResponse>('/auth/verify-email', { token });
+    return response.data;
+  }
+
+  async resendVerification() {
+    const response = await this.client.post<ApiResponse>('/auth/resend-verification');
+    return response.data;
+  }
+
   logout() {
     this.setToken(null);
   }
@@ -319,6 +329,40 @@ class ApiClient {
     return response.data;
   }
 
+  async getAdminOrganizations(page = 1, limit = 20) {
+    const response = await this.client.get<ApiResponse<any>>('/admin/organizations', {
+      params: { page, limit },
+    });
+    return response.data;
+  }
+
+  async getAdminPrompts() {
+    const response = await this.client.get<ApiResponse<any>>('/admin/prompts');
+    return response.data;
+  }
+
+  async updateAdminPrompt(id: string, data: { promptText: string; isActive?: boolean }) {
+    const response = await this.client.put<ApiResponse<any>>(`/admin/prompts/${id}`, data);
+    return response.data;
+  }
+
+  async getAdminTemplates() {
+    const response = await this.client.get<ApiResponse<any>>('/admin/templates');
+    return response.data;
+  }
+
+  async createAdminTemplate(data: {
+    name: string;
+    description?: string;
+    templateConfig: any;
+    isDefault?: boolean;
+    isPremium?: boolean;
+    isAtsSafe?: boolean;
+  }) {
+    const response = await this.client.post<ApiResponse<any>>('/admin/templates', data);
+    return response.data;
+  }
+
   async getDisclaimer() {
     const response = await this.client.get<ApiResponse<{ disclaimer: string; lastUpdated: string }>>('/disclaimer');
     return response.data;
@@ -339,6 +383,53 @@ class ApiClient {
       params,
       responseType: 'blob',
     });
+    return response.data;
+  }
+
+  // Organization endpoints
+  async createOrganization(data: { name: string; domain?: string }) {
+    const response = await this.client.post<ApiResponse<any>>('/organization', data);
+    return response.data;
+  }
+
+  async getOrganization() {
+    const response = await this.client.get<ApiResponse<any>>('/organization');
+    return response.data;
+  }
+
+  async updateOrganization(data: {
+    name?: string;
+    domain?: string;
+    logoUrl?: string;
+    primaryColor?: string;
+    anonymizationEnabled?: boolean;
+  }) {
+    const response = await this.client.put<ApiResponse<any>>('/organization', data);
+    return response.data;
+  }
+
+  async inviteMember(email: string) {
+    const response = await this.client.post<ApiResponse<any>>('/organization/invite', { email });
+    return response.data;
+  }
+
+  async acceptInvite(token: string) {
+    const response = await this.client.post<ApiResponse<any>>('/organization/accept-invite', { token });
+    return response.data;
+  }
+
+  async removeMember(memberId: string) {
+    const response = await this.client.delete<ApiResponse<any>>(`/organization/members/${memberId}`);
+    return response.data;
+  }
+
+  async updateMemberRole(memberId: string, role: 'ORG_ADMIN' | 'ORG_USER') {
+    const response = await this.client.put<ApiResponse<any>>(`/organization/members/${memberId}/role`, { role });
+    return response.data;
+  }
+
+  async leaveOrganization() {
+    const response = await this.client.post<ApiResponse<any>>('/organization/leave');
     return response.data;
   }
 }
