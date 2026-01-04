@@ -190,7 +190,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
-                    {careerStats?.applicationStats.total || 0}
+                    {(careerStats as any)?.applications?.total || 0}
                   </p>
                   <p className="text-xs font-medium text-slate-500">Applications</p>
                 </div>
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
-                    {careerStats?.interviewStats.upcoming || 0}
+                    {(careerStats as any)?.upcoming?.interviews?.length || 0}
                   </p>
                   <p className="text-xs font-medium text-slate-500">Interviews</p>
                 </div>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
-                    {careerStats?.applicationStats.responseRate || 0}%
+                    {(careerStats as any)?.applications?.responseRate || 0}%
                   </p>
                   <p className="text-xs font-medium text-slate-500">Response Rate</p>
                 </div>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Application Tracker Summary */}
-        {careerStats && careerStats.applicationStats.total > 0 && (
+        {careerStats && (careerStats as any).applications?.total > 0 && (
           <Card variant="elevated">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
@@ -261,17 +261,17 @@ export default function DashboardPage() {
                     className={`${color} rounded-xl p-3 text-center transition-transform hover:scale-105`}
                   >
                     <p className="text-2xl font-bold">
-                      {careerStats.applicationStats.byStatus[key] || 0}
+                      {(careerStats as any).applications?.byStatus?.[key] || 0}
                     </p>
                     <p className="text-xs font-medium opacity-80">{label}</p>
                   </div>
                 ))}
               </div>
-              {careerStats.applicationStats.thisWeek > 0 && (
+              {(careerStats as any).applications?.thisWeek > 0 && (
                 <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
                   <TrendingUp className="h-4 w-4 text-green-500" />
                   <span>
-                    <strong>{careerStats.applicationStats.thisWeek}</strong> applications this week
+                    <strong>{(careerStats as any).applications?.thisWeek}</strong> applications this week
                   </span>
                 </div>
               )}
