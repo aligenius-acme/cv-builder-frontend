@@ -197,6 +197,23 @@ class ApiClient {
     return response.data;
   }
 
+  // Scrape job posting from URL
+  async scrapeJobUrl(url: string) {
+    const response = await this.client.post<ApiResponse<{
+      url: string;
+      title: string;
+      company: string;
+      location?: string;
+      salary?: string;
+      description: string;
+      requirements?: string[];
+      benefits?: string[];
+      employmentType?: string;
+      experienceLevel?: string;
+    }>>('/resumes/scrape-job', { url });
+    return response.data;
+  }
+
   // Cover Letter endpoints
   async generateCoverLetter(data: {
     resumeVersionId?: string;
@@ -430,6 +447,325 @@ class ApiClient {
 
   async leaveOrganization() {
     const response = await this.client.post<ApiResponse<any>>('/organization/leave');
+    return response.data;
+  }
+
+  // Share endpoints
+  async toggleSharing(resumeId: string, versionId: string, isPublic: boolean) {
+    const response = await this.client.post<ApiResponse<{
+      isPublic: boolean;
+      shareToken: string | null;
+      shareUrl: string | null;
+      views: number;
+      downloads: number;
+    }>>(`/shared/${resumeId}/versions/${versionId}/share`, { isPublic });
+    return response.data;
+  }
+
+  async getSharingStatus(resumeId: string, versionId: string) {
+    const response = await this.client.get<ApiResponse<{
+      isPublic: boolean;
+      shareToken: string | null;
+      shareUrl: string | null;
+      totalViews: number;
+      totalDownloads: number;
+      viewsLast7Days: number;
+      downloadsLast7Days: number;
+      recentActivity: Array<{
+        id: string;
+        eventType: string;
+        country?: string;
+        city?: string;
+        createdAt: string;
+      }>;
+    }>>(`/shared/${resumeId}/versions/${versionId}/share`);
+    return response.data;
+  }
+
+  async getSharedResume(token: string) {
+    const response = await this.client.get<ApiResponse<{
+      jobTitle: string;
+      companyName: string;
+      atsScore: number;
+      candidateName: string;
+      resume: {
+        contact: any;
+        summary: string;
+        experience: any[];
+        education: any[];
+        skills: string[];
+        certifications?: string[];
+        projects?: any[];
+      };
+    }>>(`/shared/${token}`);
+    return response.data;
+  }
+
+  async downloadSharedResume(token: string, format: 'pdf' | 'docx' = 'pdf', template = 'london-navy') {
+    const response = await this.client.get(`/shared/${token}/download`, {
+      params: { format, template },
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+
+  // AI Writing endpoints
+  async getAISuggestions(data: {
+    text: string;
+    context?: {
+      jobTitle?: string;
+      industry?: string;
+      section?: 'experience' | 'summary' | 'skills' | 'education';
+      previousBullets?: string[];
+    };
+    suggestionType: 'improve' | 'expand' | 'quantify' | 'action-verb' | 'complete';
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      suggestions: string[] | Array<{ verb: string; example: string }>;
+      type: string;
+    }>>('/ai-writing/suggestions', data);
+    return response.data;
+  }
+
+  async getAICompletions(data: {
+    text: string;
+    cursorPosition?: number;
+    section?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      completions: string[];
+    }>>('/ai-writing/completions', data);
+    return response.data;
+  }
+
+  async generateBulletPoints(data: {
+    jobTitle: string;
+    company: string;
+    responsibilities?: string;
+    achievements?: string;
+    targetRole?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      bulletPoints: string[];
+    }>>('/ai-writing/generate-bullets', data);
+    return response.data;
+  }
+
+  // Interview Prep endpoints
+  async generateInterviewQuestions(data: {
+    jobTitle: string;
+    company?: string;
+    industry?: string;
+    jobDescription?: string;
+    resumeData?: any;
+    questionTypes?: ('behavioral' | 'technical' | 'situational')[];
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      questions: Array<{
+        question: string;
+        category: string;
+        difficulty: string;
+        tips?: string;
+        sampleAnswer?: string;
+      }>;
+      jobTitle: string;
+      company?: string;
+    }>>('/interview-prep/generate', data);
+    return response.data;
+  }
+
+  async evaluateAnswer(data: {
+    question: string;
+    answer: string;
+    jobTitle?: string;
+    company?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      score: number;
+      strengths: string[];
+      improvements: string[];
+      improvedAnswer: string;
+      feedback: string;
+    }>>('/interview-prep/evaluate', data);
+    return response.data;
+  }
+
+  async getCommonQuestions(category?: string) {
+    const response = await this.client.get<ApiResponse<{
+      questions: Array<{
+        question: string;
+        category: string;
+        difficulty: string;
+        tips?: string;
+      }>;
+      categories: string[];
+    }>>('/interview-prep/common', { params: { category } });
+    return response.data;
+  }
+
+  // Salary Analyzer endpoints
+  async analyzeSalary(data: {
+    jobTitle: string;
+    location: string;
+    experienceYears?: number;
+    industry?: string;
+    companySize?: string;
+    skills?: string[];
+    currentOffer?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      analysis: {
+        salaryRange: { min: number; median: number; max: number; currency: string };
+        percentile: { '25th': number; '50th': number; '75th': number; '90th': number };
+        factors: Array<{ name: string; impact: string; description: string }>;
+        benefits: { common: string[]; premium: string[] };
+        negotiationTips: string[];
+        marketOutlook: string;
+        competitorSalaries: Array<{ company: string; range: string }>;
+        offerAnalysis?: { comparison: string; percentileRank: number; recommendation: string };
+      };
+      query: any;
+    }>>('/salary/analyze', data);
+    return response.data;
+  }
+
+  async compareOffers(offers: Array<{
+    company: string;
+    position: string;
+    baseSalary: number;
+    bonus?: string;
+    equity?: string;
+    benefits?: string[];
+    remoteWork?: string;
+    ptoDays?: number;
+    location?: string;
+  }>) {
+    const response = await this.client.post<ApiResponse<{
+      totalCompensation: Array<{ company: string; estimated: number }>;
+      rankings: Record<string, string[]>;
+      prosAndCons: Array<{ company: string; pros: string[]; cons: string[] }>;
+      recommendation: any;
+      negotiationSuggestions: any[];
+    }>>('/salary/compare', { offers });
+    return response.data;
+  }
+
+  async getNegotiationScript(data: {
+    currentOffer: string;
+    targetSalary: string;
+    reasons?: string[];
+    jobTitle?: string;
+    company?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      openingStatement: string;
+      keyPoints: Array<{ point: string; elaboration: string }>;
+      responses: Record<string, string>;
+      closingStatement: string;
+      emailTemplate: string;
+      tips: string[];
+    }>>('/salary/negotiation-script', data);
+    return response.data;
+  }
+
+  // Job Board endpoints
+  async searchJobs(params: {
+    keywords: string;
+    location?: string;
+    experienceLevel?: string;
+    jobType?: string;
+    remote?: boolean;
+    postedWithin?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const response = await this.client.get<ApiResponse<{
+      jobs: Array<{
+        id: string;
+        title: string;
+        company: string;
+        location: string;
+        salary?: string;
+        type: string;
+        posted: string;
+        description: string;
+        requirements?: string[];
+        source: string;
+        url: string;
+        logo?: string;
+      }>;
+      total: number;
+      page: number;
+      totalPages: number;
+      filters: any;
+    }>>('/jobs/search', { params });
+    return response.data;
+  }
+
+  async getJobDetails(id: string, url?: string) {
+    const response = await this.client.get<ApiResponse<{
+      fullDescription: string;
+      responsibilities: string[];
+      requirements: string[];
+      niceToHave: string[];
+      benefits: string[];
+      culture: string;
+    }>>(`/jobs/details/${id}`, { params: { url } });
+    return response.data;
+  }
+
+  async saveJob(jobId: string, jobData: any) {
+    const response = await this.client.post<ApiResponse<{ jobId: string }>>('/jobs/save', { jobId, jobData });
+    return response.data;
+  }
+
+  async getSavedJobs() {
+    const response = await this.client.get<ApiResponse<{ jobs: any[]; total: number }>>('/jobs/saved');
+    return response.data;
+  }
+
+  async getRecommendedJobs(resumeId?: string) {
+    const response = await this.client.get<ApiResponse<{
+      jobs: any[];
+      basedOn: { skills: string[]; recentTitles: string[] };
+    }>>('/jobs/recommended', { params: { resumeId } });
+    return response.data;
+  }
+
+  // Resume Builder endpoints
+  async createBlankResume(data: { title?: string; template?: string }) {
+    const response = await this.client.post<ApiResponse<{
+      id: string;
+      title: string;
+      parsedData: any;
+      createdAt: string;
+    }>>('/resumes/create', data);
+    return response.data;
+  }
+
+  async updateResumeContent(id: string, data: { parsedData?: any; title?: string }) {
+    const response = await this.client.put<ApiResponse<{
+      id: string;
+      title: string;
+      parsedData: any;
+      updatedAt: string;
+    }>>(`/resumes/${id}/content`, data);
+    return response.data;
+  }
+
+  async downloadBuiltResume(id: string, format: 'pdf' | 'docx' = 'pdf', template = 'london-navy') {
+    const response = await this.client.get(`/resumes/${id}/download`, {
+      params: { format, template },
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+
+  async previewBuiltResume(id: string, template = 'london-navy') {
+    const response = await this.client.get(`/resumes/${id}/preview`, {
+      params: { template },
+      responseType: 'blob',
+    });
     return response.data;
   }
 }

@@ -86,14 +86,25 @@ export default function ResumesPage() {
               Manage and customize your resumes for different job applications
             </p>
           </div>
-          <Button
-            variant="gradient"
-            size="lg"
-            leftIcon={<Plus className="h-5 w-5" />}
-            onClick={() => setShowUploader(!showUploader)}
-          >
-            Upload Resume
-          </Button>
+          <div className="flex gap-3">
+            <Link href="/resume-builder">
+              <Button
+                variant="gradient"
+                size="lg"
+                leftIcon={<Plus className="h-5 w-5" />}
+              >
+                Create New
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="lg"
+              leftIcon={<Upload className="h-5 w-5" />}
+              onClick={() => setShowUploader(!showUploader)}
+            >
+              Upload
+            </Button>
+          </div>
         </div>
 
         {/* Upload Section */}
@@ -180,17 +191,28 @@ export default function ResumesPage() {
                 <p className="text-slate-500 mb-6 max-w-sm mx-auto">
                   {searchQuery
                     ? 'Try adjusting your search query'
-                    : 'Upload your first resume to start customizing it for job applications'}
+                    : 'Create a resume from scratch or upload an existing one to get started'}
                 </p>
                 {!searchQuery && (
-                  <Button
-                    variant="gradient"
-                    size="lg"
-                    leftIcon={<Upload className="h-5 w-5" />}
-                    onClick={() => setShowUploader(true)}
-                  >
-                    Upload Your Resume
-                  </Button>
+                  <div className="flex gap-3 justify-center">
+                    <Link href="/resume-builder">
+                      <Button
+                        variant="gradient"
+                        size="lg"
+                        leftIcon={<Plus className="h-5 w-5" />}
+                      >
+                        Create New Resume
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      leftIcon={<Upload className="h-5 w-5" />}
+                      onClick={() => setShowUploader(true)}
+                    >
+                      Upload Resume
+                    </Button>
+                  </div>
                 )}
               </div>
             </CardContent>

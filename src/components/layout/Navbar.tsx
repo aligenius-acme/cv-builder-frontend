@@ -17,6 +17,10 @@ import {
   ChevronDown,
   Sparkles,
   LayoutDashboard,
+  MessageSquare,
+  DollarSign,
+  Search,
+  PenTool,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -30,7 +34,11 @@ export default function Navbar() {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Resumes', href: '/resumes', icon: FileText },
+    { name: 'Builder', href: '/resume-builder', icon: PenTool },
     { name: 'Cover Letters', href: '/cover-letters', icon: Briefcase },
+    { name: 'Jobs', href: '/jobs', icon: Search },
+    { name: 'Interview', href: '/interview-prep', icon: MessageSquare },
+    { name: 'Salary', href: '/salary-analyzer', icon: DollarSign },
   ];
 
   const userNavigation = [

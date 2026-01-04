@@ -29,6 +29,11 @@ import {
   MapPin,
   GraduationCap,
   GitCompare,
+  Link2,
+  Loader2,
+  Globe,
+  DollarSign,
+  Clock,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -50,6 +55,17 @@ export default function ResumeDetailPage() {
   const [jobTitle, setJobTitle] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+
+  // Job URL scraping state
+  const [inputMode, setInputMode] = useState<'url' | 'manual'>('url');
+  const [jobUrl, setJobUrl] = useState('');
+  const [isScrapingUrl, setIsScrapingUrl] = useState(false);
+  const [scrapedJobInfo, setScrapedJobInfo] = useState<{
+    location?: string;
+    salary?: string;
+    employmentType?: string;
+    experienceLevel?: string;
+  } | null>(null);
 
   const isPro = user?.planType === 'PRO' || user?.planType === 'BUSINESS';
 
@@ -113,6 +129,61 @@ export default function ResumeDetailPage() {
     } catch (error) {
       toast.error('Failed to download resume');
     }
+  };
+
+  const handleScrapeJobUrl = async () => {
+    if (!jobUrl) {
+      toast.error('Please enter a job posting URL');
+      return;
+    }
+
+    // Validate URL
+    try {
+      new URL(jobUrl);
+    } catch {
+      toast.error('Please enter a valid URL');
+      return;
+    }
+
+    setIsScrapingUrl(true);
+
+    try {
+      const response = await api.scrapeJobUrl(jobUrl);
+
+      if (response.success && response.data) {
+        const data = response.data;
+
+        // Auto-fill the form
+        setJobTitle(data.title || '');
+        setCompanyName(data.company || '');
+        setJobDescription(data.description || '');
+
+        // Store additional info
+        setScrapedJobInfo({
+          location: data.location,
+          salary: data.salary,
+          employmentType: data.employmentType,
+          experienceLevel: data.experienceLevel,
+        });
+
+        toast.success('Job details extracted successfully!');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to fetch job posting. Try pasting the description manually.');
+      setInputMode('manual');
+    } finally {
+      setIsScrapingUrl(false);
+    }
+  };
+
+  const resetForm = () => {
+    setShowCustomizeForm(false);
+    setJobTitle('');
+    setCompanyName('');
+    setJobDescription('');
+    setJobUrl('');
+    setScrapedJobInfo(null);
+    setInputMode('url');
   };
 
   if (isLoading) {
@@ -181,72 +252,166 @@ export default function ResumeDetailPage() {
 
             {showCustomizeForm && (
               <CardContent>
-                <form onSubmit={handleCustomize} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Input Mode Toggle */}
+                <div className="flex items-center gap-2 mb-6 p-1 bg-slate-100 rounded-xl w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('url')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      inputMode === 'url'
+                        ? 'bg-white text-indigo-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Paste Job Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('manual')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      inputMode === 'manual'
+                        ? 'bg-white text-indigo-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <FileText className="h-4 w-4" />
+                    Enter Manually
+                  </button>
+                </div>
+
+                {/* URL Input Mode */}
+                {inputMode === 'url' && !jobTitle && (
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                        Job Title
+                        Job Posting URL
                       </label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                        <input
-                          type="text"
-                          placeholder="e.g., Senior Software Engineer"
-                          value={jobTitle}
-                          onChange={(e) => setJobTitle(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
-                        />
+                      <div className="flex gap-3">
+                        <div className="relative flex-1">
+                          <Globe className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                          <input
+                            type="url"
+                            placeholder="https://linkedin.com/jobs/... or any job posting URL"
+                            value={jobUrl}
+                            onChange={(e) => setJobUrl(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleScrapeJobUrl()}
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="gradient"
+                          onClick={handleScrapeJobUrl}
+                          isLoading={isScrapingUrl}
+                          leftIcon={isScrapingUrl ? undefined : <Sparkles className="h-4 w-4" />}
+                        >
+                          {isScrapingUrl ? 'Extracting...' : 'Extract'}
+                        </Button>
+                      </div>
+                      <p className="mt-2 text-xs text-slate-500">
+                        Supports LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, and most job boards
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Form (shown after URL extraction or in manual mode) */}
+                {(inputMode === 'manual' || jobTitle) && (
+                  <form onSubmit={handleCustomize} className="space-y-5">
+                    {/* Scraped Job Info Banner */}
+                    {scrapedJobInfo && (scrapedJobInfo.location || scrapedJobInfo.salary || scrapedJobInfo.employmentType) && (
+                      <div className="flex flex-wrap items-center gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                        {scrapedJobInfo.location && (
+                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <MapPin className="h-4 w-4" />
+                            {scrapedJobInfo.location}
+                          </span>
+                        )}
+                        {scrapedJobInfo.salary && (
+                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <DollarSign className="h-4 w-4" />
+                            {scrapedJobInfo.salary}
+                          </span>
+                        )}
+                        {scrapedJobInfo.employmentType && (
+                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <Clock className="h-4 w-4" />
+                            {scrapedJobInfo.employmentType}
+                          </span>
+                        )}
+                        {scrapedJobInfo.experienceLevel && (
+                          <Badge variant="info" size="sm">{scrapedJobInfo.experienceLevel}</Badge>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                          Job Title
+                        </label>
+                        <div className="relative">
+                          <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="e.g., Senior Software Engineer"
+                            value={jobTitle}
+                            onChange={(e) => setJobTitle(e.target.value)}
+                            required
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                          Company Name
+                        </label>
+                        <div className="relative">
+                          <Building className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="e.g., Google"
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
+                            required
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                        Company Name
+                        Job Description
                       </label>
-                      <div className="relative">
-                        <Building className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                        <input
-                          type="text"
-                          placeholder="e.g., Google"
-                          value={companyName}
-                          onChange={(e) => setCompanyName(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
-                        />
-                      </div>
+                      <textarea
+                        rows={8}
+                        placeholder="Paste the full job description here..."
+                        value={jobDescription}
+                        onChange={(e) => setJobDescription(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                      />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                      Job Description
-                    </label>
-                    <textarea
-                      rows={8}
-                      placeholder="Paste the full job description here..."
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                      required
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowCustomizeForm(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      variant="gradient"
-                      isLoading={isCustomizing}
-                      leftIcon={<Sparkles className="h-4 w-4" />}
-                    >
-                      Customize Resume
-                    </Button>
-                  </div>
-                </form>
+                    <div className="flex justify-end gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetForm}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="gradient"
+                        isLoading={isCustomizing}
+                        leftIcon={<Sparkles className="h-4 w-4" />}
+                      >
+                        Customize Resume
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </CardContent>
             )}
           </Card>

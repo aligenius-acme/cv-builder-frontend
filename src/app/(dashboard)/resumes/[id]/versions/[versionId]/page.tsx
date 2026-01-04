@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
 import DownloadModal from '@/components/resume/DownloadModal';
 import ATSSimulator from '@/components/resume/ATSSimulator';
+import ShareModal from '@/components/resume/ShareModal';
 import {
   ArrowLeft,
   Download,
@@ -18,6 +19,7 @@ import {
   Sparkles,
   FileText,
   Briefcase,
+  Share2,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { ResumeVersion } from '@/types';
@@ -33,6 +35,7 @@ export default function VersionDetailPage() {
   const [version, setVersion] = useState<ResumeVersion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     loadVersion();
@@ -80,6 +83,16 @@ export default function VersionDetailPage() {
           companyName={version.companyName}
         />
 
+        {/* Share Modal */}
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          resumeId={resumeId}
+          versionId={versionId}
+          jobTitle={version.jobTitle}
+          companyName={version.companyName}
+        />
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -97,14 +110,24 @@ export default function VersionDetailPage() {
               </p>
             </div>
           </div>
-          <Button
-            variant="gradient"
-            size="lg"
-            onClick={() => setShowDownloadModal(true)}
-            leftIcon={<Download className="h-5 w-5" />}
-          >
-            Download Resume
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setShowShareModal(true)}
+              leftIcon={<Share2 className="h-5 w-5" />}
+            >
+              Share
+            </Button>
+            <Button
+              variant="gradient"
+              size="lg"
+              onClick={() => setShowDownloadModal(true)}
+              leftIcon={<Download className="h-5 w-5" />}
+            >
+              Download Resume
+            </Button>
+          </div>
         </div>
 
         {/* ATS Simulator */}
