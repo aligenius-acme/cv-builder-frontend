@@ -126,6 +126,112 @@ class ApiClient {
     this.setToken(null);
   }
 
+  // OAuth endpoints
+  async getOAuthProviders() {
+    const response = await this.client.get<ApiResponse<{
+      providers: { google: boolean; github: boolean };
+      urls: { google?: string; github?: string };
+    }>>('/oauth/providers');
+    return response.data;
+  }
+
+  async googleOAuthCallback(code: string) {
+    const response = await this.client.post<ApiResponse<{
+      user: User;
+      token: string;
+      isNewUser: boolean;
+    }>>('/oauth/google/callback', { code });
+    if (response.data.data?.token) {
+      this.setToken(response.data.data.token);
+    }
+    return response.data;
+  }
+
+  async githubOAuthCallback(code: string) {
+    const response = await this.client.post<ApiResponse<{
+      user: User;
+      token: string;
+      isNewUser: boolean;
+    }>>('/oauth/github/callback', { code });
+    if (response.data.data?.token) {
+      this.setToken(response.data.data.token);
+    }
+    return response.data;
+  }
+
+  // Grammar Check endpoints (LanguageTool - FREE)
+  async checkGrammar(text: string, language: string = 'en-US') {
+    const response = await this.client.post<ApiResponse<{
+      suggestions: Array<{
+        type: string;
+        message: string;
+        shortMessage: string;
+        offset: number;
+        length: number;
+        originalText: string;
+        suggestions: string[];
+        category: string;
+        ruleId: string;
+        sentence: string;
+      }>;
+      stats: {
+        total: number;
+        byType: Record<string, number>;
+        criticalCount: number;
+      };
+      textLength: number;
+    }>>('/grammar/check', { text, language });
+    return response.data;
+  }
+
+  async checkResumeGrammar(sections: Array<{ name: string; text: string }>, language: string = 'en-US') {
+    const response = await this.client.post<ApiResponse<{
+      sections: Array<{
+        section: string;
+        suggestions: Array<{
+          type: string;
+          message: string;
+          offset: number;
+          length: number;
+          suggestions: string[];
+        }>;
+      }>;
+      overallStats: {
+        total: number;
+        byType: Record<string, number>;
+        criticalCount: number;
+      };
+      totalLength: number;
+    }>>('/grammar/check-resume', { sections, language });
+    return response.data;
+  }
+
+  async getGrammarLanguages() {
+    const response = await this.client.get<ApiResponse<{
+      languages: Array<{ name: string; code: string; longCode: string }>;
+    }>>('/grammar/languages');
+    return response.data;
+  }
+
+  // Company Logo endpoints (Clearbit + UI Avatars - FREE)
+  async getCompanyLogo(company: string, size: number = 128) {
+    const response = await this.client.get<ApiResponse<{
+      logoUrl: string;
+      source: string;
+      domain?: string;
+    }>>(`/company-logos/${encodeURIComponent(company)}`, { params: { size } });
+    return response.data;
+  }
+
+  async getCompanyLogos(companies: string[], size: number = 64) {
+    const response = await this.client.post<ApiResponse<Record<string, {
+      logoUrl: string;
+      source: string;
+      domain?: string;
+    }>>>('/company-logos/batch', { companies }, { params: { size } });
+    return response.data;
+  }
+
   // Resume endpoints
   async uploadResume(file: File) {
     const formData = new FormData();

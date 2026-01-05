@@ -492,6 +492,70 @@ export default function JobBoardPage() {
   );
 }
 
+// Get company logo URL using Clearbit (free) with UI Avatars fallback
+function getCompanyLogoUrl(company: string, size: number = 64): string {
+  // Common company domain mappings
+  const domains: Record<string, string> = {
+    'google': 'google.com', 'microsoft': 'microsoft.com', 'apple': 'apple.com',
+    'amazon': 'amazon.com', 'meta': 'meta.com', 'netflix': 'netflix.com',
+    'salesforce': 'salesforce.com', 'oracle': 'oracle.com', 'ibm': 'ibm.com',
+    'adobe': 'adobe.com', 'spotify': 'spotify.com', 'uber': 'uber.com',
+    'stripe': 'stripe.com', 'shopify': 'shopify.com', 'slack': 'slack.com',
+    'github': 'github.com', 'atlassian': 'atlassian.com', 'figma': 'figma.com',
+  };
+
+  const normalized = company.toLowerCase().trim();
+  let domain = domains[normalized];
+
+  // Try partial match
+  if (!domain) {
+    for (const [key, val] of Object.entries(domains)) {
+      if (normalized.includes(key)) { domain = val; break; }
+    }
+  }
+
+  // Try to generate domain from company name
+  if (!domain) {
+    const cleaned = normalized.replace(/\s+(inc\.?|llc\.?|ltd\.?|corp\.?)$/i, '').replace(/[^a-z0-9]/g, '');
+    if (cleaned.length > 2) domain = `${cleaned}.com`;
+  }
+
+  if (domain) {
+    return `https://logo.clearbit.com/${domain}?size=${size}`;
+  }
+
+  // Fallback to UI Avatars
+  const initials = company.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  return `https://ui-avatars.com/api/?name=${initials}&size=${size}&background=6366f1&color=ffffff&bold=true`;
+}
+
+// Company Logo component with fallback
+function CompanyLogo({ company, size = 40 }: { company: string; size?: number }) {
+  const [imgError, setImgError] = useState(false);
+  const initials = company.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+
+  if (imgError) {
+    return (
+      <div
+        className="rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold flex-shrink-0"
+        style={{ width: size, height: size, fontSize: size * 0.35 }}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={getCompanyLogoUrl(company, size)}
+      alt={company}
+      className="rounded-lg object-contain flex-shrink-0 bg-white"
+      style={{ width: size, height: size }}
+      onError={() => setImgError(true)}
+    />
+  );
+}
+
 // Job Card Component
 function JobCard({
   job,
@@ -514,7 +578,8 @@ function JobCard({
       onClick={onSelect}
     >
       <CardContent className="p-4">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <CompanyLogo company={job.company} size={44} />
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-slate-900 truncate">{job.title}</h3>
             <p className="text-sm text-slate-600">{job.company}</p>
