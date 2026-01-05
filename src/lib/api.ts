@@ -1059,6 +1059,95 @@ class ApiClient {
     const response = await this.client.get<ApiResponse<ABTestAnalytics>>(`/ab-tests/${id}/analytics`);
     return response.data;
   }
+
+  // AI Features - Differentiation Tools
+
+  // Job Match Score - Calculate compatibility before applying
+  async calculateJobMatch(data: {
+    resumeId: string;
+    jobDescription: string;
+    jobTitle: string;
+  }) {
+    const response = await this.client.post<ApiResponse<JobMatchResult>>('/ai-features/job-match', data);
+    return response.data;
+  }
+
+  // Quick job match from tracked job
+  async quickJobMatch(jobId: string, resumeId?: string) {
+    const response = await this.client.get<ApiResponse<JobMatchResult & {
+      jobId: string;
+      jobTitle: string;
+      company: string;
+      resumeId: string;
+      resumeName: string;
+    }>>(`/ai-features/job-match/${jobId}`, {
+      params: resumeId ? { resumeId } : undefined,
+    });
+    return response.data;
+  }
+
+  // Achievement Quantifier - Convert vague bullets to metrics
+  async quantifyAchievements(data: {
+    bullets: string[];
+    jobContext?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<AchievementQuantifierResult>>(
+      '/ai-features/quantify-achievements',
+      data
+    );
+    return response.data;
+  }
+
+  // Weakness Detector - Find red flags in resume
+  async detectWeaknesses(data: {
+    resumeId: string;
+    targetRole?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<WeaknessDetectorResult>>(
+      '/ai-features/weakness-detector',
+      data
+    );
+    return response.data;
+  }
+
+  // Follow-up Email Generator
+  async generateFollowUpEmail(data: {
+    type: FollowUpType;
+    recipientName?: string;
+    recipientTitle?: string;
+    companyName: string;
+    jobTitle: string;
+    interviewDate?: string;
+    interviewDetails?: string;
+    candidateName: string;
+    keyPoints?: string[];
+  }) {
+    const response = await this.client.post<ApiResponse<FollowUpEmailResult>>(
+      '/ai-features/follow-up-email',
+      data
+    );
+    return response.data;
+  }
+
+  // Networking Message Generator
+  async generateNetworkingMessage(data: {
+    platform: NetworkingPlatform;
+    purpose: NetworkingPurpose;
+    senderName: string;
+    senderBackground: string;
+    recipientName: string;
+    recipientTitle: string;
+    recipientCompany: string;
+    commonGround?: string[];
+    targetRole?: string;
+    specificAsk?: string;
+  }) {
+    const response = await this.client.post<ApiResponse<NetworkingMessageResult>>(
+      '/ai-features/networking-message',
+      data
+    );
+    return response.data;
+  }
 }
 
 // Types for Job Tracker
@@ -1279,6 +1368,74 @@ export interface ABTestAnalytics {
   };
   totalSamples: number;
 }
+
+// Types for AI Features
+export interface JobMatchResult {
+  overallScore: number;
+  breakdown: {
+    skillsMatch: number;
+    experienceMatch: number;
+    educationMatch: number;
+    keywordsMatch: number;
+  };
+  strengths: string[];
+  gaps: string[];
+  verdict: 'Strong Match' | 'Good Match' | 'Moderate Match' | 'Weak Match';
+  recommendation: string;
+  timeToApply: string;
+}
+
+export interface QuantifiedAchievement {
+  original: string;
+  quantified: string;
+  addedMetrics: string[];
+  impactLevel: 'High' | 'Medium' | 'Low';
+  suggestions: string[];
+}
+
+export interface AchievementQuantifierResult {
+  achievements: QuantifiedAchievement[];
+  overallImprovement: string;
+  tips: string[];
+}
+
+export interface ResumeWeakness {
+  issue: string;
+  location: string;
+  severity: 'Critical' | 'Major' | 'Minor';
+  impact: string;
+  fix: string;
+  example?: string;
+}
+
+export interface WeaknessDetectorResult {
+  weaknesses: ResumeWeakness[];
+  overallHealth: 'Excellent' | 'Good' | 'Needs Work' | 'Critical Issues';
+  healthScore: number;
+  prioritizedActions: string[];
+  positives: string[];
+}
+
+export interface FollowUpEmailResult {
+  subject: string;
+  body: string;
+  timing: string;
+  tips: string[];
+  alternativeSubjects: string[];
+}
+
+export interface NetworkingMessageResult {
+  message: string;
+  platform: string;
+  approach: string;
+  followUpMessage?: string;
+  tips: string[];
+  personalizationPoints: string[];
+}
+
+export type FollowUpType = 'thank_you' | 'post_interview' | 'no_response' | 'after_rejection' | 'networking';
+export type NetworkingPlatform = 'linkedin' | 'email' | 'twitter';
+export type NetworkingPurpose = 'job_inquiry' | 'informational_interview' | 'referral_request' | 'reconnection' | 'cold_outreach';
 
 export const api = new ApiClient();
 export default api;

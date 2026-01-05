@@ -25,6 +25,7 @@ import {
   FlaskConical,
   GraduationCap,
   BookOpen,
+  Wand2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -39,10 +40,10 @@ export default function Navbar() {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Resumes', href: '/resumes', icon: FileText },
     { name: 'Builder', href: '/resume-builder', icon: PenTool },
+    { name: 'AI Tools', href: '/ai-tools', icon: Wand2 },
     { name: 'Tracker', href: '/job-tracker', icon: Kanban },
     { name: 'A/B Test', href: '/ab-testing', icon: FlaskConical },
     { name: 'Skills', href: '/skill-gap', icon: GraduationCap },
-    { name: 'Examples', href: '/resume-examples', icon: BookOpen },
     { name: 'Jobs', href: '/jobs', icon: Search },
   ];
 
