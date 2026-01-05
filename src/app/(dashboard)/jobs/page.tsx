@@ -296,7 +296,10 @@ export default function JobBoardPage() {
               </div>
             ) : jobs.length > 0 ? (
               <div className="space-y-4">
-                <p className="text-sm text-slate-500">{jobs.length} jobs found</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500">{jobs.length} jobs found</p>
+                  <p className="text-xs text-slate-400">Powered by Adzuna</p>
+                </div>
                 {jobs.map((job) => (
                   <JobCard
                     key={job.id}
@@ -525,11 +528,14 @@ function JobCard({
                 {job.posted}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
               {job.salary && (
                 <Badge variant="success" size="sm">{job.salary}</Badge>
               )}
               <Badge variant="default" size="sm">{job.type}</Badge>
+              {job.source && (
+                <Badge variant="info" size="sm" className="opacity-70">{job.source}</Badge>
+              )}
             </div>
           </div>
           <button
