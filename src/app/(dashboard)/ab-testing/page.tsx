@@ -27,13 +27,10 @@ import {
 import api, { ABTest, ABTestVariant, ABTestAnalytics } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/lib/utils';
-
-const statusConfig: Record<string, { color: string; label: string }> = {
-  DRAFT: { color: 'bg-slate-100 text-slate-700', label: 'Draft' },
-  RUNNING: { color: 'bg-green-100 text-green-700', label: 'Running' },
-  PAUSED: { color: 'bg-amber-100 text-amber-700', label: 'Paused' },
-  COMPLETED: { color: 'bg-blue-100 text-blue-700', label: 'Completed' },
-};
+import PageHeader from '@/components/shared/PageHeader';
+import EmptyState from '@/components/shared/EmptyState';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { AB_TEST_STATUS_CONFIG } from '@/lib/colors';
 
 export default function ABTestingPage() {
   const [tests, setTests] = useState<ABTest[]>([]);
@@ -182,34 +179,23 @@ export default function ABTestingPage() {
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <FlaskConical className="h-5 w-5" />
-                <span className="text-white/80 text-sm font-medium">Resume Optimization</span>
-              </div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                A/B Testing
-              </h1>
-              <p className="text-white/80 text-lg max-w-2xl">
-                Test different resume versions to see which performs better. Track views, downloads,
-                and response rates to optimize your job applications.
-              </p>
-            </div>
+        <PageHeader
+          icon={<FlaskConical className="h-5 w-5" />}
+          label="Resume Optimization"
+          title="A/B Testing"
+          description="Test different resume versions to see which performs better. Track views, downloads, and response rates to optimize your job applications."
+          gradient="cyan"
+          actions={
             <Button
               variant="secondary"
               size="lg"
               leftIcon={<Plus className="h-5 w-5" />}
               onClick={() => setShowCreateModal(true)}
-              className="mt-4 lg:mt-0"
             >
               Create Test
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tests List */}
@@ -249,8 +235,8 @@ export default function ABTestingPage() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-slate-900 line-clamp-1">{test.name}</h3>
-                        <Badge className={statusConfig[test.status].color}>
-                          {statusConfig[test.status].label}
+                        <Badge className={AB_TEST_STATUS_CONFIG[test.status as keyof typeof AB_TEST_STATUS_CONFIG]?.color}>
+                          {AB_TEST_STATUS_CONFIG[test.status as keyof typeof AB_TEST_STATUS_CONFIG]?.label}
                         </Badge>
                       </div>
                       {test.targetJobTitle && (
