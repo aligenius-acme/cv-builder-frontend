@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   MapPin,
@@ -24,6 +25,11 @@ import {
   CheckCircle2,
   Star,
   ArrowRight,
+  Heart,
+  Trash2,
+  Calendar,
+  Target,
+  ListChecks,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -50,7 +56,16 @@ interface JobListing {
   logo?: string;
 }
 
+interface SavedJobListing extends JobListing {
+  savedJobId: string;
+  savedAt: string;
+  notes?: string;
+}
+
+type TabType = 'search' | 'saved';
+
 export default function JobBoardPage() {
+  const [activeTab, setActiveTab] = useState<TabType>('search');
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
@@ -65,11 +80,29 @@ export default function JobBoardPage() {
   const [jobDetails, setJobDetails] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [recommendedJobs, setRecommendedJobs] = useState<JobListing[]>([]);
-  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
+
+  // Saved jobs state
+  const [savedJobsList, setSavedJobsList] = useState<SavedJobListing[]>([]);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+  const [savedJobsCount, setSavedJobsCount] = useState(0);
+
+  // Tracked jobs state (jobs already in Job Tracker)
+  const [trackedJobUrls, setTrackedJobUrls] = useState<Set<string>>(new Set());
+
+  const router = useRouter();
 
   useEffect(() => {
     loadRecommendedJobs();
+    loadSavedJobs();
+    loadTrackedJobs();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'saved') {
+      loadSavedJobs();
+    }
+  }, [activeTab]);
 
   const loadRecommendedJobs = async () => {
     try {
@@ -79,6 +112,88 @@ export default function JobBoardPage() {
       }
     } catch (error) {
       // Silent fail
+    }
+  };
+
+  const loadSavedJobs = async () => {
+    setIsLoadingSaved(true);
+    try {
+      const response = await api.getSavedJobs();
+      if (response.success && response.data) {
+        const jobs = response.data.jobs.map((job) => ({
+          ...job,
+          posted: job.postedAt || '',
+        }));
+        setSavedJobsList(jobs);
+        setSavedJobsCount(response.data.total);
+        // Update the saved job IDs set
+        setSavedJobIds(new Set(jobs.map((j) => j.id)));
+      }
+    } catch (error) {
+      // Silent fail
+    } finally {
+      setIsLoadingSaved(false);
+    }
+  };
+
+  const loadTrackedJobs = async () => {
+    try {
+      const response = await api.getJobApplications();
+      if (response.success && response.data) {
+        // Track by job URL to identify duplicates
+        const urls = new Set(
+          response.data.applications
+            .filter((app) => app.jobUrl)
+            .map((app) => app.jobUrl as string)
+        );
+        setTrackedJobUrls(urls);
+      }
+    } catch (error) {
+      // Silent fail
+    }
+  };
+
+  const handleAddToTracker = async (job: JobListing, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+
+    // Check if already tracked
+    if (job.url && trackedJobUrls.has(job.url)) {
+      toast('This job is already in your tracker', { icon: '📋' });
+      return;
+    }
+
+    try {
+      const response = await api.createJobApplication({
+        jobTitle: job.title,
+        companyName: job.company,
+        location: job.location,
+        salary: job.salary,
+        jobUrl: job.url,
+        jobDescription: job.description,
+        status: 'WISHLIST',
+        source: job.source || 'Job Board',
+      });
+
+      if (response.success) {
+        // Update tracked URLs
+        if (job.url) {
+          setTrackedJobUrls((prev) => new Set(prev).add(job.url));
+        }
+        toast.success(
+          <div className="flex flex-col">
+            <span className="font-medium">Added to Job Tracker!</span>
+            <button
+              onClick={() => router.push('/job-tracker')}
+              className="text-sm text-indigo-600 hover:text-indigo-700 text-left mt-1"
+            >
+              View in Tracker →
+            </button>
+          </div>,
+          { duration: 4000 }
+        );
+      }
+    } catch (error) {
+      toast.error('Failed to add to tracker');
     }
   };
 
@@ -131,12 +246,68 @@ export default function JobBoardPage() {
 
   const handleSaveJob = async (job: JobListing, e?: React.MouseEvent) => {
     e?.stopPropagation();
+
+    const isCurrentlySaved = savedJobIds.has(job.id);
+
+    if (isCurrentlySaved) {
+      // Unsave
+      try {
+        await api.deleteSavedJob(job.id);
+        setSavedJobIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(job.id);
+          return newSet;
+        });
+        setSavedJobsList(prev => prev.filter(j => j.id !== job.id));
+        setSavedJobsCount(prev => Math.max(0, prev - 1));
+        toast.success('Job removed from saved list');
+      } catch (error) {
+        toast.error('Failed to remove job');
+      }
+    } else {
+      // Save
+      try {
+        await api.saveJob(job.id, {
+          title: job.title,
+          company: job.company,
+          location: job.location,
+          salary: job.salary,
+          type: job.type,
+          description: job.description,
+          url: job.url,
+          postedAt: job.posted,
+          source: job.source,
+          logoUrl: job.logo,
+        });
+        setSavedJobIds(prev => new Set(prev).add(job.id));
+        setSavedJobsCount(prev => prev + 1);
+        toast.success('Job saved to your list!');
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          // Already saved
+          setSavedJobIds(prev => new Set(prev).add(job.id));
+          toast('Job already saved', { icon: '📌' });
+        } else {
+          toast.error('Failed to save job');
+        }
+      }
+    }
+  };
+
+  const handleUnsaveJob = async (jobId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     try {
-      await api.saveJob(job.id, job);
-      setSavedJobs(prev => new Set(prev).add(job.id));
-      toast.success('Job saved to your list!');
+      await api.deleteSavedJob(jobId);
+      setSavedJobIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(jobId);
+        return newSet;
+      });
+      setSavedJobsList(prev => prev.filter(j => j.id !== jobId));
+      setSavedJobsCount(prev => Math.max(0, prev - 1));
+      toast.success('Job removed from saved list');
     } catch (error) {
-      toast.error('Failed to save job');
+      toast.error('Failed to remove job');
     }
   };
 
@@ -160,8 +331,48 @@ export default function JobBoardPage() {
           gradient="slate"
         />
 
-        {/* Search Section */}
-        <Card variant="elevated">
+        {/* Tabs */}
+        <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-xl shadow-sm w-fit">
+          <button
+            onClick={() => setActiveTab('search')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
+              activeTab === 'search'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            )}
+          >
+            <Search className="h-4 w-4" />
+            Search Jobs
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
+              activeTab === 'saved'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            )}
+          >
+            <Heart className="h-4 w-4" />
+            Saved Jobs
+            {savedJobsCount > 0 && (
+              <Badge
+                variant={activeTab === 'saved' ? 'default' : 'gradient'}
+                size="sm"
+                className={cn(activeTab === 'saved' && 'bg-white/20 text-white')}
+              >
+                {savedJobsCount}
+              </Badge>
+            )}
+          </button>
+        </div>
+
+        {/* Search Tab Content */}
+        {activeTab === 'search' && (
+          <>
+            {/* Search Section */}
+            <Card variant="elevated">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4">
               {/* Main Search Row */}
@@ -308,7 +519,7 @@ export default function JobBoardPage() {
                         key={job.id}
                         job={job}
                         isSelected={selectedJob?.id === job.id}
-                        isSaved={savedJobs.has(job.id)}
+                        isSaved={savedJobIds.has(job.id)}
                         onSelect={() => handleSelectJob(job)}
                         onSave={(e) => handleSaveJob(job, e)}
                         index={index}
@@ -344,7 +555,7 @@ export default function JobBoardPage() {
                       key={job.id}
                       job={job}
                       isSelected={selectedJob?.id === job.id}
-                      isSaved={savedJobs.has(job.id)}
+                      isSaved={savedJobIds.has(job.id)}
                       onSelect={() => handleSelectJob(job)}
                       onSave={(e) => handleSaveJob(job, e)}
                       index={index}
@@ -374,9 +585,11 @@ export default function JobBoardPage() {
                 job={selectedJob}
                 details={jobDetails}
                 isLoading={isLoadingDetails}
-                isSaved={savedJobs.has(selectedJob.id)}
+                isSaved={savedJobIds.has(selectedJob.id)}
+                isTracked={selectedJob.url ? trackedJobUrls.has(selectedJob.url) : false}
                 onBack={() => setSelectedJob(null)}
                 onSave={() => handleSaveJob(selectedJob)}
+                onAddToTracker={() => handleAddToTracker(selectedJob)}
               />
             ) : (
               <Card variant="elevated" className="h-full min-h-[500px]">
@@ -397,8 +610,195 @@ export default function JobBoardPage() {
             )}
           </div>
         </div>
+          </>
+        )}
+
+        {/* Saved Jobs Tab Content */}
+        {activeTab === 'saved' && (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Saved Jobs List - 2 columns */}
+            <div className={cn('lg:col-span-2 space-y-4', selectedJob && 'hidden lg:block')}>
+              {isLoadingSaved ? (
+                <LoadingSpinner text="Loading saved jobs..." />
+              ) : savedJobsList.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                      <div className="p-1.5 bg-gradient-to-br from-pink-100 to-rose-100 rounded-lg">
+                        <Heart className="h-4 w-4 text-pink-600" />
+                      </div>
+                      Your Saved Jobs
+                    </h2>
+                    <Badge variant="gradient" size="sm">{savedJobsCount} saved</Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {savedJobsList.map((job, index) => (
+                      <SavedJobCard
+                        key={job.id}
+                        job={job}
+                        isSelected={selectedJob?.id === job.id}
+                        onSelect={() => handleSelectJob(job)}
+                        onRemove={(e) => handleUnsaveJob(job.id, e)}
+                        onAddToTracker={(e) => handleAddToTracker(job, e)}
+                        isTracked={job.url ? trackedJobUrls.has(job.url) : false}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<Heart className="h-10 w-10 text-slate-400" />}
+                  title="No Saved Jobs"
+                  description="Save jobs you're interested in to review and apply later. Click the bookmark icon on any job to save it."
+                  gradient="violet"
+                  action={
+                    <Button variant="gradient" onClick={() => setActiveTab('search')}>
+                      Browse Jobs
+                    </Button>
+                  }
+                />
+              )}
+            </div>
+
+            {/* Job Details - 3 columns */}
+            <div className={cn('lg:col-span-3', !selectedJob && 'hidden lg:block')}>
+              {selectedJob ? (
+                <JobDetailsPanel
+                  job={selectedJob}
+                  details={jobDetails}
+                  isLoading={isLoadingDetails}
+                  isSaved={savedJobIds.has(selectedJob.id)}
+                  isTracked={selectedJob.url ? trackedJobUrls.has(selectedJob.url) : false}
+                  onBack={() => setSelectedJob(null)}
+                  onSave={() => handleSaveJob(selectedJob)}
+                  onAddToTracker={() => handleAddToTracker(selectedJob)}
+                />
+              ) : (
+                <Card variant="elevated" className="h-full min-h-[500px]">
+                  <CardContent className="h-full flex flex-col items-center justify-center text-center p-12">
+                    <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-rose-100 rounded-3xl flex items-center justify-center mb-6">
+                      <Heart className="h-12 w-12 text-pink-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Select a Saved Job</h3>
+                    <p className="text-slate-500 max-w-sm mb-6">
+                      Click on any saved job to view details, tailor your resume, or apply directly.
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <Calendar className="h-4 w-4" />
+                      <span>Track jobs you're interested in applying to</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+// Saved Job Card Component
+function SavedJobCard({
+  job,
+  isSelected,
+  onSelect,
+  onRemove,
+  onAddToTracker,
+  isTracked,
+  index,
+}: {
+  job: SavedJobListing;
+  isSelected: boolean;
+  onSelect: () => void;
+  onRemove: (e: React.MouseEvent) => void;
+  onAddToTracker: (e: React.MouseEvent) => void;
+  isTracked: boolean;
+  index: number;
+}) {
+  const savedDate = new Date(job.savedAt);
+  const formattedDate = savedDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+
+  return (
+    <Card
+      variant="elevated"
+      hover
+      className={cn(
+        'cursor-pointer transition-all duration-200 group',
+        isSelected && 'ring-2 ring-pink-500 shadow-lg shadow-pink-500/10'
+      )}
+      onClick={onSelect}
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <CompanyLogo company={job.company} size={52} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h3 className="font-semibold text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-1">
+                  {job.title}
+                </h3>
+                <p className="text-sm text-slate-600 flex items-center gap-1 mt-0.5">
+                  <Building2 className="h-3.5 w-3.5" />
+                  {job.company}
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                {isTracked ? (
+                  <Link href="/job-tracker">
+                    <Badge variant="info" size="sm" className="cursor-pointer hover:bg-indigo-200">
+                      <ListChecks className="h-3 w-3 mr-1" />
+                      In Tracker
+                    </Badge>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={onAddToTracker}
+                    className="p-2 rounded-lg transition-all flex-shrink-0 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600"
+                    title="Add to Job Tracker"
+                  >
+                    <Target className="h-4 w-4" />
+                  </button>
+                )}
+                <button
+                  onClick={onRemove}
+                  className="p-2 rounded-lg transition-all flex-shrink-0 hover:bg-red-50 text-slate-400 hover:text-red-500"
+                  title="Remove from saved"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 mt-2 text-sm text-slate-500">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                <span className="truncate max-w-[120px]">{job.location}</span>
+              </span>
+              <span className="flex items-center gap-1 text-pink-600">
+                <Calendar className="h-3.5 w-3.5" />
+                Saved {formattedDate}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {job.salary && (
+                <Badge variant="success" size="sm" className="font-medium">
+                  <DollarSign className="h-3 w-3 mr-0.5" />
+                  {job.salary}
+                </Badge>
+              )}
+              <Badge variant="default" size="sm">{job.type || 'Full-time'}</Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -543,15 +943,19 @@ function JobDetailsPanel({
   details,
   isLoading,
   isSaved,
+  isTracked,
   onBack,
   onSave,
+  onAddToTracker,
 }: {
   job: JobListing;
   details: any;
   isLoading: boolean;
   isSaved: boolean;
+  isTracked: boolean;
   onBack: () => void;
   onSave: () => void;
+  onAddToTracker: () => void;
 }) {
   return (
     <Card variant="elevated" className="sticky top-6">
@@ -597,8 +1001,19 @@ function JobDetailsPanel({
             </div>
           </div>
 
+          {/* Tracker Status */}
+          {isTracked && (
+            <Link href="/job-tracker" className="block mt-4">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 rounded-xl text-emerald-700 hover:bg-emerald-100 transition-colors">
+                <ListChecks className="h-4 w-4" />
+                <span className="text-sm font-medium">This job is in your tracker</span>
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </div>
+            </Link>
+          )}
+
           {/* Action Buttons */}
-          <div className="flex gap-3 mt-6">
+          <div className="flex flex-wrap gap-3 mt-6">
             <Button
               variant="gradient"
               size="lg"
@@ -617,6 +1032,17 @@ function JobDetailsPanel({
                 Tailor Resume
               </Button>
             </Link>
+            {!isTracked && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={onAddToTracker}
+                leftIcon={<Target className="h-4 w-4" />}
+                className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+              >
+                Add to Tracker
+              </Button>
+            )}
             <Button
               variant={isSaved ? 'primary' : 'outline'}
               size="lg"

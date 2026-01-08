@@ -18,10 +18,28 @@ import {
   BarChart3,
   Target,
   Loader2,
+  Zap,
+  TrendingUp,
+  Shield,
+  Award,
+  ArrowRight,
+  Sparkles,
+  RefreshCw,
+  AlertCircle,
+  ThumbsUp,
+  ThumbsDown,
+  Rocket,
+  Star,
+  CheckCheck,
+  Terminal,
+  Code,
+  Monitor,
+  ScanLine,
 } from 'lucide-react';
 import { ATSAnalysis } from '@/types';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 
 interface ATSSimulatorProps {
   resumeId: string;
@@ -39,7 +57,7 @@ export default function ATSSimulator({
   const [analysis, setAnalysis] = useState<ATSAnalysis | null>(initialAnalysis || null);
   const [isLoading, setIsLoading] = useState(false);
   const [showExtractedView, setShowExtractedView] = useState(false);
-  const [showRecommendations, setShowRecommendations] = useState(true);
+  const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
   const runSimulation = async () => {
     setIsLoading(true);
@@ -56,124 +74,226 @@ export default function ATSSimulator({
     }
   };
 
-  const getSectionScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-600 bg-emerald-100';
-    if (score >= 60) return 'text-amber-600 bg-amber-100';
-    return 'text-red-600 bg-red-100';
+  const getScoreGrade = (score: number) => {
+    if (score >= 90) return { grade: 'A+', label: 'Excellent', color: 'emerald' };
+    if (score >= 80) return { grade: 'A', label: 'Great', color: 'emerald' };
+    if (score >= 70) return { grade: 'B', label: 'Good', color: 'blue' };
+    if (score >= 60) return { grade: 'C', label: 'Fair', color: 'amber' };
+    if (score >= 50) return { grade: 'D', label: 'Needs Work', color: 'orange' };
+    return { grade: 'F', label: 'Poor', color: 'red' };
   };
 
-  const getSectionScoreBar = (score: number) => {
-    if (score >= 80) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-amber-500';
-    return 'bg-red-500';
+  const getPassStatus = (score: number) => {
+    if (score >= 75) return { status: 'LIKELY TO PASS', icon: Shield, color: 'emerald', bg: 'from-emerald-500 to-green-600' };
+    if (score >= 60) return { status: 'BORDERLINE', icon: AlertCircle, color: 'amber', bg: 'from-amber-500 to-orange-500' };
+    return { status: 'AT RISK', icon: XCircle, color: 'red', bg: 'from-red-500 to-rose-600' };
   };
 
   if (!analysis) {
     return (
-      <Card variant="elevated">
-        <CardContent className="py-12">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <Cpu className="h-10 w-10 text-cyan-600" />
+      <Card variant="elevated" className="overflow-hidden">
+        <div className="relative">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-indigo-500/5" />
+          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+
+          <CardContent className="relative py-16">
+            <div className="text-center max-w-lg mx-auto">
+              <div className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-cyan-500/30 animate-pulse">
+                <Cpu className="h-12 w-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-3">ATS Compatibility Scanner</h3>
+              <p className="text-slate-500 mb-8 text-lg">
+                Discover how Applicant Tracking Systems will read, parse, and score your resume. Get actionable insights to improve your chances.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-4 mb-8">
+                <div className="flex items-center gap-2 text-sm text-slate-600 bg-white px-4 py-2 rounded-full shadow-sm">
+                  <Target className="h-4 w-4 text-indigo-500" />
+                  Keyword Analysis
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600 bg-white px-4 py-2 rounded-full shadow-sm">
+                  <BarChart3 className="h-4 w-4 text-indigo-500" />
+                  Section Scoring
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600 bg-white px-4 py-2 rounded-full shadow-sm">
+                  <Eye className="h-4 w-4 text-indigo-500" />
+                  ATS Preview
+                </div>
+              </div>
+
+              <Button
+                variant="gradient"
+                size="lg"
+                onClick={runSimulation}
+                isLoading={isLoading}
+                leftIcon={<Zap className="h-5 w-5" />}
+                className="px-8 py-4 text-lg shadow-xl shadow-indigo-500/30"
+              >
+                {isLoading ? 'Scanning...' : 'Run ATS Scan'}
+              </Button>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">ATS Simulator</h3>
-            <p className="text-slate-500 mb-6 max-w-sm mx-auto">
-              See exactly how ATS systems will read and score your resume. Identify formatting issues and risky elements.
-            </p>
-            <Button
-              variant="gradient"
-              size="lg"
-              onClick={runSimulation}
-              isLoading={isLoading}
-              leftIcon={<Eye className="h-5 w-5" />}
-            >
-              Run ATS Simulation
-            </Button>
-          </div>
-        </CardContent>
+          </CardContent>
+        </div>
       </Card>
     );
   }
 
+  const scoreGrade = getScoreGrade(analysis.score);
+  const passStatus = getPassStatus(analysis.score);
+  const PassIcon = passStatus.icon;
+
   return (
     <div className="space-y-6">
-      {/* Header with Rescan Button */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-          <Cpu className="h-5 w-5 text-cyan-600" />
-          ATS Simulation Results
-        </h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={runSimulation}
-          isLoading={isLoading}
-          leftIcon={<Loader2 className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />}
-        >
-          Rescan
-        </Button>
-      </div>
+      {/* Hero Score Section */}
+      <Card variant="elevated" className="overflow-hidden">
+        <div className={cn(
+          "relative bg-gradient-to-br p-8",
+          analysis.score >= 75 ? "from-emerald-600 via-teal-600 to-cyan-600" :
+          analysis.score >= 60 ? "from-amber-500 via-orange-500 to-yellow-500" :
+          "from-red-500 via-rose-500 to-pink-500"
+        )}>
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
 
-      {/* Overall Score & Keyword Match */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card variant="elevated">
-          <CardContent className="py-6">
-            <div className="flex items-center gap-6">
-              <ATSScoreCircle score={analysis.score} size="lg" />
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-1">Overall ATS Score</h3>
-                <p className="text-sm text-slate-500">
+          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Score Display */}
+            <div className="flex items-center gap-8">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center shadow-2xl">
+                    <div className="text-center">
+                      <span className={cn(
+                        "text-5xl font-black",
+                        analysis.score >= 75 ? "text-emerald-600" :
+                        analysis.score >= 60 ? "text-amber-600" :
+                        "text-red-600"
+                      )}>
+                        {analysis.score}
+                      </span>
+                      <span className="text-slate-400 text-lg">/100</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Grade Badge */}
+                <div className={cn(
+                  "absolute -bottom-2 -right-2 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-lg",
+                  analysis.score >= 75 ? "bg-emerald-500 text-white" :
+                  analysis.score >= 60 ? "bg-amber-500 text-white" :
+                  "bg-red-500 text-white"
+                )}>
+                  {scoreGrade.grade}
+                </div>
+              </div>
+
+              <div className="text-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <PassIcon className="h-5 w-5" />
+                  <span className="text-sm font-semibold tracking-wider opacity-90">{passStatus.status}</span>
+                </div>
+                <h2 className="text-3xl font-bold mb-1">ATS Score: {scoreGrade.label}</h2>
+                <p className="text-white/80 max-w-md">
                   {analysis.score >= 80
-                    ? 'Excellent! Your resume should pass most ATS filters.'
+                    ? 'Your resume is well-optimized for ATS systems. Great job!'
                     : analysis.score >= 60
-                    ? 'Good. Consider improvements for better ATS compatibility.'
-                    : 'Needs work. Significant improvements recommended.'}
+                    ? 'Your resume may pass some ATS filters but needs improvement.'
+                    : 'Your resume needs significant improvements to pass ATS filters.'}
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card variant="elevated">
-          <CardContent className="py-6">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center">
-                <Target className="h-10 w-10 text-indigo-600" />
+            {/* Quick Stats */}
+            <div className="flex gap-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 text-center min-w-[120px]">
+                <Target className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-3xl font-bold text-white">{analysis.keywordMatchPercentage}%</div>
+                <div className="text-xs text-white/70 mt-1">Keyword Match</div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-1">Keyword Match</h3>
-                <p className="text-3xl font-bold text-indigo-600">{analysis.keywordMatchPercentage}%</p>
-                <p className="text-sm text-slate-500">
-                  {analysis.matchedKeywords.length} of {analysis.matchedKeywords.length + analysis.missingKeywords.length} keywords matched
-                </p>
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 text-center min-w-[120px]">
+                <CheckCircle className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-3xl font-bold text-white">{analysis.matchedKeywords.length}</div>
+                <div className="text-xs text-white/70 mt-1">Keywords Found</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 text-center min-w-[120px]">
+                <AlertTriangle className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-3xl font-bold text-white">{analysis.missingKeywords.length}</div>
+                <div className="text-xs text-white/70 mt-1">Keywords Missing</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
 
-      {/* Section Scores */}
+          {/* Rescan Button */}
+          <button
+            onClick={runSimulation}
+            disabled={isLoading}
+            className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-white text-sm transition-colors"
+          >
+            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            Rescan
+          </button>
+        </div>
+      </Card>
+
+      {/* Section Scores - Visual Gauges */}
       <Card variant="elevated">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-slate-400" />
-            Section Scores
-          </CardTitle>
-          <CardDescription>How each section of your resume performs in ATS analysis</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-indigo-600" />
+                Section Performance
+              </CardTitle>
+              <CardDescription>How each section of your resume scores</CardDescription>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-emerald-500" /> 80+</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500" /> 60-79</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500" /> &lt;60</span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(analysis.sectionScores).map(([section, score]) => (
-              <div key={section} className="flex items-center gap-4">
-                <div className="w-24 text-sm font-medium text-slate-700 capitalize">{section}</div>
-                <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                key={section}
+                className={cn(
+                  "relative p-4 rounded-xl border-2 transition-all hover:shadow-md",
+                  score >= 80 ? "border-emerald-200 bg-emerald-50/50" :
+                  score >= 60 ? "border-amber-200 bg-amber-50/50" :
+                  "border-red-200 bg-red-50/50"
+                )}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-slate-700 capitalize">{section}</span>
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg",
+                    score >= 80 ? "bg-emerald-500 text-white" :
+                    score >= 60 ? "bg-amber-500 text-white" :
+                    "bg-red-500 text-white"
+                  )}>
+                    {score}
+                  </div>
+                </div>
+                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${getSectionScoreBar(score)}`}
+                    className={cn(
+                      "h-full rounded-full transition-all duration-700",
+                      score >= 80 ? "bg-gradient-to-r from-emerald-400 to-emerald-600" :
+                      score >= 60 ? "bg-gradient-to-r from-amber-400 to-amber-600" :
+                      "bg-gradient-to-r from-red-400 to-red-600"
+                    )}
                     style={{ width: `${score}%` }}
                   />
                 </div>
-                <div className={`w-12 text-right text-sm font-semibold ${getSectionScoreColor(score).split(' ')[0]}`}>
-                  {score}%
+                <div className="mt-2 flex items-center gap-1 text-xs">
+                  {score >= 80 ? (
+                    <><ThumbsUp className="h-3 w-3 text-emerald-600" /><span className="text-emerald-600">Excellent</span></>
+                  ) : score >= 60 ? (
+                    <><TrendingUp className="h-3 w-3 text-amber-600" /><span className="text-amber-600">Room to improve</span></>
+                  ) : (
+                    <><ThumbsDown className="h-3 w-3 text-red-600" /><span className="text-red-600">Needs attention</span></>
+                  )}
                 </div>
               </div>
             ))}
@@ -181,96 +301,119 @@ export default function ATSSimulator({
         </CardContent>
       </Card>
 
-      {/* Keywords */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-emerald-700">
-              <CheckCircle className="h-5 w-5" />
-              Matched Keywords ({analysis.matchedKeywords.length})
+      {/* Keywords Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Matched Keywords */}
+        <Card variant="elevated" className="border-l-4 border-l-emerald-500">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2 text-emerald-700">
+                <CheckCircle className="h-5 w-5" />
+                Keywords Found
+              </span>
+              <Badge variant="success" size="lg">{analysis.matchedKeywords.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {analysis.matchedKeywords.length > 0 ? (
-                analysis.matchedKeywords.map((keyword, i) => (
-                  <Badge key={i} variant="success" size="lg">
+            {analysis.matchedKeywords.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {analysis.matchedKeywords.map((keyword, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-medium"
+                  >
+                    <CheckCircle className="h-3.5 w-3.5" />
                     {keyword}
-                  </Badge>
-                ))
-              ) : (
-                <p className="text-slate-500 text-sm">No keywords matched</p>
-              )}
-            </div>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-500 text-sm italic">No keywords matched - this needs attention!</p>
+            )}
           </CardContent>
         </Card>
 
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-700">
-              <XCircle className="h-5 w-5" />
-              Missing Keywords ({analysis.missingKeywords.length})
+        {/* Missing Keywords */}
+        <Card variant="elevated" className="border-l-4 border-l-red-500">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2 text-red-700">
+                <XCircle className="h-5 w-5" />
+                Keywords Missing
+              </span>
+              <Badge variant="error" size="lg">{analysis.missingKeywords.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {analysis.missingKeywords.length > 0 ? (
-                analysis.missingKeywords.map((keyword, i) => (
-                  <Badge key={i} variant="error" size="lg">
-                    {keyword}
-                  </Badge>
-                ))
-              ) : (
-                <p className="text-emerald-600 text-sm flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" />
-                  All important keywords found
+            {analysis.missingKeywords.length > 0 ? (
+              <>
+                <p className="text-sm text-slate-600 mb-3">
+                  Consider adding these keywords to improve your match rate:
                 </p>
-              )}
-            </div>
+                <div className="flex flex-wrap gap-2">
+                  {analysis.missingKeywords.map((keyword, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium"
+                    >
+                      <XCircle className="h-3.5 w-3.5" />
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-emerald-600">
+                <Award className="h-5 w-5" />
+                <span className="font-medium">Perfect! All important keywords found</span>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Risky Elements & Formatting Issues */}
+      {/* Issues & Warnings */}
       {(analysis.riskyElements.length > 0 || analysis.formattingIssues.length > 0) && (
-        <Card variant="elevated" className="border-amber-200 bg-amber-50/50">
+        <Card variant="elevated" className="border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-800">
               <AlertTriangle className="h-5 w-5" />
-              Potential Issues
+              Issues Detected ({analysis.riskyElements.length + analysis.formattingIssues.length})
             </CardTitle>
             <CardDescription className="text-amber-700">
-              These elements may cause problems with ATS parsing
+              These issues may cause problems with ATS parsing
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {analysis.riskyElements.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-amber-900 mb-2">Risky Elements</h4>
-                  <ul className="space-y-2">
-                    {analysis.riskyElements.map((element, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-amber-800 bg-amber-100 p-3 rounded-xl">
-                        <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        {element}
-                      </li>
-                    ))}
-                  </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {analysis.riskyElements.map((element, i) => (
+                <div
+                  key={`risk-${i}`}
+                  className="flex items-start gap-3 p-4 bg-white rounded-xl border border-amber-200 shadow-sm"
+                >
+                  <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">Risky Element</span>
+                    <p className="text-sm text-slate-700 mt-1">{element}</p>
+                  </div>
                 </div>
-              )}
-              {analysis.formattingIssues.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-amber-900 mb-2">Formatting Issues</h4>
-                  <ul className="space-y-2">
-                    {analysis.formattingIssues.map((issue, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-amber-800 bg-amber-100 p-3 rounded-xl">
-                        <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        {issue}
-                      </li>
-                    ))}
-                  </ul>
+              ))}
+              {analysis.formattingIssues.map((issue, i) => (
+                <div
+                  key={`format-${i}`}
+                  className="flex items-start gap-3 p-4 bg-white rounded-xl border border-orange-200 shadow-sm"
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <XCircle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium text-orange-600 uppercase tracking-wide">Formatting Issue</span>
+                    <p className="text-sm text-slate-700 mt-1">{issue}</p>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -278,76 +421,244 @@ export default function ATSSimulator({
 
       {/* Recommendations */}
       {analysis.recommendations.length > 0 && (
-        <Card variant="elevated">
-          <CardHeader>
-            <button
-              onClick={() => setShowRecommendations(!showRecommendations)}
-              className="w-full flex items-center justify-between"
-            >
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-amber-500" />
-                Recommendations ({analysis.recommendations.length})
-              </CardTitle>
-              {showRecommendations ? (
-                <ChevronUp className="h-5 w-5 text-slate-400" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-slate-400" />
-              )}
-            </button>
-          </CardHeader>
-          {showRecommendations && (
-            <CardContent>
-              <ul className="space-y-3">
-                {analysis.recommendations.map((rec, i) => (
-                  <li key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
-                    <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-indigo-600">{i + 1}</span>
+        <div className="relative overflow-hidden rounded-2xl border border-indigo-200/50 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 shadow-lg">
+          {/* Header with gradient */}
+          <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-6">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                  <Rocket className="h-7 w-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    Boost Your ATS Score
+                    <Sparkles className="h-5 w-5 text-yellow-300" />
+                  </h3>
+                  <p className="text-indigo-200 text-sm mt-1">
+                    {analysis.recommendations.length} actionable improvements identified
+                  </p>
+                </div>
+              </div>
+              <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                <TrendingUp className="h-5 w-5 text-emerald-300" />
+                <span className="text-white font-medium">+{Math.min(20, analysis.recommendations.length * 3)}% potential</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommendations list */}
+          <div className="p-6 space-y-4">
+            {(showAllRecommendations ? analysis.recommendations : analysis.recommendations.slice(0, 3)).map((rec, i) => {
+              const priorityConfig = [
+                { bg: 'from-indigo-500 to-purple-600', ring: 'ring-indigo-500/20', border: 'border-indigo-200', icon: Star, label: 'High Impact' },
+                { bg: 'from-purple-500 to-pink-600', ring: 'ring-purple-500/20', border: 'border-purple-200', icon: Zap, label: 'Quick Win' },
+                { bg: 'from-pink-500 to-rose-500', ring: 'ring-pink-500/20', border: 'border-pink-200', icon: Target, label: 'Recommended' },
+              ];
+              const config = priorityConfig[i % 3];
+              const PriorityIcon = config.icon;
+
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "relative group bg-white rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden",
+                    config.border
+                  )}
+                >
+                  {/* Left gradient accent */}
+                  <div className={cn("absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b", config.bg)} />
+
+                  <div className="flex items-start gap-4 p-5 pl-6">
+                    {/* Number badge */}
+                    <div className={cn(
+                      "relative flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg ring-4",
+                      config.bg,
+                      config.ring
+                    )}>
+                      <span className="text-xl font-bold text-white">{i + 1}</span>
                     </div>
-                    <p className="text-sm text-slate-700">{rec}</p>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                          i === 0 ? "bg-indigo-100 text-indigo-700" :
+                          i === 1 ? "bg-purple-100 text-purple-700" :
+                          "bg-pink-100 text-pink-700"
+                        )}>
+                          <PriorityIcon className="h-3 w-3" />
+                          {config.label}
+                        </span>
+                      </div>
+                      <p className="text-slate-700 leading-relaxed">{rec}</p>
+                    </div>
+
+                    {/* Action arrow */}
+                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Show more button */}
+          {analysis.recommendations.length > 3 && (
+            <div className="px-6 pb-6">
+              <button
+                onClick={() => setShowAllRecommendations(!showAllRecommendations)}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 rounded-xl text-indigo-600 font-medium text-sm transition-colors border border-indigo-200/50"
+              >
+                {showAllRecommendations ? (
+                  <><ChevronUp className="h-4 w-4" /> Show fewer recommendations</>
+                ) : (
+                  <><ChevronDown className="h-4 w-4" /> View {analysis.recommendations.length - 3} more recommendations</>
+                )}
+              </button>
+            </div>
           )}
-        </Card>
+
+          {/* Footer tip */}
+          <div className="px-6 pb-6">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200/50">
+              <CheckCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+              <p className="text-sm text-slate-600">
+                <span className="font-medium text-emerald-700">Tip:</span> Focus on high-impact recommendations first for the biggest score improvements.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ATS Extracted View */}
       {analysis.atsExtractedView && (
-        <Card variant="elevated">
-          <CardHeader>
-            <button
-              onClick={() => setShowExtractedView(!showExtractedView)}
-              className="w-full flex items-center justify-between"
-            >
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-slate-400" />
-                  ATS Extracted View
-                </CardTitle>
-                <CardDescription>
-                  This is what an ATS system sees when parsing your resume
-                </CardDescription>
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-xl">
+          {/* Header */}
+          <button
+            onClick={() => setShowExtractedView(!showExtractedView)}
+            className="w-full relative bg-gradient-to-r from-slate-800 to-slate-700 p-6 hover:from-slate-700 hover:to-slate-600 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-400/20">
+                  <Terminal className="h-7 w-7 text-white" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    ATS Eye View
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/30">
+                      <ScanLine className="h-3 w-3 mr-1" />
+                      Parser Output
+                    </span>
+                  </h3>
+                  <p className="text-slate-400 text-sm mt-1">
+                    See exactly what ATS systems extract from your resume
+                  </p>
+                </div>
               </div>
-              {showExtractedView ? (
-                <ChevronUp className="h-5 w-5 text-slate-400" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-slate-400" />
-              )}
-            </button>
-          </CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-600/50 rounded-lg">
+                  <Monitor className="h-4 w-4 text-slate-300" />
+                  <span className="text-sm text-slate-300">Technical View</span>
+                </div>
+                <div className={cn(
+                  "w-10 h-10 rounded-xl bg-slate-600/50 flex items-center justify-center transition-transform",
+                  showExtractedView && "rotate-180"
+                )}>
+                  <ChevronDown className="h-5 w-5 text-slate-300" />
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Expandable content */}
           {showExtractedView && (
-            <CardContent>
-              <div className="bg-slate-900 text-green-400 p-6 rounded-xl font-mono text-sm whitespace-pre-wrap overflow-x-auto">
-                {analysis.atsExtractedView}
+            <div className="p-6 pt-0">
+              {/* Terminal window */}
+              <div className="relative mt-6 rounded-xl overflow-hidden border border-slate-600/50 shadow-2xl">
+                {/* macOS-style title bar */}
+                <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-slate-700 to-slate-800 border-b border-slate-600/50">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/50" />
+                    <span className="w-3 h-3 rounded-full bg-amber-500 shadow-lg shadow-amber-500/50" />
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-slate-900/50 rounded-md">
+                    <Code className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="text-xs text-slate-400 font-mono">ats_parser_output.txt</span>
+                  </div>
+                  <div className="w-16" /> {/* Spacer for balance */}
+                </div>
+
+                {/* Terminal content */}
+                <div className="relative bg-gradient-to-b from-slate-900 to-black">
+                  {/* Scan line effect */}
+                  <div className="absolute inset-0 pointer-events-none opacity-5">
+                    <div className="absolute inset-0" style={{
+                      backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
+                    }} />
+                  </div>
+
+                  <div className="p-6 font-mono text-sm whitespace-pre-wrap overflow-x-auto max-h-96 overflow-y-auto text-emerald-400 leading-relaxed relative z-10">
+                    <span className="text-cyan-400">$ </span>
+                    <span className="text-slate-400">ats_parser --extract resume.pdf</span>
+                    <br />
+                    <span className="text-slate-500">--- BEGIN EXTRACTED CONTENT ---</span>
+                    <br /><br />
+                    {analysis.atsExtractedView}
+                    <br /><br />
+                    <span className="text-slate-500">--- END EXTRACTED CONTENT ---</span>
+                    <br />
+                    <span className="text-emerald-500">✓ Parsing complete</span>
+                  </div>
+                </div>
               </div>
-              <p className="mt-4 text-xs text-slate-500 text-center">
-                This simulates how text-based ATS systems extract and read your resume content.
-                Graphics, tables, and special formatting are typically lost.
-              </p>
-            </CardContent>
+
+              {/* Info cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-200">Formatting Lost</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Tables, columns, and graphics are stripped</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                    <Eye className="h-4 w-4 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-200">Plain Text Only</p>
+                    <p className="text-xs text-slate-400 mt-0.5">This is exactly what recruiters search</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="h-4 w-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-200">Verify Keywords</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Ensure important terms appear here</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pro tip */}
+              <div className="mt-4 flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-500/20">
+                <Lightbulb className="h-5 w-5 text-cyan-400 flex-shrink-0" />
+                <p className="text-sm text-slate-300">
+                  <span className="font-medium text-cyan-300">Pro tip:</span> If your key qualifications don&apos;t appear clearly in this view, consider simplifying your resume&apos;s formatting.
+                </p>
+              </div>
+            </div>
           )}
-        </Card>
+        </div>
       )}
     </div>
   );

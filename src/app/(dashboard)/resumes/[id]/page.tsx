@@ -29,11 +29,13 @@ import {
   MapPin,
   GraduationCap,
   GitCompare,
-  Link2,
   Loader2,
-  Globe,
   DollarSign,
   Clock,
+  Heart,
+  Search,
+  ChevronDown,
+  ExternalLink,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -56,22 +58,61 @@ export default function ResumeDetailPage() {
   const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
 
-  // Job URL scraping state
-  const [inputMode, setInputMode] = useState<'url' | 'manual'>('url');
-  const [jobUrl, setJobUrl] = useState('');
-  const [isScrapingUrl, setIsScrapingUrl] = useState(false);
-  const [scrapedJobInfo, setScrapedJobInfo] = useState<{
+  // Input mode state
+  const [inputMode, setInputMode] = useState<'saved' | 'manual'>('saved');
+
+  // Saved jobs state
+  const [savedJobs, setSavedJobs] = useState<Array<{
+    id: string;
+    title: string;
+    company: string;
+    location: string;
+    salary?: string;
+    description: string;
+    url: string;
+    type?: string;
+  }>>([]);
+  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(false);
+  const [selectedSavedJobId, setSelectedSavedJobId] = useState<string>('');
+  const [showSavedJobsDropdown, setShowSavedJobsDropdown] = useState(false);
+
+  // Selected job info for display
+  const [selectedJobInfo, setSelectedJobInfo] = useState<{
     location?: string;
     salary?: string;
-    employmentType?: string;
-    experienceLevel?: string;
+    type?: string;
+    url?: string;
   } | null>(null);
 
   const isPro = user?.planType === 'PRO' || user?.planType === 'BUSINESS';
 
   useEffect(() => {
     loadResume();
+    loadSavedJobs();
   }, [resumeId]);
+
+  const loadSavedJobs = async () => {
+    setIsLoadingSavedJobs(true);
+    try {
+      const response = await api.getSavedJobs(1, 50); // Get up to 50 saved jobs
+      if (response.success && response.data) {
+        setSavedJobs(response.data.jobs.map((job) => ({
+          id: job.id,
+          title: job.title,
+          company: job.company,
+          location: job.location,
+          salary: job.salary || undefined,
+          description: job.description,
+          url: job.url,
+          type: job.type || undefined,
+        })));
+      }
+    } catch (error) {
+      // Silent fail - saved jobs are optional
+    } finally {
+      setIsLoadingSavedJobs(false);
+    }
+  };
 
   const loadResume = async () => {
     try {
@@ -131,49 +172,34 @@ export default function ResumeDetailPage() {
     }
   };
 
-  const handleScrapeJobUrl = async () => {
-    if (!jobUrl) {
-      toast.error('Please enter a job posting URL');
-      return;
-    }
+  const handleSelectSavedJob = (jobId: string) => {
+    const job = savedJobs.find((j) => j.id === jobId);
+    if (!job) return;
 
-    // Validate URL
-    try {
-      new URL(jobUrl);
-    } catch {
-      toast.error('Please enter a valid URL');
-      return;
-    }
+    // Auto-fill the form
+    setJobTitle(job.title);
+    setCompanyName(job.company);
+    setJobDescription(job.description);
+    setSelectedSavedJobId(jobId);
+    setShowSavedJobsDropdown(false);
 
-    setIsScrapingUrl(true);
+    // Store additional info for display
+    setSelectedJobInfo({
+      location: job.location,
+      salary: job.salary,
+      type: job.type,
+      url: job.url,
+    });
 
-    try {
-      const response = await api.scrapeJobUrl(jobUrl);
+    toast.success('Job details loaded!');
+  };
 
-      if (response.success && response.data) {
-        const data = response.data;
-
-        // Auto-fill the form
-        setJobTitle(data.title || '');
-        setCompanyName(data.company || '');
-        setJobDescription(data.description || '');
-
-        // Store additional info
-        setScrapedJobInfo({
-          location: data.location,
-          salary: data.salary,
-          employmentType: data.employmentType,
-          experienceLevel: data.experienceLevel,
-        });
-
-        toast.success('Job details extracted successfully!');
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to fetch job posting. Try pasting the description manually.');
-      setInputMode('manual');
-    } finally {
-      setIsScrapingUrl(false);
-    }
+  const clearSelectedJob = () => {
+    setSelectedSavedJobId('');
+    setJobTitle('');
+    setCompanyName('');
+    setJobDescription('');
+    setSelectedJobInfo(null);
   };
 
   const resetForm = () => {
@@ -181,9 +207,10 @@ export default function ResumeDetailPage() {
     setJobTitle('');
     setCompanyName('');
     setJobDescription('');
-    setJobUrl('');
-    setScrapedJobInfo(null);
-    setInputMode('url');
+    setSelectedSavedJobId('');
+    setSelectedJobInfo(null);
+    setInputMode('saved');
+    setShowSavedJobsDropdown(false);
   };
 
   if (isLoading) {
@@ -256,15 +283,15 @@ export default function ResumeDetailPage() {
                 <div className="flex items-center gap-2 mb-6 p-1 bg-slate-100 rounded-xl w-fit">
                   <button
                     type="button"
-                    onClick={() => setInputMode('url')}
+                    onClick={() => setInputMode('saved')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      inputMode === 'url'
+                      inputMode === 'saved'
                         ? 'bg-white text-indigo-600 shadow-sm'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <Link2 className="h-4 w-4" />
-                    Paste Job Link
+                    <Heart className="h-4 w-4" />
+                    From Saved Jobs
                   </button>
                   <button
                     type="button"
@@ -280,68 +307,133 @@ export default function ResumeDetailPage() {
                   </button>
                 </div>
 
-                {/* URL Input Mode */}
-                {inputMode === 'url' && !jobTitle && (
+                {/* Saved Jobs Selector Mode */}
+                {inputMode === 'saved' && !jobTitle && (
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                        Job Posting URL
+                        Select from Saved Jobs
                       </label>
-                      <div className="flex gap-3">
-                        <div className="relative flex-1">
-                          <Globe className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                          <input
-                            type="url"
-                            placeholder="https://linkedin.com/jobs/... or any job posting URL"
-                            value={jobUrl}
-                            onChange={(e) => setJobUrl(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleScrapeJobUrl()}
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
-                          />
+                      {isLoadingSavedJobs ? (
+                        <div className="flex items-center gap-2 p-4 border border-slate-200 rounded-xl">
+                          <Loader2 className="h-5 w-5 text-indigo-600 animate-spin" />
+                          <span className="text-slate-500">Loading saved jobs...</span>
                         </div>
-                        <Button
-                          type="button"
-                          variant="gradient"
-                          onClick={handleScrapeJobUrl}
-                          isLoading={isScrapingUrl}
-                          leftIcon={isScrapingUrl ? undefined : <Sparkles className="h-4 w-4" />}
-                        >
-                          {isScrapingUrl ? 'Extracting...' : 'Extract'}
-                        </Button>
-                      </div>
-                      <p className="mt-2 text-xs text-slate-500">
-                        Supports LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, and most job boards
-                      </p>
+                      ) : savedJobs.length === 0 ? (
+                        <div className="p-6 border border-dashed border-slate-300 rounded-xl text-center">
+                          <Heart className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-600 font-medium">No saved jobs yet</p>
+                          <p className="text-sm text-slate-500 mt-1">
+                            Save jobs from the Job Board to quickly customize your resume
+                          </p>
+                          <div className="flex justify-center gap-3 mt-4">
+                            <a href="/jobs">
+                              <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                                Browse Jobs
+                              </Button>
+                            </a>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setInputMode('manual')}
+                            >
+                              Enter Manually
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowSavedJobsDropdown(!showSavedJobsDropdown)}
+                            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          >
+                            <span className="text-slate-500">Select a job to customize for...</span>
+                            <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showSavedJobsDropdown ? 'rotate-180' : ''}`} />
+                          </button>
+
+                          {showSavedJobsDropdown && (
+                            <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+                              {savedJobs.map((job) => (
+                                <button
+                                  key={job.id}
+                                  type="button"
+                                  onClick={() => handleSelectSavedJob(job.id)}
+                                  className="w-full flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left border-b border-slate-100 last:border-0"
+                                >
+                                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Building className="h-5 w-5 text-indigo-600" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-slate-900 truncate">{job.title}</p>
+                                    <p className="text-sm text-slate-500 truncate">{job.company}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      {job.location && (
+                                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                                          <MapPin className="h-3 w-3" />
+                                          {job.location}
+                                        </span>
+                                      )}
+                                      {job.salary && (
+                                        <span className="text-xs text-emerald-600 flex items-center gap-1">
+                                          <DollarSign className="h-3 w-3" />
+                                          {job.salary}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {savedJobs.length > 0 && (
+                        <p className="mt-2 text-xs text-slate-500">
+                          {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} available •{' '}
+                          <a href="/jobs" className="text-indigo-600 hover:text-indigo-700">Browse more jobs</a>
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
 
-                {/* Form (shown after URL extraction or in manual mode) */}
+                {/* Form (shown after job selection or in manual mode) */}
                 {(inputMode === 'manual' || jobTitle) && (
                   <form onSubmit={handleCustomize} className="space-y-5">
-                    {/* Scraped Job Info Banner */}
-                    {scrapedJobInfo && (scrapedJobInfo.location || scrapedJobInfo.salary || scrapedJobInfo.employmentType) && (
-                      <div className="flex flex-wrap items-center gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
-                        {scrapedJobInfo.location && (
-                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
-                            <MapPin className="h-4 w-4" />
-                            {scrapedJobInfo.location}
-                          </span>
-                        )}
-                        {scrapedJobInfo.salary && (
-                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
-                            <DollarSign className="h-4 w-4" />
-                            {scrapedJobInfo.salary}
-                          </span>
-                        )}
-                        {scrapedJobInfo.employmentType && (
-                          <span className="flex items-center gap-1.5 text-sm text-indigo-700">
-                            <Clock className="h-4 w-4" />
-                            {scrapedJobInfo.employmentType}
-                          </span>
-                        )}
-                        {scrapedJobInfo.experienceLevel && (
-                          <Badge variant="info" size="sm">{scrapedJobInfo.experienceLevel}</Badge>
+                    {/* Selected Job Info Banner */}
+                    {selectedJobInfo && (selectedJobInfo.location || selectedJobInfo.salary || selectedJobInfo.type || selectedJobInfo.url) && (
+                      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                        <div className="flex flex-wrap items-center gap-3">
+                          {selectedJobInfo.location && (
+                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                              <MapPin className="h-4 w-4" />
+                              {selectedJobInfo.location}
+                            </span>
+                          )}
+                          {selectedJobInfo.salary && (
+                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                              <DollarSign className="h-4 w-4" />
+                              {selectedJobInfo.salary}
+                            </span>
+                          )}
+                          {selectedJobInfo.type && (
+                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                              <Clock className="h-4 w-4" />
+                              {selectedJobInfo.type}
+                            </span>
+                          )}
+                        </div>
+                        {selectedJobInfo.url && (
+                          <a
+                            href={selectedJobInfo.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            View Original
+                          </a>
                         )}
                       </div>
                     )}

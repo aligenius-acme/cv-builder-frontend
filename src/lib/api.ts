@@ -825,8 +825,33 @@ class ApiClient {
     return response.data;
   }
 
-  async getSavedJobs() {
-    const response = await this.client.get<ApiResponse<{ jobs: any[]; total: number }>>('/jobs/saved');
+  async getSavedJobs(page = 1, limit = 20) {
+    const response = await this.client.get<ApiResponse<{
+      jobs: Array<{
+        id: string;
+        savedJobId: string;
+        title: string;
+        company: string;
+        location: string;
+        salary: string;
+        type: string;
+        description: string;
+        url: string;
+        postedAt: string;
+        logoUrl: string;
+        source: string;
+        savedAt: string;
+        notes?: string;
+      }>;
+      total: number;
+      page: number;
+      totalPages: number;
+    }>>('/jobs/saved', { params: { page, limit } });
+    return response.data;
+  }
+
+  async deleteSavedJob(jobId: string) {
+    const response = await this.client.delete<ApiResponse<void>>(`/jobs/saved/${jobId}`);
     return response.data;
   }
 
