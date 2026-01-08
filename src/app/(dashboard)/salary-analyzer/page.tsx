@@ -319,9 +319,9 @@ export default function SalaryAnalyzerPage() {
                     <select
                       value={companySize}
                       onChange={(e) => setCompanySize(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
                     >
-                      <option value="">Select size</option>
+                      <option value="" className="text-slate-500">Select size</option>
                       <option value="startup">Startup (1-50)</option>
                       <option value="small">Small (51-200)</option>
                       <option value="medium">Medium (201-1000)</option>

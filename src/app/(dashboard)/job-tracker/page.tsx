@@ -527,7 +527,7 @@ function ApplicationModal({
               <select
                 value={formData.status || 'WISHLIST'}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as ApplicationStatus })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
               >
                 {Object.entries(STATUS_CONFIG).map(([key, { label }]) => (
                   <option key={key} value={key}>{label}</option>
@@ -539,7 +539,7 @@ function ApplicationModal({
               <select
                 value={formData.priority || 0}
                 onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
               >
                 <option value={0}>Normal</option>
                 <option value={1}>High</option>
@@ -551,9 +551,9 @@ function ApplicationModal({
               <select
                 value={formData.source || ''}
                 onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
               >
-                <option value="">Select source</option>
+                <option value="" className="text-slate-500">Select source</option>
                 <option value="linkedin">LinkedIn</option>
                 <option value="indeed">Indeed</option>
                 <option value="company_website">Company Website</option>

@@ -1,13 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable standalone output for Docker deployment
-  output: 'standalone',
-
   // Optimize images
   images: {
-    domains: ['localhost'],
-    unoptimized: process.env.NODE_ENV === 'development',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
   },
 
   // Disable x-powered-by header for security

@@ -190,7 +190,7 @@ export default function AIWritingAssistant({
           className={cn(
             'w-full px-4 py-3 pr-12 border border-slate-200 rounded-xl',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-            'resize-none text-slate-700 placeholder:text-slate-400',
+            'resize-none text-slate-700',
             'transition-all duration-200'
           )}
           style={{ lineHeight: '24px' }}

@@ -270,6 +270,54 @@ body {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+/* Global form control text styles - ensure dark text for actual values */
+input,
+textarea,
+select {
+  color: #0f172a; /* slate-900 - dark text for actual values */
+}
+
+/* Global placeholder styles - slightly lighter than input text but still visible */
+input::placeholder,
+textarea::placeholder {
+  color: #64748b; /* slate-500 - visible but distinguishable from input text */
+  opacity: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+/* Select placeholder styling - when empty value is selected */
+select option[value=""] {
+  color: #64748b;
+}
+
+/* Select with placeholder selected (empty value) */
+select:invalid,
+select.placeholder-shown {
+  color: #64748b;
+}
+
+/* When a real option is selected, ensure dark text */
+select:valid:not(.placeholder-shown) {
+  color: #0f172a;
+}
+
 /* Badge styles */
 .badge-gradient {
   background: var(--gradient-primary);

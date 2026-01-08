@@ -207,7 +207,7 @@ export default function AdminPromptsPage() {
                           value={editedText}
                           onChange={(e) => setEditedText(e.target.value)}
                           rows={12}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 font-mono text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-y"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-y"
                         />
                         <div className="flex items-center gap-3">
                           <Button

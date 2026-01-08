@@ -184,7 +184,7 @@ export default function AdminUsersPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by email or name..."
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                 />
               </div>
               <select
@@ -193,9 +193,9 @@ export default function AdminUsersPage() {
                   setRoleFilter(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
               >
-                <option value="">All Roles</option>
+                <option value="" className="text-slate-500">All Roles</option>
                 <option value="USER">User</option>
                 <option value="ORG_USER">Org User</option>
                 <option value="ORG_ADMIN">Org Admin</option>

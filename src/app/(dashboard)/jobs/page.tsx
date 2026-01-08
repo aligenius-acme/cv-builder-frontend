@@ -10,17 +10,27 @@ import {
   DollarSign,
   Briefcase,
   Bookmark,
+  BookmarkCheck,
   ExternalLink,
   Filter,
   Loader2,
-  ChevronDown,
+  ChevronLeft,
   FileText,
   Sparkles,
   X,
+  TrendingUp,
+  Users,
+  Globe,
+  CheckCircle2,
+  Star,
+  ArrowRight,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import PageHeader from '@/components/shared/PageHeader';
+import EmptyState from '@/components/shared/EmptyState';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -55,6 +65,7 @@ export default function JobBoardPage() {
   const [jobDetails, setJobDetails] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [recommendedJobs, setRecommendedJobs] = useState<JobListing[]>([]);
+  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadRecommendedJobs();
@@ -118,370 +129,269 @@ export default function JobBoardPage() {
     }
   };
 
-  const handleSaveJob = async (job: JobListing) => {
+  const handleSaveJob = async (job: JobListing, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     try {
       await api.saveJob(job.id, job);
-      toast.success('Job saved!');
+      setSavedJobs(prev => new Set(prev).add(job.id));
+      toast.success('Job saved to your list!');
     } catch (error) {
       toast.error('Failed to save job');
     }
   };
 
+  const clearFilters = () => {
+    setExperienceLevel('');
+    setJobType('');
+    setRemoteOnly(false);
+  };
+
+  const activeFiltersCount = [experienceLevel, jobType, remoteOnly].filter(Boolean).length;
+
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <Briefcase className="h-5 w-5" />
-              <span className="text-white/80 text-sm font-medium">Job Discovery</span>
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-              Job Board
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Find and apply to jobs tailored to your profile. Search thousands of opportunities
-              and get AI-powered recommendations based on your skills.
-            </p>
-          </div>
-        </div>
+        {/* Header */}
+        <PageHeader
+          icon={<Briefcase className="h-5 w-5" />}
+          label="Job Discovery"
+          title="Job Board"
+          description="Find and apply to jobs tailored to your profile. Search thousands of opportunities and get AI-powered recommendations."
+          gradient="slate"
+        />
 
-        {/* Search Bar */}
+        {/* Search Section */}
         <Card variant="elevated">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-3">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                <input
-                  type="text"
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Job title, skills, or keywords"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div className="flex-1 relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="City, state, or remote"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  leftIcon={<Filter className="h-4 w-4" />}
-                >
-                  Filters
-                  {(experienceLevel || jobType || remoteOnly) && (
-                    <Badge variant="info" size="sm" className="ml-1">
-                      {[experienceLevel, jobType, remoteOnly && 'Remote'].filter(Boolean).length}
-                    </Badge>
-                  )}
-                </Button>
-                <Button
-                  variant="gradient"
-                  onClick={handleSearch}
-                  disabled={isSearching}
-                  leftIcon={isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-
-            {/* Filters Panel */}
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Experience Level</label>
-                  <select
-                    value={experienceLevel}
-                    onChange={(e) => setExperienceLevel(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">Any level</option>
-                    <option value="entry">Entry Level</option>
-                    <option value="mid">Mid Level</option>
-                    <option value="senior">Senior</option>
-                    <option value="lead">Lead / Manager</option>
-                    <option value="executive">Executive</option>
-                  </select>
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4">
+              {/* Main Search Row */}
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    placeholder="Job title, skills, or keywords"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Job Type</label>
-                  <select
-                    value={jobType}
-                    onChange={(e) => setJobType(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">Any type</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
-                  </select>
+                <div className="flex-1 relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    placeholder="City, state, or 'remote'"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  />
                 </div>
-                <div className="flex items-end">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={remoteOnly}
-                      onChange={(e) => setRemoteOnly(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="text-sm font-medium text-slate-700">Remote only</span>
-                  </label>
-                </div>
-                <div className="flex items-end">
+                <div className="flex gap-2">
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setExperienceLevel('');
-                      setJobType('');
-                      setRemoteOnly(false);
-                    }}
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setShowFilters(!showFilters)}
+                    leftIcon={<Filter className="h-4 w-4" />}
+                    className={cn(showFilters && 'bg-slate-100')}
                   >
-                    Clear filters
+                    Filters
+                    {activeFiltersCount > 0 && (
+                      <Badge variant="gradient" size="sm" className="ml-2">
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                  <Button
+                    variant="gradient"
+                    size="lg"
+                    onClick={handleSearch}
+                    disabled={isSearching}
+                    leftIcon={isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  >
+                    Search Jobs
                   </Button>
                 </div>
               </div>
-            )}
+
+              {/* Filters Panel */}
+              {showFilters && (
+                <div className="pt-4 border-t border-slate-200 animate-slide-down">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Experience Level
+                      </label>
+                      <select
+                        value={experienceLevel}
+                        onChange={(e) => setExperienceLevel(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                      >
+                        <option value="" className="text-slate-500">Any level</option>
+                        <option value="entry">Entry Level</option>
+                        <option value="mid">Mid Level</option>
+                        <option value="senior">Senior</option>
+                        <option value="lead">Lead / Manager</option>
+                        <option value="executive">Executive</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Job Type
+                      </label>
+                      <select
+                        value={jobType}
+                        onChange={(e) => setJobType(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                      >
+                        <option value="" className="text-slate-500">Any type</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="internship">Internship</option>
+                      </select>
+                    </div>
+                    <div className="flex items-end">
+                      <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors w-full">
+                        <input
+                          type="checkbox"
+                          checked={remoteOnly}
+                          onChange={(e) => setRemoteOnly(e.target.checked)}
+                          className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <div>
+                          <span className="text-sm font-medium text-slate-900">Remote Only</span>
+                          <p className="text-xs text-slate-500">Work from anywhere</p>
+                        </div>
+                      </label>
+                    </div>
+                    <div className="flex items-end">
+                      <Button
+                        variant="ghost"
+                        onClick={clearFilters}
+                        className="w-full"
+                        leftIcon={<X className="h-4 w-4" />}
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
-        {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Job List */}
-          <div className={cn('lg:col-span-1 space-y-4', selectedJob && 'hidden lg:block')}>
+        {/* Content Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Job List - 2 columns */}
+          <div className={cn('lg:col-span-2 space-y-4', selectedJob && 'hidden lg:block')}>
             {!hasSearched ? (
               // Recommended Jobs
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-indigo-600" />
-                  Recommended for You
-                </h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg">
+                      <Sparkles className="h-4 w-4 text-indigo-600" />
+                    </div>
+                    Recommended for You
+                  </h2>
+                  {recommendedJobs.length > 0 && (
+                    <Badge variant="info" size="sm">{recommendedJobs.length} jobs</Badge>
+                  )}
+                </div>
                 {recommendedJobs.length > 0 ? (
-                  recommendedJobs.map((job) => (
+                  <div className="space-y-3">
+                    {recommendedJobs.map((job, index) => (
+                      <JobCard
+                        key={job.id}
+                        job={job}
+                        isSelected={selectedJob?.id === job.id}
+                        isSaved={savedJobs.has(job.id)}
+                        onSelect={() => handleSelectJob(job)}
+                        onSave={(e) => handleSaveJob(job, e)}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={<Search className="h-10 w-10 text-slate-400" />}
+                    title="Search for Jobs"
+                    description="Enter keywords above to discover thousands of opportunities matching your skills."
+                    gradient="slate"
+                  />
+                )}
+              </div>
+            ) : isSearching ? (
+              <LoadingSpinner text="Searching jobs..." />
+            ) : jobs.length > 0 ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-semibold text-slate-900">Search Results</h2>
+                    <Badge variant="default" size="sm">{jobs.length} jobs</Badge>
+                  </div>
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <Globe className="h-3 w-3" />
+                    Powered by Adzuna
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {jobs.map((job, index) => (
                     <JobCard
                       key={job.id}
                       job={job}
                       isSelected={selectedJob?.id === job.id}
+                      isSaved={savedJobs.has(job.id)}
                       onSelect={() => handleSelectJob(job)}
-                      onSave={() => handleSaveJob(job)}
+                      onSave={(e) => handleSaveJob(job, e)}
+                      index={index}
                     />
-                  ))
-                ) : (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                      <p className="text-slate-500">Search for jobs to get started</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            ) : isSearching ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-4" />
-                <p className="text-slate-500">Searching jobs...</p>
-              </div>
-            ) : jobs.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-500">{jobs.length} jobs found</p>
-                  <p className="text-xs text-slate-400">Powered by Adzuna</p>
+                  ))}
                 </div>
-                {jobs.map((job) => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    isSelected={selectedJob?.id === job.id}
-                    onSelect={() => handleSelectJob(job)}
-                    onSave={() => handleSaveJob(job)}
-                  />
-                ))}
               </div>
             ) : (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                  <p className="text-slate-500">No jobs found. Try different keywords.</p>
-                </CardContent>
-              </Card>
+              <EmptyState
+                icon={<Search className="h-10 w-10 text-slate-400" />}
+                title="No Jobs Found"
+                description="Try different keywords or adjust your filters to find more opportunities."
+                gradient="slate"
+                action={
+                  <Button variant="outline" onClick={clearFilters}>
+                    Clear Filters
+                  </Button>
+                }
+              />
             )}
           </div>
 
-          {/* Job Details */}
-          <div className={cn('lg:col-span-2', !selectedJob && 'hidden lg:block')}>
+          {/* Job Details - 3 columns */}
+          <div className={cn('lg:col-span-3', !selectedJob && 'hidden lg:block')}>
             {selectedJob ? (
-              <Card variant="elevated" className="sticky top-24">
-                <CardContent className="p-6">
-                  {/* Mobile back button */}
-                  <button
-                    onClick={() => setSelectedJob(null)}
-                    className="lg:hidden flex items-center gap-1 text-sm text-indigo-600 mb-4"
-                  >
-                    <ChevronDown className="h-4 w-4 rotate-90" />
-                    Back to results
-                  </button>
-
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-slate-900">{selectedJob.title}</h2>
-                      <div className="flex items-center gap-3 mt-2 text-slate-600">
-                        <span className="flex items-center gap-1">
-                          <Building2 className="h-4 w-4" />
-                          {selectedJob.company}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {selectedJob.location}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 mt-2">
-                        {selectedJob.salary && (
-                          <Badge variant="success" size="lg">
-                            <DollarSign className="h-3 w-3 mr-1" />
-                            {selectedJob.salary}
-                          </Badge>
-                        )}
-                        <Badge variant="default" size="lg">
-                          {selectedJob.type}
-                        </Badge>
-                        <span className="text-sm text-slate-500 flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {selectedJob.posted}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSaveJob(selectedJob)}
-                        leftIcon={<Bookmark className="h-4 w-4" />}
-                      >
-                        Save
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-3 mb-6">
-                    <Button
-                      variant="gradient"
-                      className="flex-1"
-                      leftIcon={<ExternalLink className="h-4 w-4" />}
-                      onClick={() => window.open(selectedJob.url, '_blank')}
-                    >
-                      Apply Now
-                    </Button>
-                    <Link href={`/resumes?jobTitle=${encodeURIComponent(selectedJob.title)}&company=${encodeURIComponent(selectedJob.company)}`}>
-                      <Button
-                        variant="outline"
-                        leftIcon={<FileText className="h-4 w-4" />}
-                      >
-                        Tailor Resume
-                      </Button>
-                    </Link>
-                  </div>
-
-                  {/* Details */}
-                  {isLoadingDetails ? (
-                    <div className="flex items-center justify-center py-12">
-                      <Loader2 className="h-6 w-6 text-indigo-600 animate-spin" />
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Description */}
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-3">About this role</h3>
-                        <p className="text-slate-700">{jobDetails?.fullDescription || selectedJob.description}</p>
-                      </div>
-
-                      {/* Responsibilities */}
-                      {jobDetails?.responsibilities && jobDetails.responsibilities.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900 mb-3">Responsibilities</h3>
-                          <ul className="space-y-2">
-                            {jobDetails.responsibilities.map((r: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2 text-slate-700">
-                                <span className="text-indigo-500 mt-1.5">•</span>
-                                {r}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* Requirements */}
-                      {(jobDetails?.requirements || selectedJob.requirements)?.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900 mb-3">Requirements</h3>
-                          <ul className="space-y-2">
-                            {(jobDetails?.requirements || selectedJob.requirements).map((r: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2 text-slate-700">
-                                <span className="text-indigo-500 mt-1.5">•</span>
-                                {r}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* Nice to Have */}
-                      {jobDetails?.niceToHave && jobDetails.niceToHave.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900 mb-3">Nice to Have</h3>
-                          <ul className="space-y-2">
-                            {jobDetails.niceToHave.map((n: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2 text-slate-700">
-                                <span className="text-green-500 mt-1.5">+</span>
-                                {n}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* Benefits */}
-                      {jobDetails?.benefits && jobDetails.benefits.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900 mb-3">Benefits</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {jobDetails.benefits.map((b: string, i: number) => (
-                              <Badge key={i} variant="success" size="lg">{b}</Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Source */}
-                      <div className="pt-4 border-t border-slate-200">
-                        <p className="text-sm text-slate-500">
-                          Posted via {selectedJob.source}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <JobDetailsPanel
+                job={selectedJob}
+                details={jobDetails}
+                isLoading={isLoadingDetails}
+                isSaved={savedJobs.has(selectedJob.id)}
+                onBack={() => setSelectedJob(null)}
+                onSave={() => handleSaveJob(selectedJob)}
+              />
             ) : (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Briefcase className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-900 mb-2">Select a job to view details</h3>
-                  <p className="text-slate-500">Click on any job listing to see the full description and apply</p>
+              <Card variant="elevated" className="h-full min-h-[500px]">
+                <CardContent className="h-full flex flex-col items-center justify-center text-center p-12">
+                  <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-gray-100 rounded-3xl flex items-center justify-center mb-6">
+                    <Briefcase className="h-12 w-12 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">Select a Job</h3>
+                  <p className="text-slate-500 max-w-sm mb-6">
+                    Click on any job listing to view the full description, requirements, and apply directly.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>Get personalized recommendations based on your profile</span>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -492,8 +402,11 @@ export default function JobBoardPage() {
   );
 }
 
-// Get company logo URL using Clearbit (free) with UI Avatars fallback
-function getCompanyLogoUrl(company: string, size: number = 64): string {
+// Company Logo component with fallback
+function CompanyLogo({ company, size = 48 }: { company: string; size?: number }) {
+  const [imgError, setImgError] = useState(false);
+  const initials = company.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+
   // Common company domain mappings
   const domains: Record<string, string> = {
     'google': 'google.com', 'microsoft': 'microsoft.com', 'apple': 'apple.com',
@@ -502,42 +415,25 @@ function getCompanyLogoUrl(company: string, size: number = 64): string {
     'adobe': 'adobe.com', 'spotify': 'spotify.com', 'uber': 'uber.com',
     'stripe': 'stripe.com', 'shopify': 'shopify.com', 'slack': 'slack.com',
     'github': 'github.com', 'atlassian': 'atlassian.com', 'figma': 'figma.com',
+    'boeing': 'boeing.com', 'intel': 'intel.com', 'nvidia': 'nvidia.com',
   };
 
   const normalized = company.toLowerCase().trim();
   let domain = domains[normalized];
-
-  // Try partial match
   if (!domain) {
     for (const [key, val] of Object.entries(domains)) {
       if (normalized.includes(key)) { domain = val; break; }
     }
   }
-
-  // Try to generate domain from company name
   if (!domain) {
     const cleaned = normalized.replace(/\s+(inc\.?|llc\.?|ltd\.?|corp\.?)$/i, '').replace(/[^a-z0-9]/g, '');
     if (cleaned.length > 2) domain = `${cleaned}.com`;
   }
 
-  if (domain) {
-    return `https://logo.clearbit.com/${domain}?size=${size}`;
-  }
-
-  // Fallback to UI Avatars
-  const initials = company.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-  return `https://ui-avatars.com/api/?name=${initials}&size=${size}&background=6366f1&color=ffffff&bold=true`;
-}
-
-// Company Logo component with fallback
-function CompanyLogo({ company, size = 40 }: { company: string; size?: number }) {
-  const [imgError, setImgError] = useState(false);
-  const initials = company.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-
-  if (imgError) {
+  if (imgError || !domain) {
     return (
       <div
-        className="rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold flex-shrink-0"
+        className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0 shadow-sm"
         style={{ width: size, height: size, fontSize: size * 0.35 }}
       >
         {initials}
@@ -547,9 +443,9 @@ function CompanyLogo({ company, size = 40 }: { company: string; size?: number })
 
   return (
     <img
-      src={getCompanyLogoUrl(company, size)}
+      src={`https://logo.clearbit.com/${domain}?size=${size * 2}`}
       alt={company}
-      className="rounded-lg object-contain flex-shrink-0 bg-white"
+      className="rounded-xl object-contain flex-shrink-0 bg-white border border-slate-100 shadow-sm"
       style={{ width: size, height: size }}
       onError={() => setImgError(true)}
     />
@@ -560,58 +456,299 @@ function CompanyLogo({ company, size = 40 }: { company: string; size?: number })
 function JobCard({
   job,
   isSelected,
+  isSaved,
   onSelect,
   onSave,
+  index,
 }: {
   job: JobListing;
   isSelected: boolean;
+  isSaved: boolean;
   onSelect: () => void;
-  onSave: () => void;
+  onSave: (e: React.MouseEvent) => void;
+  index: number;
 }) {
   return (
     <Card
       variant="elevated"
+      hover
       className={cn(
-        'cursor-pointer transition-all hover:shadow-lg',
-        isSelected && 'ring-2 ring-indigo-500'
+        'cursor-pointer transition-all duration-200 group',
+        isSelected && 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-500/10'
       )}
       onClick={onSelect}
+      style={{ animationDelay: `${index * 50}ms` }}
     >
       <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <CompanyLogo company={job.company} size={44} />
+        <div className="flex items-start gap-4">
+          <CompanyLogo company={job.company} size={52} />
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 truncate">{job.title}</h3>
-            <p className="text-sm text-slate-600">{job.company}</p>
-            <div className="flex items-center gap-2 mt-2 text-sm text-slate-500">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                  {job.title}
+                </h3>
+                <p className="text-sm text-slate-600 flex items-center gap-1 mt-0.5">
+                  <Building2 className="h-3.5 w-3.5" />
+                  {job.company}
+                </p>
+              </div>
+              <button
+                onClick={onSave}
+                className={cn(
+                  'p-2 rounded-lg transition-all flex-shrink-0',
+                  isSaved
+                    ? 'bg-indigo-100 text-indigo-600'
+                    : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                )}
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="h-4 w-4" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3 mt-2 text-sm text-slate-500">
               <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {job.location}
+                <MapPin className="h-3.5 w-3.5" />
+                <span className="truncate max-w-[120px]">{job.location}</span>
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3.5 w-3.5" />
                 {job.posted}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
+
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
               {job.salary && (
-                <Badge variant="success" size="sm">{job.salary}</Badge>
+                <Badge variant="success" size="sm" className="font-medium">
+                  <DollarSign className="h-3 w-3 mr-0.5" />
+                  {job.salary}
+                </Badge>
               )}
               <Badge variant="default" size="sm">{job.type}</Badge>
-              {job.source && (
-                <Badge variant="info" size="sm" className="opacity-70">{job.source}</Badge>
-              )}
             </div>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Job Details Panel Component
+function JobDetailsPanel({
+  job,
+  details,
+  isLoading,
+  isSaved,
+  onBack,
+  onSave,
+}: {
+  job: JobListing;
+  details: any;
+  isLoading: boolean;
+  isSaved: boolean;
+  onBack: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <Card variant="elevated" className="sticky top-6">
+      <CardContent className="p-0">
+        {/* Header */}
+        <div className="p-6 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white">
+          {/* Mobile back button */}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSave();
-            }}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            onClick={onBack}
+            className="lg:hidden flex items-center gap-1 text-sm text-indigo-600 mb-4 hover:text-indigo-700 transition-colors"
           >
-            <Bookmark className="h-4 w-4 text-slate-400" />
+            <ChevronLeft className="h-4 w-4" />
+            Back to results
           </button>
+
+          <div className="flex items-start gap-4">
+            <CompanyLogo company={job.company} size={64} />
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-slate-900 line-clamp-2">{job.title}</h2>
+              <div className="flex items-center gap-4 mt-2 text-slate-600">
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="h-4 w-4 text-slate-400" />
+                  {job.company}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-slate-400" />
+                  {job.location}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                {job.salary && (
+                  <Badge variant="success" size="lg" className="font-semibold">
+                    <DollarSign className="h-3.5 w-3.5 mr-0.5" />
+                    {job.salary}
+                  </Badge>
+                )}
+                <Badge variant="default" size="lg">{job.type}</Badge>
+                <Badge variant="info" size="lg" className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {job.posted}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 mt-6">
+            <Button
+              variant="gradient"
+              size="lg"
+              className="flex-1"
+              leftIcon={<ExternalLink className="h-4 w-4" />}
+              onClick={() => window.open(job.url, '_blank')}
+            >
+              Apply Now
+            </Button>
+            <Link href={`/resumes?jobTitle=${encodeURIComponent(job.title)}&company=${encodeURIComponent(job.company)}`}>
+              <Button
+                variant="outline"
+                size="lg"
+                leftIcon={<FileText className="h-4 w-4" />}
+              >
+                Tailor Resume
+              </Button>
+            </Link>
+            <Button
+              variant={isSaved ? 'primary' : 'outline'}
+              size="lg"
+              onClick={onSave}
+              leftIcon={isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            >
+              {isSaved ? 'Saved' : 'Save'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Details Content */}
+        <div className="p-6 max-h-[600px] overflow-y-auto">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-3" />
+              <p className="text-sm text-slate-500">Loading job details...</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Description */}
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-indigo-100 rounded-lg">
+                    <FileText className="h-4 w-4 text-indigo-600" />
+                  </div>
+                  About this Role
+                </h3>
+                <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                  {details?.fullDescription || job.description}
+                </p>
+              </div>
+
+              {/* Responsibilities */}
+              {details?.responsibilities?.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <div className="p-1.5 bg-purple-100 rounded-lg">
+                      <Users className="h-4 w-4 text-purple-600" />
+                    </div>
+                    Responsibilities
+                  </h3>
+                  <ul className="space-y-2">
+                    {details.responsibilities.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-slate-700">
+                        <ArrowRight className="h-4 w-4 text-indigo-500 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Requirements */}
+              {(details?.requirements || job.requirements)?.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <div className="p-1.5 bg-amber-100 rounded-lg">
+                      <CheckCircle2 className="h-4 w-4 text-amber-600" />
+                    </div>
+                    Requirements
+                  </h3>
+                  <ul className="space-y-2">
+                    {(details?.requirements || job.requirements).map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-slate-700">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Nice to Have */}
+              {details?.niceToHave?.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <div className="p-1.5 bg-emerald-100 rounded-lg">
+                      <Star className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    Nice to Have
+                  </h3>
+                  <ul className="space-y-2">
+                    {details.niceToHave.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-slate-700">
+                        <Star className="h-4 w-4 text-amber-400 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Benefits */}
+              {details?.benefits?.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <div className="p-1.5 bg-green-100 rounded-lg">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                    </div>
+                    Benefits & Perks
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {details.benefits.map((item: string, i: number) => (
+                      <Badge key={i} variant="success" size="lg" className="font-normal">
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Source Footer */}
+              <div className="pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between text-sm text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <Globe className="h-4 w-4" />
+                    Posted via {job.source}
+                  </span>
+                  <a
+                    href={job.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+                  >
+                    View original posting
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

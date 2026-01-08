@@ -173,7 +173,7 @@ export default function AdminTemplatesPage() {
                     value={newTemplate.name}
                     onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
                     placeholder="e.g., Modern Professional"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                     required
                   />
                 </div>
@@ -187,7 +187,7 @@ export default function AdminTemplatesPage() {
                     onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
                     placeholder="Describe the template style and features..."
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
                   />
                 </div>
 

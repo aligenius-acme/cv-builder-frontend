@@ -257,7 +257,7 @@ export default function OrganizationPage() {
                       value={newOrgName}
                       onChange={(e) => setNewOrgName(e.target.value)}
                       placeholder="e.g., Acme Corporation"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                       required
                     />
                   </div>
@@ -275,7 +275,7 @@ export default function OrganizationPage() {
                         value={newOrgDomain}
                         onChange={(e) => setNewOrgDomain(e.target.value)}
                         placeholder="acme.com"
-                        className="flex-1 px-4 py-3 rounded-r-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                        className="flex-1 px-4 py-3 rounded-r-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                       />
                     </div>
                     <p className="text-sm text-slate-400 mt-1">
@@ -434,7 +434,7 @@ export default function OrganizationPage() {
                       value={settingsDomain}
                       onChange={(e) => setSettingsDomain(e.target.value)}
                       placeholder="acme.com"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -482,7 +482,7 @@ export default function OrganizationPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="colleague@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                     required
                   />
                 </div>

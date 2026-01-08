@@ -278,7 +278,7 @@ export default function DownloadModal({
                   <select
                     value={selectedLayoutType}
                     onChange={(e) => setSelectedLayoutType(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
                   >
                     {layoutTypes.map(lt => (
                       <option key={lt.id} value={lt.id}>{lt.label}</option>
@@ -289,7 +289,7 @@ export default function DownloadModal({
                   <select
                     value={selectedFeature}
                     onChange={(e) => setSelectedFeature(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
                   >
                     {features.map(f => (
                       <option key={f.id} value={f.id}>{f.label}</option>

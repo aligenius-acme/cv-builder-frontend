@@ -181,9 +181,9 @@ function JobMatchTab({ resumes }: { resumes: any[] }) {
             <select
               value={selectedResumeId}
               onChange={(e) => setSelectedResumeId(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
             >
-              <option value="">Choose a resume...</option>
+              <option value="" className="text-slate-500">Choose a resume...</option>
               {resumes.map((resume) => (
                 <option key={resume.id} value={resume.id}>
                   {resume.title || resume.fileName}
@@ -630,9 +630,9 @@ function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
             <select
               value={selectedResumeId}
               onChange={(e) => setSelectedResumeId(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white text-slate-900"
             >
-              <option value="">Choose a resume...</option>
+              <option value="" className="text-slate-500">Choose a resume...</option>
               {resumes.map((resume) => (
                 <option key={resume.id} value={resume.id}>
                   {resume.title || resume.fileName}
@@ -1150,7 +1150,7 @@ function NetworkingMessageTab() {
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value as NetworkingPurpose)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
               >
                 {purposes.map((p) => (
                   <option key={p.value} value={p.value}>{p.label}</option>

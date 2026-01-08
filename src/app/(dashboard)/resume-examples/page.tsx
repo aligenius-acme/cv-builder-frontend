@@ -157,9 +157,9 @@ export default function ResumeExamplesPage() {
               <select
                 value={selectedIndustry}
                 onChange={(e) => setSelectedIndustry(e.target.value)}
-                className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white min-w-[180px]"
+                className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-900 min-w-[180px]"
               >
-                <option value="">All Industries</option>
+                <option value="" className="text-slate-500">All Industries</option>
                 {industries.map((ind) => (
                   <option key={ind} value={ind}>{ind}</option>
                 ))}
@@ -169,9 +169,9 @@ export default function ResumeExamplesPage() {
               <select
                 value={selectedOccupation}
                 onChange={(e) => setSelectedOccupation(e.target.value)}
-                className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white min-w-[200px]"
+                className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-900 min-w-[200px]"
               >
-                <option value="">All Occupations</option>
+                <option value="" className="text-slate-500">All Occupations</option>
                 {occupations.map((occ) => (
                   <option key={occ.id} value={occ.id}>{occ.title}</option>
                 ))}

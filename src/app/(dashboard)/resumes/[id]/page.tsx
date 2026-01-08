@@ -296,7 +296,7 @@ export default function ResumeDetailPage() {
                             value={jobUrl}
                             onChange={(e) => setJobUrl(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleScrapeJobUrl()}
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                           />
                         </div>
                         <Button
@@ -359,7 +359,7 @@ export default function ResumeDetailPage() {
                             value={jobTitle}
                             onChange={(e) => setJobTitle(e.target.value)}
                             required
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -375,7 +375,7 @@ export default function ResumeDetailPage() {
                             value={companyName}
                             onChange={(e) => setCompanyName(e.target.value)}
                             required
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -390,7 +390,7 @@ export default function ResumeDetailPage() {
                         value={jobDescription}
                         onChange={(e) => setJobDescription(e.target.value)}
                         required
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
                       />
                     </div>
                     <div className="flex justify-end gap-3">

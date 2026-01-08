@@ -194,9 +194,9 @@ export default function AdminAIUsagePage() {
                   setOperationFilter(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
               >
-                <option value="">All Operations</option>
+                <option value="" className="text-slate-500">All Operations</option>
                 <option value="RESUME_PARSE">Resume Parse</option>
                 <option value="RESUME_CUSTOMIZE">Resume Customize</option>
                 <option value="COVER_LETTER">Cover Letter</option>

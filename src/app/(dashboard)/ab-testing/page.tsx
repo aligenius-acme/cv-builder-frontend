@@ -568,7 +568,7 @@ export default function ABTestingPage() {
                   <select
                     value={newTest.goal}
                     onChange={(e) => setNewTest({ ...newTest, goal: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
                   >
                     <option value="response_rate">Response Rate</option>
                     <option value="interview_rate">Interview Rate</option>

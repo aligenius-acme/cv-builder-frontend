@@ -137,9 +137,9 @@ export default function SkillGapPage() {
                   <select
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-slate-900"
                   >
-                    <option value="">Select level</option>
+                    <option value="" className="text-slate-500">Select level</option>
                     <option value="entry">Entry Level (0-2 years)</option>
                     <option value="mid">Mid Level (2-5 years)</option>
                     <option value="senior">Senior (5-10 years)</option>
@@ -154,9 +154,9 @@ export default function SkillGapPage() {
                   <select
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-slate-900"
                   >
-                    <option value="">Select industry</option>
+                    <option value="" className="text-slate-500">Select industry</option>
                     <option value="technology">Technology</option>
                     <option value="finance">Finance</option>
                     <option value="healthcare">Healthcare</option>

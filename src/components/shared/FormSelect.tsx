@@ -16,8 +16,9 @@ export interface FormSelectProps extends SelectHTMLAttributes<HTMLSelectElement>
 }
 
 const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
-  ({ label, error, hint, options, placeholder, className, id, ...props }, ref) => {
+  ({ label, error, hint, options, placeholder, className, id, value, ...props }, ref) => {
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const isPlaceholderSelected = value === '' || value === undefined;
 
     return (
       <div className="space-y-1.5">
@@ -30,12 +31,14 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
         <select
           ref={ref}
           id={selectId}
+          value={value}
           className={cn(
-            'w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900',
+            'w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white',
             'transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500',
             error && 'border-red-300 focus:ring-red-500/20 focus:border-red-500',
-            props.disabled && 'bg-slate-50 text-slate-500 cursor-not-allowed',
+            props.disabled && 'bg-slate-50 cursor-not-allowed',
+            isPlaceholderSelected ? 'text-slate-500' : 'text-slate-900',
             className
           )}
           {...props}
@@ -46,7 +49,7 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
             </option>
           )}
           {options.map((option) => (
-            <option key={option.value} value={option.value} disabled={option.disabled}>
+            <option key={option.value} value={option.value} disabled={option.disabled} className="text-slate-900">
               {option.label}
             </option>
           ))}
