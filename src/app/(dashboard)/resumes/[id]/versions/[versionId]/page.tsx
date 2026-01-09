@@ -39,11 +39,48 @@ import {
   ArrowRightLeft,
   ListChecks,
   RefreshCw,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { ResumeVersion } from '@/types';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
+
+interface ParsedResumeData {
+  contact?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    linkedin?: string;
+    github?: string;
+    website?: string;
+  };
+  summary?: string;
+  experience?: Array<{
+    title: string;
+    company: string;
+    dates?: string;
+    location?: string;
+    description?: string[];
+  }>;
+  education?: Array<{
+    degree: string;
+    institution: string;
+    graduationDate?: string;
+    gpa?: string;
+  }>;
+  skills?: string[];
+  certifications?: string[];
+  projects?: Array<{
+    name: string;
+    description?: string;
+    technologies?: string[];
+    link?: string;
+  }>;
+}
 
 export default function VersionDetailPage() {
   const params = useParams();
@@ -55,6 +92,8 @@ export default function VersionDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showBeforeAfter, setShowBeforeAfter] = useState(true);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['summary', 'experience', 'skills']));
 
   useEffect(() => {
     loadVersion();
@@ -74,6 +113,16 @@ export default function VersionDetailPage() {
     }
   };
 
+  const toggleSection = (section: string) => {
+    const newSet = new Set(expandedSections);
+    if (newSet.has(section)) {
+      newSet.delete(section);
+    } else {
+      newSet.add(section);
+    }
+    setExpandedSections(newSet);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-mesh flex items-center justify-center">
@@ -88,6 +137,9 @@ export default function VersionDetailPage() {
   if (!version) {
     return null;
   }
+
+  const originalData = (version as any).originalData as ParsedResumeData | undefined;
+  const tailoredData = version.tailoredData as ParsedResumeData | undefined;
 
   return (
     <div className="min-h-screen bg-mesh">
@@ -166,6 +218,278 @@ export default function VersionDetailPage() {
             riskyElements: version.atsDetails.riskyElements || [],
           } : undefined}
         />
+
+        {/* Before/After Comparison Section */}
+        {originalData && tailoredData && (
+          <div className="relative overflow-hidden rounded-2xl border border-cyan-200/50 bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/20 shadow-lg">
+            {/* Header with gradient */}
+            <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 p-6">
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                    <ArrowRightLeft className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                      Before & After Comparison
+                      <Sparkles className="h-5 w-5 text-yellow-300" />
+                    </h3>
+                    <p className="text-cyan-200 text-sm mt-1">
+                      See exactly how your resume was optimized for this role
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowBeforeAfter(!showBeforeAfter)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors text-white text-sm font-medium"
+                >
+                  {showBeforeAfter ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Collapse
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Expand
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {showBeforeAfter && (
+              <div className="p-6 space-y-6">
+                {/* Summary Comparison */}
+                {(originalData.summary || tailoredData.summary) && (
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('summary')}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Professional Summary</span>
+                      </div>
+                      {expandedSections.has('summary') ? (
+                        <ChevronUp className="h-5 w-5 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-slate-500" />
+                      )}
+                    </button>
+                    {expandedSections.has('summary') && (
+                      <div className="grid md:grid-cols-2 gap-4 p-4">
+                        {/* Before */}
+                        <div className="relative">
+                          <div className="absolute -top-2 left-4 px-2 py-0.5 bg-slate-100 rounded text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            Original
+                          </div>
+                          <div className="mt-2 p-4 bg-slate-50 rounded-lg border border-slate-200 min-h-[100px]">
+                            <p className="text-sm text-slate-600 leading-relaxed">
+                              {originalData.summary || 'No summary in original resume'}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Arrow */}
+                        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg">
+                            <ArrowRight className="h-5 w-5 text-white" />
+                          </div>
+                        </div>
+                        {/* After */}
+                        <div className="relative">
+                          <div className="absolute -top-2 left-4 px-2 py-0.5 bg-emerald-100 rounded text-xs font-medium text-emerald-700 uppercase tracking-wide">
+                            Optimized
+                          </div>
+                          <div className="mt-2 p-4 bg-emerald-50 rounded-lg border border-emerald-200 min-h-[100px]">
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              {tailoredData.summary || 'No summary generated'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Skills Comparison */}
+                {((originalData.skills && originalData.skills.length > 0) || (tailoredData.skills && tailoredData.skills.length > 0)) && (
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('skills')}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-purple-50 hover:from-violet-100 hover:to-purple-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
+                          <Zap className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Key Skills</span>
+                        <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded-full">
+                          {originalData.skills?.length || 0} → {tailoredData.skills?.length || 0}
+                        </span>
+                      </div>
+                      {expandedSections.has('skills') ? (
+                        <ChevronUp className="h-5 w-5 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-slate-500" />
+                      )}
+                    </button>
+                    {expandedSections.has('skills') && (
+                      <div className="grid md:grid-cols-2 gap-4 p-4">
+                        {/* Before */}
+                        <div className="relative">
+                          <div className="absolute -top-2 left-4 px-2 py-0.5 bg-slate-100 rounded text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            Original
+                          </div>
+                          <div className="mt-2 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div className="flex flex-wrap gap-2">
+                              {originalData.skills?.map((skill, i) => (
+                                <span
+                                  key={i}
+                                  className="inline-flex items-center px-2.5 py-1 bg-white rounded-lg text-xs font-medium text-slate-600 border border-slate-200"
+                                >
+                                  {skill}
+                                </span>
+                              )) || <span className="text-sm text-slate-500">No skills listed</span>}
+                            </div>
+                          </div>
+                        </div>
+                        {/* After */}
+                        <div className="relative">
+                          <div className="absolute -top-2 left-4 px-2 py-0.5 bg-violet-100 rounded text-xs font-medium text-violet-700 uppercase tracking-wide">
+                            Optimized
+                          </div>
+                          <div className="mt-2 p-4 bg-violet-50 rounded-lg border border-violet-200">
+                            <div className="flex flex-wrap gap-2">
+                              {tailoredData.skills?.map((skill, i) => {
+                                const isNew = !originalData.skills?.includes(skill);
+                                return (
+                                  <span
+                                    key={i}
+                                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border ${
+                                      isNew
+                                        ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                                        : 'bg-white text-slate-700 border-violet-200'
+                                    }`}
+                                  >
+                                    {isNew && <Star className="h-3 w-3" />}
+                                    {skill}
+                                  </span>
+                                );
+                              }) || <span className="text-sm text-slate-500">No skills listed</span>}
+                            </div>
+                            {tailoredData.skills && originalData.skills && (
+                              <p className="mt-3 text-xs text-violet-600">
+                                <Star className="h-3 w-3 inline mr-1" />
+                                = Added/prioritized for this role
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Experience Comparison */}
+                {((originalData.experience && originalData.experience.length > 0) || (tailoredData.experience && tailoredData.experience.length > 0)) && (
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('experience')}
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-500/25">
+                          <Briefcase className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Professional Experience</span>
+                      </div>
+                      {expandedSections.has('experience') ? (
+                        <ChevronUp className="h-5 w-5 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-slate-500" />
+                      )}
+                    </button>
+                    {expandedSections.has('experience') && (
+                      <div className="p-4 space-y-6">
+                        {tailoredData.experience?.map((exp, expIndex) => {
+                          const originalExp = originalData.experience?.find(
+                            (o) => o.company === exp.company && o.title === exp.title
+                          ) || originalData.experience?.[expIndex];
+                          return (
+                            <div key={expIndex} className="rounded-lg border border-indigo-100 overflow-hidden">
+                              <div className="p-3 bg-gradient-to-r from-indigo-100 to-blue-100">
+                                <h5 className="font-medium text-slate-900">{exp.title}</h5>
+                                <p className="text-sm text-indigo-600">{exp.company} {exp.dates && `• ${exp.dates}`}</p>
+                              </div>
+                              <div className="grid md:grid-cols-2 gap-4 p-4">
+                                {/* Original Description */}
+                                <div className="relative">
+                                  <div className="absolute -top-2 left-4 px-2 py-0.5 bg-slate-100 rounded text-xs font-medium text-slate-600 uppercase tracking-wide">
+                                    Original
+                                  </div>
+                                  <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                    {originalExp?.description && originalExp.description.length > 0 ? (
+                                      <ul className="space-y-2">
+                                        {originalExp.description.map((desc, j) => (
+                                          <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
+                                            <ChevronRight className="h-3 w-3 text-slate-400 flex-shrink-0 mt-0.5" />
+                                            <span>{desc}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-xs text-slate-500">No description in original</p>
+                                    )}
+                                  </div>
+                                </div>
+                                {/* Tailored Description */}
+                                <div className="relative">
+                                  <div className="absolute -top-2 left-4 px-2 py-0.5 bg-indigo-100 rounded text-xs font-medium text-indigo-700 uppercase tracking-wide">
+                                    Optimized
+                                  </div>
+                                  <div className="mt-2 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                    {exp.description && exp.description.length > 0 ? (
+                                      <ul className="space-y-2">
+                                        {exp.description.map((desc, j) => (
+                                          <li key={j} className="flex items-start gap-2 text-xs text-slate-700">
+                                            <ChevronRight className="h-3 w-3 text-indigo-500 flex-shrink-0 mt-0.5" />
+                                            <span>{desc}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-xs text-slate-500">No description generated</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Info footer */}
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl border border-cyan-200/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-100 flex items-center justify-center">
+                      <Lightbulb className="h-4 w-4 text-cyan-600" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    <span className="font-medium text-slate-700">Pro tip:</span> Review the changes to ensure they accurately represent your experience while being optimized for ATS and recruiters.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Changes Explanation */}
         {version.changesExplanation && (
@@ -397,19 +721,19 @@ export default function VersionDetailPage() {
               </div>
               {/* Quick stats */}
               <div className="relative flex items-center gap-4 mt-4 pt-4 border-t border-white/20">
-                {version.tailoredData.skills && version.tailoredData.skills.length > 0 && (
+                {tailoredData?.skills && tailoredData.skills.length > 0 && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg backdrop-blur-sm">
                     <Zap className="h-4 w-4 text-yellow-300" />
-                    <span className="text-sm font-medium text-white">{version.tailoredData.skills.length} Skills</span>
+                    <span className="text-sm font-medium text-white">{tailoredData.skills.length} Skills</span>
                   </div>
                 )}
-                {version.tailoredData.experience && version.tailoredData.experience.length > 0 && (
+                {tailoredData?.experience && tailoredData.experience.length > 0 && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg backdrop-blur-sm">
                     <Briefcase className="h-4 w-4 text-emerald-300" />
-                    <span className="text-sm font-medium text-white">{version.tailoredData.experience.length} Positions</span>
+                    <span className="text-sm font-medium text-white">{tailoredData.experience.length} Positions</span>
                   </div>
                 )}
-                {version.tailoredData.summary && (
+                {tailoredData?.summary && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg backdrop-blur-sm">
                     <User className="h-4 w-4 text-cyan-300" />
                     <span className="text-sm font-medium text-white">Custom Summary</span>
@@ -421,7 +745,7 @@ export default function VersionDetailPage() {
             {/* Content sections */}
             <div className="p-6 space-y-8">
               {/* Summary */}
-              {version.tailoredData.summary && (
+              {tailoredData?.summary && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25">
@@ -439,14 +763,14 @@ export default function VersionDetailPage() {
                       </svg>
                     </div>
                     <p className="text-sm text-slate-700 leading-relaxed pl-8">
-                      {version.tailoredData.summary}
+                      {tailoredData.summary}
                     </p>
                   </div>
                 </div>
               )}
 
               {/* Skills */}
-              {version.tailoredData.skills && version.tailoredData.skills.length > 0 && (
+              {tailoredData?.skills && tailoredData.skills.length > 0 && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
@@ -459,7 +783,7 @@ export default function VersionDetailPage() {
                   </div>
                   <div className="bg-gradient-to-r from-violet-50/50 to-purple-50/50 rounded-xl p-5 border border-violet-200/50">
                     <div className="flex flex-wrap gap-2">
-                      {version.tailoredData.skills.map((skill, i) => (
+                      {tailoredData.skills.map((skill: string, i: number) => (
                         <span
                           key={i}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-sm font-medium text-slate-700 border border-violet-200/50 shadow-sm hover:shadow-md hover:border-violet-300 transition-all cursor-default"
@@ -474,7 +798,7 @@ export default function VersionDetailPage() {
               )}
 
               {/* Experience */}
-              {version.tailoredData.experience && version.tailoredData.experience.length > 0 && (
+              {tailoredData?.experience && tailoredData.experience.length > 0 && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-500/25">
@@ -486,7 +810,7 @@ export default function VersionDetailPage() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    {version.tailoredData.experience.map((exp, i) => (
+                    {tailoredData.experience.map((exp: any, i: number) => (
                       <div
                         key={i}
                         className="relative bg-white rounded-xl p-5 border border-indigo-200/50 shadow-sm hover:shadow-md transition-shadow group"
@@ -513,7 +837,7 @@ export default function VersionDetailPage() {
                             </div>
                             {exp.description && exp.description.length > 0 && (
                               <ul className="mt-4 space-y-2">
-                                {exp.description.map((desc, j) => (
+                                {exp.description.map((desc: string, j: number) => (
                                   <li key={j} className="flex items-start gap-3 text-sm text-slate-600">
                                     <ChevronRight className="h-4 w-4 text-indigo-400 flex-shrink-0 mt-0.5" />
                                     <span className="leading-relaxed">{desc}</span>

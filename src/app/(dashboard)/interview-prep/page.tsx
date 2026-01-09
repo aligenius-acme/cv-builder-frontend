@@ -19,6 +19,11 @@ import {
   CheckCircle,
   XCircle,
   Lightbulb,
+  AlertTriangle,
+  HelpCircle,
+  ClipboardList,
+  Award,
+  Ban,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -33,6 +38,19 @@ interface Question {
   difficulty: string;
   tips?: string;
   sampleAnswer?: string;
+  redFlagAnswers?: string[];
+  followUpQuestions?: string[];
+  starTemplate?: {
+    situation: string;
+    task: string;
+    action: string;
+    result: string;
+  };
+  scoringRubric?: {
+    excellent: string;
+    good: string;
+    poor: string;
+  };
 }
 
 interface Evaluation {
@@ -61,6 +79,10 @@ export default function InterviewPrepPage() {
   const [practiceMode, setPracticeMode] = useState(false);
   const [commonQuestions, setCommonQuestions] = useState<Question[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showRedFlags, setShowRedFlags] = useState(false);
+  const [showFollowUps, setShowFollowUps] = useState(false);
+  const [showStarTemplate, setShowStarTemplate] = useState(false);
+  const [showScoringRubric, setShowScoringRubric] = useState(false);
 
   useEffect(() => {
     loadCommonQuestions();
@@ -135,23 +157,28 @@ export default function InterviewPrepPage() {
     }
   };
 
+  const resetPanels = () => {
+    setUserAnswer('');
+    setEvaluation(null);
+    setShowSampleAnswer(false);
+    setShowTips(false);
+    setShowRedFlags(false);
+    setShowFollowUps(false);
+    setShowStarTemplate(false);
+    setShowScoringRubric(false);
+  };
+
   const nextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setUserAnswer('');
-      setEvaluation(null);
-      setShowSampleAnswer(false);
-      setShowTips(false);
+      resetPanels();
     }
   };
 
   const previousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setUserAnswer('');
-      setEvaluation(null);
-      setShowSampleAnswer(false);
-      setShowTips(false);
+      resetPanels();
     }
   };
 
@@ -159,8 +186,7 @@ export default function InterviewPrepPage() {
     setQuestions([question]);
     setCurrentQuestionIndex(0);
     setPracticeMode(true);
-    setUserAnswer('');
-    setEvaluation(null);
+    resetPanels();
   };
 
   const toggleQuestionType = (type: string) => {
@@ -199,14 +225,24 @@ export default function InterviewPrepPage() {
     }
   };
 
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Interview Prep</h1>
-            <p className="mt-1 text-slate-500">Practice interview questions and get AI feedback</p>
+        {/* Header Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-8 text-white">
+          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <MessageSquare className="h-5 w-5" />
+              <span className="text-white/80 text-sm font-medium">AI Interview Coach</span>
+            </div>
+            <h1 className="text-3xl lg:text-4xl font-bold mb-2">Interview Prep</h1>
+            <p className="text-white/80 text-lg max-w-2xl">
+              Practice with AI-generated questions tailored to your target role. Get instant feedback
+              and improve your answers before the real interview.
+            </p>
           </div>
         </div>
 
@@ -411,33 +447,200 @@ export default function InterviewPrepPage() {
             <Card variant="elevated">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Badge className={getCategoryColor(questions[currentQuestionIndex]?.category)}>
-                    {questions[currentQuestionIndex]?.category}
+                  <Badge className={getCategoryColor(currentQuestion?.category)}>
+                    {currentQuestion?.category}
                   </Badge>
-                  <Badge className={getDifficultyColor(questions[currentQuestionIndex]?.difficulty)}>
-                    {questions[currentQuestionIndex]?.difficulty}
+                  <Badge className={getDifficultyColor(currentQuestion?.difficulty)}>
+                    {currentQuestion?.difficulty}
                   </Badge>
                 </div>
 
                 <h2 className="text-xl font-semibold text-slate-900 mb-6">
-                  {questions[currentQuestionIndex]?.question}
+                  {currentQuestion?.question}
                 </h2>
 
-                {/* Tips Toggle */}
-                {questions[currentQuestionIndex]?.tips && (
-                  <button
-                    onClick={() => setShowTips(!showTips)}
-                    className="flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 mb-4"
-                  >
-                    <Lightbulb className="h-4 w-4" />
-                    {showTips ? 'Hide Tips' : 'Show Tips'}
-                    <ChevronDown className={cn('h-4 w-4 transition-transform', showTips && 'rotate-180')} />
-                  </button>
+                {/* Preparation Helpers */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {currentQuestion?.tips && (
+                    <button
+                      onClick={() => setShowTips(!showTips)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        showTips
+                          ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      <Lightbulb className="h-4 w-4" />
+                      Tips
+                    </button>
+                  )}
+                  {currentQuestion?.starTemplate && (
+                    <button
+                      onClick={() => setShowStarTemplate(!showStarTemplate)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        showStarTemplate
+                          ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      <ClipboardList className="h-4 w-4" />
+                      STAR Template
+                    </button>
+                  )}
+                  {currentQuestion?.redFlagAnswers && currentQuestion.redFlagAnswers.length > 0 && (
+                    <button
+                      onClick={() => setShowRedFlags(!showRedFlags)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        showRedFlags
+                          ? 'bg-red-100 text-red-700 ring-1 ring-red-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      <Ban className="h-4 w-4" />
+                      Red Flags
+                    </button>
+                  )}
+                  {currentQuestion?.followUpQuestions && currentQuestion.followUpQuestions.length > 0 && (
+                    <button
+                      onClick={() => setShowFollowUps(!showFollowUps)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        showFollowUps
+                          ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                      Follow-ups
+                    </button>
+                  )}
+                  {currentQuestion?.scoringRubric && (
+                    <button
+                      onClick={() => setShowScoringRubric(!showScoringRubric)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        showScoringRubric
+                          ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      <Award className="h-4 w-4" />
+                      Scoring Guide
+                    </button>
+                  )}
+                </div>
+
+                {/* Tips Panel */}
+                {showTips && currentQuestion?.tips && (
+                  <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="h-4 w-4 text-amber-600" />
+                      <h4 className="font-medium text-amber-900">Answering Tips</h4>
+                    </div>
+                    <p className="text-sm text-amber-800">{currentQuestion.tips}</p>
+                  </div>
                 )}
 
-                {showTips && questions[currentQuestionIndex]?.tips && (
-                  <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 mb-4">
-                    <p className="text-sm text-amber-800">{questions[currentQuestionIndex].tips}</p>
+                {/* STAR Template Panel */}
+                {showStarTemplate && currentQuestion?.starTemplate && (
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ClipboardList className="h-4 w-4 text-blue-600" />
+                      <h4 className="font-medium text-blue-900">STAR Method Template</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">S</span>
+                        <div>
+                          <p className="font-medium text-blue-900 text-sm">Situation</p>
+                          <p className="text-sm text-blue-700">{currentQuestion.starTemplate.situation}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">T</span>
+                        <div>
+                          <p className="font-medium text-blue-900 text-sm">Task</p>
+                          <p className="text-sm text-blue-700">{currentQuestion.starTemplate.task}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">A</span>
+                        <div>
+                          <p className="font-medium text-blue-900 text-sm">Action</p>
+                          <p className="text-sm text-blue-700">{currentQuestion.starTemplate.action}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">R</span>
+                        <div>
+                          <p className="font-medium text-blue-900 text-sm">Result</p>
+                          <p className="text-sm text-blue-700">{currentQuestion.starTemplate.result}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Red Flag Answers Panel */}
+                {showRedFlags && currentQuestion?.redFlagAnswers && currentQuestion.redFlagAnswers.length > 0 && (
+                  <div className="p-4 bg-red-50 rounded-xl border border-red-200 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Ban className="h-4 w-4 text-red-600" />
+                      <h4 className="font-medium text-red-900">Answers to Avoid</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {currentQuestion.redFlagAnswers.map((flag, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-red-800">
+                          <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                          <span>{flag}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Follow-up Questions Panel */}
+                {showFollowUps && currentQuestion?.followUpQuestions && currentQuestion.followUpQuestions.length > 0 && (
+                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-200 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <HelpCircle className="h-4 w-4 text-purple-600" />
+                      <h4 className="font-medium text-purple-900">Likely Follow-up Questions</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {currentQuestion.followUpQuestions.map((followUp, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-purple-800">
+                          <ChevronRight className="h-4 w-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                          <span>{followUp}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Scoring Rubric Panel */}
+                {showScoringRubric && currentQuestion?.scoringRubric && (
+                  <div className="p-4 bg-gradient-to-r from-green-50 via-amber-50 to-red-50 rounded-xl border border-slate-200 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Award className="h-4 w-4 text-slate-600" />
+                      <h4 className="font-medium text-slate-900">Self-Evaluation Guide</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="p-3 bg-green-100/50 rounded-lg border border-green-200">
+                        <p className="font-medium text-green-800 text-sm mb-1">Excellent</p>
+                        <p className="text-xs text-green-700">{currentQuestion.scoringRubric.excellent}</p>
+                      </div>
+                      <div className="p-3 bg-amber-100/50 rounded-lg border border-amber-200">
+                        <p className="font-medium text-amber-800 text-sm mb-1">Good</p>
+                        <p className="text-xs text-amber-700">{currentQuestion.scoringRubric.good}</p>
+                      </div>
+                      <div className="p-3 bg-red-100/50 rounded-lg border border-red-200">
+                        <p className="font-medium text-red-800 text-sm mb-1">Needs Work</p>
+                        <p className="text-xs text-red-700">{currentQuestion.scoringRubric.poor}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -464,7 +667,7 @@ export default function InterviewPrepPage() {
                       {isEvaluating ? 'Evaluating...' : 'Get AI Feedback'}
                     </Button>
 
-                    {questions[currentQuestionIndex]?.sampleAnswer && (
+                    {currentQuestion?.sampleAnswer && (
                       <Button
                         variant="outline"
                         onClick={() => setShowSampleAnswer(!showSampleAnswer)}
@@ -476,10 +679,10 @@ export default function InterviewPrepPage() {
                 </div>
 
                 {/* Sample Answer */}
-                {showSampleAnswer && questions[currentQuestionIndex]?.sampleAnswer && (
+                {showSampleAnswer && currentQuestion?.sampleAnswer && (
                   <div className="mt-6 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
                     <h4 className="font-medium text-indigo-900 mb-2">Sample Answer</h4>
-                    <p className="text-sm text-indigo-800">{questions[currentQuestionIndex].sampleAnswer}</p>
+                    <p className="text-sm text-indigo-800">{currentQuestion.sampleAnswer}</p>
                   </div>
                 )}
 
@@ -528,10 +731,10 @@ export default function InterviewPrepPage() {
                           Areas for Improvement
                         </h4>
                         <ul className="space-y-1">
-                          {evaluation.improvements.map((i, idx) => (
+                          {evaluation.improvements.map((item, idx) => (
                             <li key={idx} className="text-sm text-amber-800 flex items-start gap-2">
                               <span className="text-amber-500 mt-1">•</span>
-                              {i}
+                              {item}
                             </li>
                           ))}
                         </ul>

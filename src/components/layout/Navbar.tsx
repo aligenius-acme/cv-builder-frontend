@@ -26,6 +26,7 @@ import {
   GraduationCap,
   BookOpen,
   Wand2,
+  MoreHorizontal,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -33,19 +34,31 @@ import Button from '@/components/ui/Button';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const pathname = usePathname();
 
-  const navigation = [
+  // Primary navigation - most used features
+  const primaryNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Resumes', href: '/resumes', icon: FileText },
     { name: 'Builder', href: '/resume-builder', icon: PenTool },
+    { name: 'Letters', href: '/cover-letters', icon: BookOpen },
     { name: 'AI Tools', href: '/ai-tools', icon: Wand2 },
     { name: 'Tracker', href: '/job-tracker', icon: Kanban },
-    { name: 'A/B Test', href: '/ab-testing', icon: FlaskConical },
-    { name: 'Skills', href: '/skill-gap', icon: GraduationCap },
     { name: 'Jobs', href: '/jobs', icon: Search },
   ];
+
+  // Secondary navigation - "More" dropdown
+  const moreNavigation = [
+    { name: 'Interview Prep', href: '/interview-prep', icon: MessageSquare },
+    { name: 'Salary Analyzer', href: '/salary-analyzer', icon: DollarSign },
+    { name: 'A/B Testing', href: '/ab-testing', icon: FlaskConical },
+    { name: 'Skill Gap', href: '/skill-gap', icon: GraduationCap },
+  ];
+
+  // All navigation for mobile
+  const allNavigation = [...primaryNavigation, ...moreNavigation];
 
   const userNavigation = [
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -53,6 +66,7 @@ export default function Navbar() {
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+  const isMoreActive = moreNavigation.some(item => isActive(item.href));
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
@@ -74,24 +88,78 @@ export default function Navbar() {
 
             {isAuthenticated && (
               <div className="hidden md:ml-10 md:flex md:items-center md:space-x-1">
-                {navigation.map((item) => (
+                {/* Primary Navigation */}
+                {primaryNavigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'flex items-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200',
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200',
                       isActive(item.href)
                         ? 'text-indigo-600 bg-indigo-50'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     )}
                   >
                     <item.icon className={cn(
-                      'h-4 w-4 mr-2',
+                      'h-4 w-4 mr-1.5',
                       isActive(item.href) ? 'text-indigo-600' : 'text-slate-400'
                     )} />
                     {item.name}
                   </Link>
                 ))}
+
+                {/* More Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowMoreMenu(!showMoreMenu)}
+                    className={cn(
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200',
+                      isMoreActive
+                        ? 'text-indigo-600 bg-indigo-50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    )}
+                  >
+                    <MoreHorizontal className={cn(
+                      'h-4 w-4 mr-1.5',
+                      isMoreActive ? 'text-indigo-600' : 'text-slate-400'
+                    )} />
+                    More
+                    <ChevronDown className={cn(
+                      'h-3.5 w-3.5 ml-1 transition-transform duration-200',
+                      showMoreMenu && 'rotate-180'
+                    )} />
+                  </button>
+
+                  {showMoreMenu && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowMoreMenu(false)}
+                      />
+                      <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/60 py-2 z-20 animate-slide-down">
+                        {moreNavigation.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            onClick={() => setShowMoreMenu(false)}
+                            className={cn(
+                              'flex items-center px-4 py-2.5 text-sm transition-colors',
+                              isActive(item.href)
+                                ? 'text-indigo-600 bg-indigo-50'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                            )}
+                          >
+                            <item.icon className={cn(
+                              'h-4 w-4 mr-3',
+                              isActive(item.href) ? 'text-indigo-600' : 'text-slate-400'
+                            )} />
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -212,7 +280,8 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                {navigation.map((item) => (
+                {/* All navigation items for mobile */}
+                {allNavigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}

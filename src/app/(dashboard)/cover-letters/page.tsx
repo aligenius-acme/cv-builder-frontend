@@ -16,6 +16,17 @@ import {
   Building,
   ChevronRight,
   Crown,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  CheckCircle,
+  Lightbulb,
+  Mail,
+  MessageSquare,
+  Target,
+  Wand2,
+  X,
+  Edit3,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { CoverLetter, Resume } from '@/types';
@@ -23,13 +34,28 @@ import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
+interface EnhancedCoverLetter extends CoverLetter {
+  alternativeOpenings?: string[];
+  keyPhrases?: string[];
+  toneAnalysis?: {
+    current: string;
+    score: number;
+    suggestions?: string[];
+  };
+  callToActionVariations?: string[];
+  subjectLineOptions?: string[];
+}
+
 export default function CoverLettersPage() {
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
+  const [coverLetters, setCoverLetters] = useState<EnhancedCoverLetter[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showGenerator, setShowGenerator] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasAccess, setHasAccess] = useState(true);
+  const [expandedLetter, setExpandedLetter] = useState<string | null>(null);
+  const [showEnhancements, setShowEnhancements] = useState<Record<string, boolean>>({});
+  const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
   // Form state
   const [jobTitle, setJobTitle] = useState('');
@@ -74,12 +100,23 @@ export default function CoverLettersPage() {
 
     setIsGenerating(true);
     try {
-      const response = await api.generateCoverLetter({
-        jobTitle,
-        companyName,
-        jobDescription,
-        tone,
-      });
+      // Try enhanced endpoint first, fallback to regular
+      let response;
+      try {
+        response = await api.generateEnhancedCoverLetter({
+          jobTitle,
+          companyName,
+          jobDescription,
+          tone,
+        });
+      } catch {
+        response = await api.generateCoverLetter({
+          jobTitle,
+          companyName,
+          jobDescription,
+          tone,
+        });
+      }
 
       if (response.success && response.data) {
         setCoverLetters((prev) => [response.data!, ...prev]);
@@ -126,6 +163,20 @@ export default function CoverLettersPage() {
     }
   };
 
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedItem(id);
+    toast.success('Copied to clipboard!');
+    setTimeout(() => setCopiedItem(null), 2000);
+  };
+
+  const toggleEnhancements = (id: string) => {
+    setShowEnhancements((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   if (!hasAccess) {
     return (
       <div className="min-h-screen bg-mesh">
@@ -163,22 +214,31 @@ export default function CoverLettersPage() {
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Cover Letters</h1>
-            <p className="text-slate-500 mt-1">
-              Generate AI-powered cover letters tailored to your job applications
-            </p>
+        {/* Header Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 p-8 text-white">
+          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5" />
+                <span className="text-white/80 text-sm font-medium">AI Writing Assistant</span>
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-bold mb-2">Cover Letters</h1>
+              <p className="text-white/80 text-lg max-w-2xl">
+                Generate compelling, personalized cover letters that highlight your unique value
+                and match each job opportunity perfectly.
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="lg"
+              leftIcon={<Plus className="h-5 w-5" />}
+              onClick={() => setShowGenerator(!showGenerator)}
+              className="mt-6 lg:mt-0"
+            >
+              Generate Cover Letter
+            </Button>
           </div>
-          <Button
-            variant="gradient"
-            size="lg"
-            leftIcon={<Plus className="h-5 w-5" />}
-            onClick={() => setShowGenerator(!showGenerator)}
-          >
-            Generate Cover Letter
-          </Button>
         </div>
 
         {/* Generator Form */}
@@ -320,7 +380,7 @@ export default function CoverLettersPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
             {coverLetters.map((coverLetter, index) => (
               <Card
                 key={coverLetter.id}
@@ -358,6 +418,17 @@ export default function CoverLettersPage() {
                         <Download className="h-5 w-5" />
                       </button>
                       <button
+                        onClick={() => copyToClipboard(coverLetter.content, coverLetter.id)}
+                        className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                        title="Copy content"
+                      >
+                        {copiedItem === coverLetter.id ? (
+                          <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        ) : (
+                          <Copy className="h-5 w-5" />
+                        )}
+                      </button>
+                      <button
                         onClick={() => handleDelete(coverLetter.id)}
                         className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                         title="Delete"
@@ -367,11 +438,207 @@ export default function CoverLettersPage() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-slate-50 rounded-xl">
+                  {/* Cover Letter Content */}
+                  <div className="p-4 bg-slate-50 rounded-xl mb-4">
                     <p className="text-sm text-slate-700 whitespace-pre-wrap line-clamp-4">
                       {coverLetter.content}
                     </p>
+                    <button
+                      onClick={() => setExpandedLetter(expandedLetter === coverLetter.id ? null : coverLetter.id)}
+                      className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
+                    >
+                      {expandedLetter === coverLetter.id ? (
+                        <>
+                          Show less
+                          <ChevronUp className="h-4 w-4" />
+                        </>
+                      ) : (
+                        <>
+                          Read full letter
+                          <ChevronDown className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                    {expandedLetter === coverLetter.id && (
+                      <div className="mt-3 pt-3 border-t border-slate-200">
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                          {coverLetter.content}
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Enhanced AI Features Section */}
+                  {(coverLetter.alternativeOpenings || coverLetter.subjectLineOptions || coverLetter.callToActionVariations) && (
+                    <div className="border-t border-slate-200 pt-4">
+                      <button
+                        onClick={() => toggleEnhancements(coverLetter.id)}
+                        className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors mb-3"
+                      >
+                        <Wand2 className="h-4 w-4" />
+                        {showEnhancements[coverLetter.id] ? 'Hide' : 'Show'} AI Alternatives & Enhancements
+                        {showEnhancements[coverLetter.id] ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </button>
+
+                      {showEnhancements[coverLetter.id] && (
+                        <div className="space-y-4 animate-slide-up">
+                          {/* Subject Line Options */}
+                          {coverLetter.subjectLineOptions && coverLetter.subjectLineOptions.length > 0 && (
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                              <h4 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                                <Mail className="h-4 w-4" />
+                                Email Subject Lines
+                              </h4>
+                              <div className="space-y-2">
+                                {coverLetter.subjectLineOptions.map((subject, idx) => (
+                                  <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-3 border border-blue-100">
+                                    <span className="text-sm text-slate-700">{subject}</span>
+                                    <button
+                                      onClick={() => copyToClipboard(subject, `subject-${coverLetter.id}-${idx}`)}
+                                      className="text-blue-600 hover:text-blue-700 p-1"
+                                    >
+                                      {copiedItem === `subject-${coverLetter.id}-${idx}` ? (
+                                        <CheckCircle className="h-4 w-4" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Alternative Openings */}
+                          {coverLetter.alternativeOpenings && coverLetter.alternativeOpenings.length > 0 && (
+                            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                              <h4 className="text-sm font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                                <Edit3 className="h-4 w-4" />
+                                Alternative Opening Paragraphs
+                              </h4>
+                              <div className="space-y-3">
+                                {coverLetter.alternativeOpenings.map((opening, idx) => (
+                                  <div key={idx} className="bg-white rounded-lg p-3 border border-purple-100">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex-1">
+                                        <Badge className="bg-purple-100 text-purple-700 mb-2">Option {idx + 1}</Badge>
+                                        <p className="text-sm text-slate-700">{opening}</p>
+                                      </div>
+                                      <button
+                                        onClick={() => copyToClipboard(opening, `opening-${coverLetter.id}-${idx}`)}
+                                        className="text-purple-600 hover:text-purple-700 p-1 flex-shrink-0"
+                                      >
+                                        {copiedItem === `opening-${coverLetter.id}-${idx}` ? (
+                                          <CheckCircle className="h-4 w-4" />
+                                        ) : (
+                                          <Copy className="h-4 w-4" />
+                                        )}
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Call to Action Variations */}
+                          {coverLetter.callToActionVariations && coverLetter.callToActionVariations.length > 0 && (
+                            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                              <h4 className="text-sm font-semibold text-emerald-800 mb-3 flex items-center gap-2">
+                                <Target className="h-4 w-4" />
+                                Call-to-Action Closing Variations
+                              </h4>
+                              <div className="space-y-2">
+                                {coverLetter.callToActionVariations.map((cta, idx) => (
+                                  <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-3 border border-emerald-100">
+                                    <span className="text-sm text-slate-700">{cta}</span>
+                                    <button
+                                      onClick={() => copyToClipboard(cta, `cta-${coverLetter.id}-${idx}`)}
+                                      className="text-emerald-600 hover:text-emerald-700 p-1"
+                                    >
+                                      {copiedItem === `cta-${coverLetter.id}-${idx}` ? (
+                                        <CheckCircle className="h-4 w-4" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Key Phrases */}
+                          {coverLetter.keyPhrases && coverLetter.keyPhrases.length > 0 && (
+                            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+                              <h4 className="text-sm font-semibold text-amber-800 mb-3 flex items-center gap-2">
+                                <Lightbulb className="h-4 w-4" />
+                                Key Phrases to Highlight
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {coverLetter.keyPhrases.map((phrase, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    className="bg-white text-amber-700 border border-amber-200 cursor-pointer hover:bg-amber-100 transition-colors"
+                                    onClick={() => copyToClipboard(phrase, `phrase-${coverLetter.id}-${idx}`)}
+                                  >
+                                    {copiedItem === `phrase-${coverLetter.id}-${idx}` ? (
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                    ) : null}
+                                    {phrase}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Tone Analysis */}
+                          {coverLetter.toneAnalysis && (
+                            <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-slate-200">
+                              <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4" />
+                                Tone Analysis
+                              </h4>
+                              <div className="flex items-center gap-4 mb-2">
+                                <span className="text-sm text-slate-600">Current Tone:</span>
+                                <Badge className="bg-slate-100 text-slate-700">{coverLetter.toneAnalysis.current}</Badge>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-slate-600">Score:</span>
+                                  <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full rounded-full ${
+                                        coverLetter.toneAnalysis.score >= 80 ? 'bg-emerald-500' :
+                                        coverLetter.toneAnalysis.score >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                                      }`}
+                                      style={{ width: `${coverLetter.toneAnalysis.score}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-sm font-medium text-slate-700">{coverLetter.toneAnalysis.score}%</span>
+                                </div>
+                              </div>
+                              {coverLetter.toneAnalysis.suggestions && coverLetter.toneAnalysis.suggestions.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-slate-200">
+                                  <span className="text-xs font-medium text-slate-500 uppercase">Suggestions:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {coverLetter.toneAnalysis.suggestions.map((suggestion, idx) => (
+                                      <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                                        <ChevronRight className="h-4 w-4 mt-0.5 text-slate-400 flex-shrink-0" />
+                                        {suggestion}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
