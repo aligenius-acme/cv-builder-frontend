@@ -140,95 +140,107 @@ export default function DashboardPage() {
 
         {/* Career Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-                  <FileText className="h-5 w-5 text-white" />
+          <Link href="/resumes">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                    <FileText className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">{resumes.length}</p>
+                    <p className="text-xs font-medium text-slate-500">Resumes</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">{resumes.length}</p>
-                  <p className="text-xs font-medium text-slate-500">Resumes</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
-                  <Target className="h-5 w-5 text-white" />
+          <Link href="/resumes">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                    <Target className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">{totalVersions}</p>
+                    <p className="text-xs font-medium text-slate-500">Versions</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">{totalVersions}</p>
-                  <p className="text-xs font-medium text-slate-500">Versions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                  <Briefcase className="h-5 w-5 text-white" />
+          <Link href="/cover-letters">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                    <Briefcase className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">{coverLetters.length}</p>
+                    <p className="text-xs font-medium text-slate-500">Cover Letters</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">{coverLetters.length}</p>
-                  <p className="text-xs font-medium text-slate-500">Cover Letters</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-                  <Send className="h-5 w-5 text-white" />
+          <Link href="/job-tracker">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                    <Send className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {(careerStats as any)?.applications?.total || 0}
+                    </p>
+                    <p className="text-xs font-medium text-slate-500">Applications</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {(careerStats as any)?.applications?.total || 0}
-                  </p>
-                  <p className="text-xs font-medium text-slate-500">Applications</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
-                  <Calendar className="h-5 w-5 text-white" />
+          <Link href="/job-tracker">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {(careerStats as any)?.upcoming?.interviews?.length || 0}
+                    </p>
+                    <p className="text-xs font-medium text-slate-500">Interviews</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {(careerStats as any)?.upcoming?.interviews?.length || 0}
-                  </p>
-                  <p className="text-xs font-medium text-slate-500">Interviews</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card variant="gradient" hover className="group">
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
-                  <CheckCircle className="h-5 w-5 text-white" />
+          <Link href="/job-tracker">
+            <Card variant="gradient" hover className="group cursor-pointer">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+                    <CheckCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {(careerStats as any)?.applications?.responseRate || 0}%
+                    </p>
+                    <p className="text-xs font-medium text-slate-500">Response Rate</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {(careerStats as any)?.applications?.responseRate || 0}%
-                  </p>
-                  <p className="text-xs font-medium text-slate-500">Response Rate</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Application Tracker Summary */}

@@ -45,8 +45,10 @@ export interface ParsedResumeData {
   experience: ExperienceEntry[];
   education: EducationEntry[];
   skills: string[];
-  certifications?: string[];
+  certifications?: CertificationEntry[];
   projects?: ProjectEntry[];
+  languages?: string[];
+  awards?: AwardEntry[];
   contact: ContactInfo;
 }
 
@@ -74,6 +76,21 @@ export interface ProjectEntry {
   description: string;
   technologies?: string[];
   url?: string;
+  link?: string;
+  company?: string;
+  dates?: string;
+}
+
+export interface CertificationEntry {
+  name: string;
+  issuer?: string;
+  date?: string;
+}
+
+export interface AwardEntry {
+  name: string;
+  issuer?: string;
+  date?: string;
 }
 
 export interface ContactInfo {

@@ -71,8 +71,8 @@ export default function ResumesPage() {
 
   const filteredResumes = resumes.filter(
     (resume) =>
-      resume.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resume.fileName.toLowerCase().includes(searchQuery.toLowerCase())
+      (resume.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (resume.fileName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
 
   return (

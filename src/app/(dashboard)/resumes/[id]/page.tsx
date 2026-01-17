@@ -30,12 +30,19 @@ import {
   GraduationCap,
   GitCompare,
   Loader2,
+  FolderKanban,
+  Award,
+  Globe,
+  Trophy,
   DollarSign,
   Clock,
   Heart,
   Search,
   ChevronDown,
   ExternalLink,
+  Eye,
+  EyeOff,
+  Code,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -52,6 +59,7 @@ export default function ResumeDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showCustomizeForm, setShowCustomizeForm] = useState(false);
+  const [showRawText, setShowRawText] = useState(false);
 
   // Customize form state
   const [jobTitle, setJobTitle] = useState('');
@@ -630,9 +638,22 @@ export default function ResumeDetailPage() {
                 {resume.parsedData.summary && (
                   <div>
                     <h4 className="font-semibold text-slate-900 mb-3">Summary</h4>
-                    <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl">
-                      {resume.parsedData.summary}
-                    </p>
+                    <div className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl">
+                      {resume.parsedData.summary.split('\n').map((line, i) => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) return null;
+                        const hasBullet = trimmedLine.startsWith('•');
+                        const text = hasBullet ? trimmedLine.substring(1).trim() : trimmedLine;
+                        return hasBullet ? (
+                          <div key={i} className="flex items-start gap-2 mb-1">
+                            <span className="text-indigo-400 mt-0.5">•</span>
+                            <span>{text}</span>
+                          </div>
+                        ) : (
+                          <p key={i} className={i > 0 ? 'mt-2' : ''}>{text}</p>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 
@@ -640,13 +661,14 @@ export default function ResumeDetailPage() {
                 {resume.parsedData.skills && resume.parsedData.skills.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-slate-900 mb-3">Skills</h4>
-                    <div className="flex flex-wrap gap-2">
+                    <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-sm text-slate-600">
                       {resume.parsedData.skills.map((skill, i) => (
-                        <Badge key={i} variant="info">
-                          {skill}
-                        </Badge>
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-teal-500 mt-0.5">•</span>
+                          <span>{skill}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
 
@@ -671,12 +693,16 @@ export default function ResumeDetailPage() {
                           </p>
                           {exp.description && exp.description.length > 0 && (
                             <ul className="mt-2 text-sm text-slate-600 space-y-1">
-                              {exp.description.slice(0, 3).map((desc, j) => (
-                                <li key={j} className="flex items-start gap-2">
-                                  <span className="text-indigo-400 mt-1.5">•</span>
-                                  {desc}
-                                </li>
-                              ))}
+                              {exp.description.map((desc, j) => {
+                                const hasBullet = desc.startsWith('•');
+                                const text = hasBullet ? desc.substring(1).trim() : desc;
+                                return (
+                                  <li key={j} className="flex items-start gap-2">
+                                    <span className="text-indigo-400 mt-1.5">•</span>
+                                    <span className="whitespace-pre-wrap">{text}</span>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           )}
                         </div>
@@ -688,27 +714,212 @@ export default function ResumeDetailPage() {
                 {/* Education */}
                 {resume.parsedData.education && resume.parsedData.education.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                       <GraduationCap className="h-4 w-4 text-slate-400" />
                       Education
                     </h4>
-                    <div className="space-y-3">
+                    <ul className="space-y-3 text-sm text-slate-600">
                       {resume.parsedData.education.map((edu, i) => (
-                        <div key={i} className="bg-slate-50 p-4 rounded-xl">
-                          <p className="font-medium text-slate-900">{edu.degree}</p>
-                          <p className="text-sm text-slate-600">
-                            {edu.institution}
-                            {edu.graduationDate && (
-                              <span className="text-slate-400"> • {edu.graduationDate}</span>
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-violet-500 mt-0.5">•</span>
+                          <div>
+                            <p className="font-medium text-slate-900">{edu.degree}</p>
+                            <p className="text-slate-600">
+                              {edu.institution}
+                              {edu.graduationDate && (
+                                <span className="text-slate-400"> • {edu.graduationDate}</span>
+                              )}
+                            </p>
+                            {edu.gpa && (
+                              <p className="text-slate-500">GPA: {edu.gpa}</p>
                             )}
-                          </p>
+                            {edu.achievements && edu.achievements.length > 0 && (
+                              <ul className="mt-1 ml-4 space-y-0.5">
+                                {edu.achievements.map((achievement, j) => (
+                                  <li key={j} className="flex items-start gap-2">
+                                    <span className="text-violet-300 mt-0.5">◦</span>
+                                    <span>{achievement}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Projects */}
+                {resume.parsedData.projects && resume.parsedData.projects.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                      <FolderKanban className="h-4 w-4 text-slate-400" />
+                      Projects
+                    </h4>
+                    <div className="space-y-4">
+                      {resume.parsedData.projects.map((project, i) => (
+                        <div key={i} className="border-l-2 border-purple-200 pl-4">
+                          <h5 className="font-medium text-slate-900">{project.name}</h5>
+                          {project.company && (
+                            <p className="text-sm text-purple-600 font-medium">
+                              {project.company}
+                              {project.dates && (
+                                <span className="text-slate-500 font-normal"> • {project.dates}</span>
+                              )}
+                            </p>
+                          )}
+                          {project.description && (
+                            <div className="mt-1 text-sm text-slate-600">
+                              {project.description.split('\n').map((line, k) => {
+                                const trimmedLine = line.trim();
+                                if (!trimmedLine) return null;
+                                const hasBullet = trimmedLine.startsWith('•');
+                                const text = hasBullet ? trimmedLine.substring(1).trim() : trimmedLine;
+                                return hasBullet ? (
+                                  <div key={k} className="flex items-start gap-2 mb-1">
+                                    <span className="text-purple-400 mt-0.5">•</span>
+                                    <span>{text}</span>
+                                  </div>
+                                ) : (
+                                  <p key={k} className={k > 0 ? 'mt-1' : ''}>{text}</p>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {project.technologies && project.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {project.technologies.map((tech, j) => (
+                                <Badge key={j} variant="secondary" size="sm">
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          {(project.url || project.link) && (
+                            <a
+                              href={project.url || project.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 mt-2 text-sm text-indigo-600 hover:text-indigo-700"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              View Project
+                            </a>
+                          )}
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
+
+                {/* Certifications */}
+                {resume.parsedData.certifications && resume.parsedData.certifications.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                      <Award className="h-4 w-4 text-slate-400" />
+                      Certifications
+                    </h4>
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      {resume.parsedData.certifications.map((cert, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-emerald-500 mt-0.5">•</span>
+                          <span>
+                            <span className="font-medium text-slate-900">{cert.name}</span>
+                            {(cert.issuer || cert.date) && (
+                              <span className="text-slate-500">
+                                {cert.issuer && ` — ${cert.issuer}`}
+                                {cert.date && ` (${cert.date})`}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Languages */}
+                {resume.parsedData.languages && resume.parsedData.languages.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-slate-400" />
+                      Languages
+                    </h4>
+                    <ul className="space-y-1 text-sm text-slate-600">
+                      {resume.parsedData.languages.map((language, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-blue-500 mt-0.5">•</span>
+                          <span>{language}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Awards */}
+                {resume.parsedData.awards && resume.parsedData.awards.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                      <Trophy className="h-4 w-4 text-slate-400" />
+                      Awards & Achievements
+                    </h4>
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      {resume.parsedData.awards.map((award, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-amber-500 mt-0.5">•</span>
+                          <span>
+                            <span className="font-medium text-slate-900">{award.name}</span>
+                            {(award.issuer || award.date) && (
+                              <span className="text-slate-500">
+                                {award.issuer && ` — ${award.issuer}`}
+                                {award.date && ` (${award.date})`}
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </CardContent>
+          </Card>
+        )}
+
+        {/* Raw Text Section */}
+        {resume.rawText && (
+          <Card variant="elevated">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Code className="h-5 w-5 text-slate-600" />
+                    Raw Extracted Text
+                  </CardTitle>
+                  <CardDescription>
+                    Text extracted from your uploaded document
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowRawText(!showRawText)}
+                  leftIcon={showRawText ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                >
+                  {showRawText ? 'Hide' : 'Show'}
+                </Button>
+              </div>
+            </CardHeader>
+            {showRawText && (
+              <CardContent>
+                <div className="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
+                  <pre className="text-sm text-slate-600 whitespace-pre-wrap font-mono">
+                    {resume.rawText}
+                  </pre>
+                </div>
+              </CardContent>
+            )}
           </Card>
         )}
 
