@@ -40,9 +40,6 @@ import {
   Search,
   ChevronDown,
   ExternalLink,
-  Eye,
-  EyeOff,
-  Code,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -59,7 +56,6 @@ export default function ResumeDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showCustomizeForm, setShowCustomizeForm] = useState(false);
-  const [showRawText, setShowRawText] = useState(false);
 
   // Customize form state
   const [jobTitle, setJobTitle] = useState('');
@@ -584,93 +580,101 @@ export default function ResumeDetailPage() {
           </Card>
         )}
 
-        {/* Original Resume Data */}
-        {resume.parsedData && (
+        {/* Original Resume Content */}
+        {resume.rawText && (
           <Card variant="elevated">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-indigo-600" />
-                Parsed Resume Data
+                Resume Content
               </CardTitle>
-              <CardDescription>
-                Data extracted from your original resume
-              </CardDescription>
+              <CardDescription>Original content from your resume</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-8">
-                {/* Contact */}
-                {resume.parsedData.contact && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                      <User className="h-4 w-4 text-slate-400" />
-                      Contact Information
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {resume.parsedData.contact.name && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <User className="h-4 w-4 text-slate-400" />
-                          {resume.parsedData.contact.name}
-                        </div>
-                      )}
-                      {resume.parsedData.contact.email && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <Mail className="h-4 w-4 text-slate-400" />
-                          {resume.parsedData.contact.email}
-                        </div>
-                      )}
-                      {resume.parsedData.contact.phone && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <Phone className="h-4 w-4 text-slate-400" />
-                          {resume.parsedData.contact.phone}
-                        </div>
-                      )}
-                      {resume.parsedData.contact.location && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <MapPin className="h-4 w-4 text-slate-400" />
-                          {resume.parsedData.contact.location}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+              <div className="text-sm text-slate-600">
+                {(() => {
+                  let underSubHeader = false;
 
-                {/* Summary */}
-                {resume.parsedData.summary && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3">Summary</h4>
-                    <div className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl">
-                      {resume.parsedData.summary.split('\n').map((line, i) => {
-                        const trimmedLine = line.trim();
-                        if (!trimmedLine) return null;
-                        const hasBullet = trimmedLine.startsWith('•');
-                        const text = hasBullet ? trimmedLine.substring(1).trim() : trimmedLine;
-                        return hasBullet ? (
-                          <div key={i} className="flex items-start gap-2 mb-1">
-                            <span className="text-indigo-400 mt-0.5">•</span>
-                            <span>{text}</span>
-                          </div>
-                        ) : (
-                          <p key={i} className={i > 0 ? 'mt-2' : ''}>{text}</p>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                  return resume.rawText.split('\n').map((line, index) => {
+                    const trimmedLine = line.trim();
 
-                {/* Skills */}
-                {resume.parsedData.skills && resume.parsedData.skills.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3">Skills</h4>
-                    <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-sm text-slate-600">
-                      {resume.parsedData.skills.map((skill, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-teal-500 mt-0.5">•</span>
-                          <span>{skill}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                    if (!trimmedLine) {
+                      return <div key={index} className="h-2" />;
+                    }
+
+                    // Section header
+                    const isHeader = (
+                      trimmedLine.length < 50 &&
+                      (trimmedLine === trimmedLine.toUpperCase() ||
+                       /^(Summary|Experience|Education|Skills|Projects|Certifications|Languages|Awards|Profile|Objective|Work History|Employment|Technical Skills|Professional Experience|Core Competencies|Achievements|Publications|References)/i.test(trimmedLine))
+                    );
+
+                    // Sub-header
+                    const hasDate = /\b(19|20)\d{2}\b/.test(trimmedLine) || /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i.test(trimmedLine);
+                    const isSubHeader = (
+                      !isHeader &&
+                      trimmedLine.length < 100 &&
+                      !/\.$/.test(trimmedLine) &&
+                      (hasDate ||
+                       /\b(Engineer|Developer|Manager|Director|Lead|Senior|Junior|Intern|Associate|Analyst|Designer|Consultant|Specialist|Coordinator|Administrator|Architect|Scientist|University|College|Institute|School|Inc|LLC|Ltd|Corp|Company|Bachelor|Master|PhD|MBA|B\.S\.|M\.S\.|B\.A\.|M\.A\.)\b/i.test(trimmedLine))
+                    );
+
+                    // Remove existing bullet characters for clean display
+                    const cleanLine = trimmedLine.replace(/^[•\-\*▪◦›●○]\s*/, '');
+
+                    if (isHeader) {
+                      underSubHeader = false;
+                      return (
+                        <h3 key={index} className="font-bold text-slate-800 uppercase tracking-wide text-xs mt-5 mb-2 border-b border-slate-200 pb-1">
+                          {trimmedLine}
+                        </h3>
+                      );
+                    }
+
+                    if (isSubHeader) {
+                      underSubHeader = true;
+                      return (
+                        <p key={index} className="font-semibold text-slate-700 mt-3 mb-0.5">
+                          {trimmedLine}
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <p key={index} className={`leading-relaxed text-slate-600 ${underSubHeader ? 'pl-4' : 'pl-1'}`}>
+                        {cleanLine}
+                      </p>
+                    );
+                  });
+                })()}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!resume.rawText && (
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-indigo-600" />
+                Resume Content
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500">No content could be extracted from this resume.</p>
+                <p className="text-sm text-slate-400 mt-2">
+                  Try re-uploading the resume or check if the file format is supported (PDF or DOCX).
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Hidden section - keeping parsedData structure for customization features */}
+        {false && resume.parsedData && (
+          <div className="hidden">
 
                 {/* Experience */}
                 {resume.parsedData.experience && resume.parsedData.experience.length > 0 && (
@@ -882,45 +886,7 @@ export default function ResumeDetailPage() {
                     </ul>
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Raw Text Section */}
-        {resume.rawText && (
-          <Card variant="elevated">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5 text-slate-600" />
-                    Raw Extracted Text
-                  </CardTitle>
-                  <CardDescription>
-                    Text extracted from your uploaded document
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowRawText(!showRawText)}
-                  leftIcon={showRawText ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                >
-                  {showRawText ? 'Hide' : 'Show'}
-                </Button>
-              </div>
-            </CardHeader>
-            {showRawText && (
-              <CardContent>
-                <div className="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
-                  <pre className="text-sm text-slate-600 whitespace-pre-wrap font-mono">
-                    {resume.rawText}
-                  </pre>
-                </div>
-              </CardContent>
-            )}
-          </Card>
+          </div>
         )}
 
         {/* ATS Simulator CTA */}

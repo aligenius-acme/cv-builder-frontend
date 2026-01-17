@@ -211,7 +211,13 @@ export default function ResumeBuilderPage() {
         title: resumeTitle,
       });
       setHasUnsavedChanges(false);
-      if (!isAutoSave) toast.success('Resume saved!');
+      if (!isAutoSave) {
+        toast.success('Resume saved!');
+        // Refresh preview after manual save
+        if (showPreview) {
+          loadPreview();
+        }
+      }
     } catch (error) {
       if (!isAutoSave) toast.error('Failed to save resume');
     } finally {
@@ -255,7 +261,7 @@ export default function ResumeBuilderPage() {
     if (showPreview && currentResumeId) {
       loadPreview();
     }
-  }, [showPreview, selectedTemplate]);
+  }, [showPreview, selectedTemplate, currentResumeId]);
 
   // Section navigation
   const sections = [
