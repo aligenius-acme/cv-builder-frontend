@@ -27,8 +27,12 @@ import {
   Wand2,
   X,
   Edit3,
+  MapPin,
+  DollarSign,
+  Heart,
+  Search,
 } from 'lucide-react';
-import api from '@/lib/api';
+import api, { JobApplication } from '@/lib/api';
 import { CoverLetter, Resume } from '@/types';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -49,6 +53,7 @@ interface EnhancedCoverLetter extends CoverLetter {
 export default function CoverLettersPage() {
   const [coverLetters, setCoverLetters] = useState<EnhancedCoverLetter[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showGenerator, setShowGenerator] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -58,6 +63,9 @@ export default function CoverLettersPage() {
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
   // Form state
+  const [inputMode, setInputMode] = useState<'manual' | 'saved'>('saved');
+  const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [showSavedJobsDropdown, setShowSavedJobsDropdown] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -69,7 +77,7 @@ export default function CoverLettersPage() {
 
   const loadData = async () => {
     try {
-      const [coverLettersRes, resumesRes] = await Promise.all([
+      const [coverLettersRes, resumesRes, jobsRes] = await Promise.all([
         api.getCoverLetters().catch((err) => {
           if (err.response?.status === 403) {
             setHasAccess(false);
@@ -77,6 +85,7 @@ export default function CoverLettersPage() {
           return { success: false, data: [] };
         }),
         api.getResumes(),
+        api.getJobApplications().catch(() => ({ success: false, data: { applications: [] } })),
       ]);
 
       if (coverLettersRes.success && coverLettersRes.data) {
@@ -85,10 +94,25 @@ export default function CoverLettersPage() {
       if (resumesRes.success && resumesRes.data) {
         setResumes(resumesRes.data);
       }
+      if (jobsRes.success && jobsRes.data?.applications) {
+        // Filter jobs that have job descriptions
+        setSavedJobs(jobsRes.data.applications.filter((job: JobApplication) => job.jobDescription));
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSelectSavedJob = (jobId: string) => {
+    setSelectedJobId(jobId);
+    setShowSavedJobsDropdown(false);
+    const job = savedJobs.find((j) => j.id === jobId);
+    if (job) {
+      setJobTitle(job.jobTitle);
+      setCompanyName(job.companyName);
+      setJobDescription(job.jobDescription || '');
     }
   };
 
@@ -124,6 +148,8 @@ export default function CoverLettersPage() {
         setJobTitle('');
         setCompanyName('');
         setJobDescription('');
+        setInputMode('manual');
+        setSelectedJobId('');
         toast.success('Cover letter generated!');
       }
     } catch (error: any) {
@@ -251,6 +277,135 @@ export default function CoverLettersPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
+              {/* Input Mode Toggle */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Job Source
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('saved')}
+                    disabled={savedJobs.length === 0}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                      inputMode === 'saved'
+                        ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                    } ${savedJobs.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Briefcase className="h-4 w-4" />
+                    Select from Saved Jobs {savedJobs.length > 0 && `(${savedJobs.length})`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode('manual');
+                      setSelectedJobId('');
+                    }}
+                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                      inputMode === 'manual'
+                        ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <Edit3 className="h-4 w-4" />
+                    Enter Manually
+                  </button>
+                </div>
+              </div>
+
+              {/* Saved Jobs Dropdown */}
+              {inputMode === 'saved' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                    Select a Saved Job
+                  </label>
+                  {savedJobs.length === 0 ? (
+                    <div className="p-6 border border-dashed border-slate-300 rounded-xl text-center">
+                      <Heart className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                      <p className="text-slate-600 font-medium">No saved jobs yet</p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Save jobs from the Job Tracker to quickly generate cover letters
+                      </p>
+                      <div className="flex justify-center gap-3 mt-4">
+                        <Link href="/job-tracker">
+                          <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                            Job Tracker
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setInputMode('manual')}
+                        >
+                          Enter Manually
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowSavedJobsDropdown(!showSavedJobsDropdown)}
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      >
+                        {selectedJobId ? (
+                          <span className="text-slate-900">
+                            {savedJobs.find(j => j.id === selectedJobId)?.jobTitle} at {savedJobs.find(j => j.id === selectedJobId)?.companyName}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">Select a job to generate cover letter for...</span>
+                        )}
+                        <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showSavedJobsDropdown ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {showSavedJobsDropdown && (
+                        <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+                          {savedJobs.map((job) => (
+                            <button
+                              key={job.id}
+                              type="button"
+                              onClick={() => handleSelectSavedJob(job.id)}
+                              className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                                selectedJobId === job.id ? 'bg-indigo-50' : ''
+                              }`}
+                            >
+                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Building className="h-5 w-5 text-indigo-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
+                                <p className="text-sm text-slate-500 truncate">{job.companyName}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  {job.location && (
+                                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      {job.location}
+                                    </span>
+                                  )}
+                                  {job.salary && (
+                                    <span className="text-xs text-emerald-600 flex items-center gap-1">
+                                      <DollarSign className="h-3 w-3" />
+                                      {job.salary}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {savedJobs.length > 0 && (
+                    <p className="mt-2 text-xs text-slate-500">
+                      {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} with descriptions •{' '}
+                      <Link href="/job-tracker" className="text-indigo-600 hover:text-indigo-700">Manage jobs</Link>
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -264,6 +419,7 @@ export default function CoverLettersPage() {
                       onChange={(e) => setJobTitle(e.target.value)}
                       placeholder="e.g., Senior Software Engineer"
                       className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      readOnly={inputMode === 'saved' && !!selectedJobId}
                     />
                   </div>
                 </div>
@@ -279,6 +435,7 @@ export default function CoverLettersPage() {
                       onChange={(e) => setCompanyName(e.target.value)}
                       placeholder="e.g., Google"
                       className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      readOnly={inputMode === 'saved' && !!selectedJobId}
                     />
                   </div>
                 </div>
@@ -315,7 +472,10 @@ export default function CoverLettersPage() {
                   onChange={(e) => setJobDescription(e.target.value)}
                   placeholder="Paste the job description here..."
                   rows={6}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                  className={`w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none ${
+                    inputMode === 'saved' && selectedJobId ? 'bg-slate-50' : ''
+                  }`}
+                  readOnly={inputMode === 'saved' && !!selectedJobId}
                 />
               </div>
 

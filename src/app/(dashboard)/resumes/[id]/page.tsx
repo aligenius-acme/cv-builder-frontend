@@ -234,7 +234,7 @@ export default function ResumeDetailPage() {
 
   return (
     <div className="min-h-screen bg-mesh">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -295,7 +295,7 @@ export default function ResumeDetailPage() {
                     }`}
                   >
                     <Heart className="h-4 w-4" />
-                    From Saved Jobs
+                    From Saved Jobs {savedJobs.length > 0 && `(${savedJobs.length})`}
                   </button>
                   <button
                     type="button"
