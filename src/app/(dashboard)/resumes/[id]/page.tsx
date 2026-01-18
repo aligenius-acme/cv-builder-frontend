@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
 import { useAuthStore } from '@/store/auth';
 import {
@@ -284,32 +285,15 @@ export default function ResumeDetailPage() {
             {showCustomizeForm && (
               <CardContent>
                 {/* Input Mode Toggle */}
-                <div className="flex items-center gap-2 mb-6 p-1 bg-slate-100 rounded-xl w-fit">
-                  <button
-                    type="button"
-                    onClick={() => setInputMode('saved')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      inputMode === 'saved'
-                        ? 'bg-white text-indigo-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <Heart className="h-4 w-4" />
-                    From Saved Jobs {savedJobs.length > 0 && `(${savedJobs.length})`}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInputMode('manual')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      inputMode === 'manual'
-                        ? 'bg-white text-indigo-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <FileText className="h-4 w-4" />
-                    Enter Manually
-                  </button>
-                </div>
+                <SegmentedControl
+                  options={[
+                    { value: 'saved' as const, label: 'From Saved Jobs', icon: <Heart className="h-4 w-4" />, count: savedJobs.length },
+                    { value: 'manual' as const, label: 'Enter Manually', icon: <FileText className="h-4 w-4" /> },
+                  ]}
+                  value={inputMode}
+                  onChange={setInputMode}
+                  className="mb-6"
+                />
 
                 {/* Saved Jobs Selector Mode */}
                 {inputMode === 'saved' && !jobTitle && (
@@ -394,8 +378,8 @@ export default function ResumeDetailPage() {
                       )}
                       {savedJobs.length > 0 && (
                         <p className="mt-2 text-xs text-slate-500">
-                          {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} available •{' '}
-                          <a href="/jobs" className="text-indigo-600 hover:text-indigo-700">Browse more jobs</a>
+                          {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} with descriptions •{' '}
+                          <a href="/jobs" className="text-indigo-600 hover:text-indigo-700">Manage jobs</a>
                         </p>
                       )}
                     </div>
