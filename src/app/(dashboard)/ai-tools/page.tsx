@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
+import Link from 'next/link';
 import {
   Sparkles,
   Target,
@@ -25,8 +27,17 @@ import {
   Users,
   FileText,
   Briefcase,
+  Building,
+  Heart,
+  Edit3,
+  ChevronDown,
+  MapPin,
+  DollarSign,
+  Upload,
+  Search,
 } from 'lucide-react';
 import api, {
+  JobApplication,
   JobMatchResult,
   AchievementQuantifierResult,
   WeaknessDetectorResult,
@@ -51,12 +62,17 @@ const tabs = [
 export default function AIToolsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('job-match');
   const [resumes, setResumes] = useState<any[]>([]);
+  const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
+  const [isLoadingResumes, setIsLoadingResumes] = useState(true);
+  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(true);
 
   useEffect(() => {
     loadResumes();
+    loadSavedJobs();
   }, []);
 
   const loadResumes = async () => {
+    setIsLoadingResumes(true);
     try {
       const response = await api.getResumes();
       if (response.success && response.data) {
@@ -64,6 +80,23 @@ export default function AIToolsPage() {
       }
     } catch (error) {
       console.error('Failed to load resumes:', error);
+    } finally {
+      setIsLoadingResumes(false);
+    }
+  };
+
+  const loadSavedJobs = async () => {
+    setIsLoadingSavedJobs(true);
+    try {
+      const response = await api.getJobApplications();
+      if (response.success && response.data?.applications) {
+        // Filter to only include jobs with descriptions
+        setSavedJobs(response.data.applications.filter((job: JobApplication) => job.jobDescription));
+      }
+    } catch (error) {
+      console.error('Failed to load saved jobs:', error);
+    } finally {
+      setIsLoadingSavedJobs(false);
     }
   };
 
@@ -108,10 +141,10 @@ export default function AIToolsPage() {
 
         {/* Tab Content */}
         <div className="min-h-[600px]">
-          {activeTab === 'job-match' && <JobMatchTab resumes={resumes} />}
-          {activeTab === 'quantifier' && <AchievementQuantifierTab />}
-          {activeTab === 'weakness' && <WeaknessDetectorTab resumes={resumes} />}
-          {activeTab === 'follow-up' && <FollowUpEmailTab />}
+          {activeTab === 'job-match' && <JobMatchTab resumes={resumes} savedJobs={savedJobs} isLoadingResumes={isLoadingResumes} isLoadingSavedJobs={isLoadingSavedJobs} />}
+          {activeTab === 'quantifier' && <AchievementQuantifierTab resumes={resumes} isLoadingResumes={isLoadingResumes} />}
+          {activeTab === 'weakness' && <WeaknessDetectorTab resumes={resumes} savedJobs={savedJobs} isLoadingResumes={isLoadingResumes} isLoadingSavedJobs={isLoadingSavedJobs} />}
+          {activeTab === 'follow-up' && <FollowUpEmailTab savedJobs={savedJobs} isLoadingSavedJobs={isLoadingSavedJobs} />}
           {activeTab === 'networking' && <NetworkingMessageTab />}
         </div>
       </div>
@@ -120,12 +153,38 @@ export default function AIToolsPage() {
 }
 
 // Job Match Score Tab
-function JobMatchTab({ resumes }: { resumes: any[] }) {
+function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs }: {
+  resumes: any[];
+  savedJobs: JobApplication[];
+  isLoadingResumes: boolean;
+  isLoadingSavedJobs: boolean;
+}) {
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<JobMatchResult | null>(null);
+
+  // Input mode and dropdowns
+  const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('saved');
+  const [selectedJobId, setSelectedJobId] = useState('');
+  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const [showJobDropdown, setShowJobDropdown] = useState(false);
+
+  const handleSelectSavedJob = (jobId: string) => {
+    const job = savedJobs.find((j) => j.id === jobId);
+    if (job) {
+      setSelectedJobId(jobId);
+      setJobTitle(job.jobTitle);
+      setJobDescription(job.jobDescription || '');
+      setShowJobDropdown(false);
+    }
+  };
+
+  const handleSelectResume = (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    setShowResumeDropdown(false);
+  };
 
   const handleAnalyze = async () => {
     if (!selectedResumeId || !jobTitle || !jobDescription) {
@@ -165,6 +224,9 @@ function JobMatchTab({ resumes }: { resumes: any[] }) {
     return 'bg-red-100 text-red-700';
   };
 
+  const selectedResume = resumes.find((r) => r.id === selectedResumeId);
+  const selectedJob = savedJobs.find((j) => j.id === selectedJobId);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Input Form */}
@@ -176,62 +238,225 @@ function JobMatchTab({ resumes }: { resumes: any[] }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Resume Selection */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Select Resume</label>
-            <select
-              value={selectedResumeId}
-              onChange={(e) => setSelectedResumeId(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
-            >
-              <option value="" className="text-slate-500">Choose a resume...</option>
-              {resumes.map((resume) => (
-                <option key={resume.id} value={resume.id}>
-                  {resume.title || resume.fileName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label>
-            <input
-              type="text"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="e.g., Senior Software Engineer"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Job Description</label>
-            <textarea
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Paste the job description here..."
-              rows={8}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
-          </div>
-
-          <Button
-            variant="gradient"
-            className="w-full"
-            onClick={handleAnalyze}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Analyzing Match...
-              </>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Resume</label>
+            {isLoadingResumes ? (
+              <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                <span className="text-slate-500">Loading resumes...</span>
+              </div>
+            ) : resumes.length === 0 ? (
+              <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
+                <p className="text-xs text-slate-500 mt-1">Upload a resume to get started</p>
+                <Link href="/resumes">
+                  <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                    Upload Resume
+                  </Button>
+                </Link>
+              </div>
             ) : (
-              <>
-                <Zap className="h-5 w-5 mr-2" />
-                Calculate Match Score
-              </>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                >
+                  {selectedResume ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
+                    </div>
+                  ) : (
+                    <span className="text-slate-500">Choose a resume...</span>
+                  )}
+                  <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showResumeDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showResumeDropdown && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {resumes.map((resume) => (
+                      <button
+                        key={resume.id}
+                        type="button"
+                        onClick={() => handleSelectResume(resume.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                          selectedResumeId === resume.id ? 'bg-blue-50' : ''
+                        }`}
+                      >
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                          <FileText className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
+                          <p className="text-xs text-slate-500">{resume.fileName}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
-          </Button>
+          </div>
+
+          {/* Job Source Toggle */}
+          <SegmentedControl
+            options={[
+              { value: 'saved' as const, label: 'From Saved Jobs', icon: <Heart className="h-4 w-4" />, count: savedJobs.length },
+              { value: 'manual' as const, label: 'Enter Manually', icon: <Edit3 className="h-4 w-4" /> },
+            ]}
+            value={jobInputMode}
+            onChange={(mode) => {
+              setJobInputMode(mode);
+              if (mode === 'manual') {
+                setSelectedJobId('');
+              }
+            }}
+          />
+
+          {/* Saved Jobs Dropdown */}
+          {jobInputMode === 'saved' && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Select a Saved Job</label>
+              {isLoadingSavedJobs ? (
+                <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                  <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                  <span className="text-slate-500">Loading saved jobs...</span>
+                </div>
+              ) : savedJobs.length === 0 ? (
+                <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                  <Heart className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-slate-600 font-medium text-sm">No saved jobs with descriptions</p>
+                  <p className="text-xs text-slate-500 mt-1">Save jobs from the Job Tracker to use here</p>
+                  <div className="flex justify-center gap-2 mt-3">
+                    <Link href="/job-tracker">
+                      <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                        Job Tracker
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={() => setJobInputMode('manual')}>
+                      Enter Manually
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowJobDropdown(!showJobDropdown)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  >
+                    {selectedJob ? (
+                      <span className="text-slate-900">{selectedJob.jobTitle} at {selectedJob.companyName}</span>
+                    ) : (
+                      <span className="text-slate-500">Select a job to analyze...</span>
+                    )}
+                    <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showJobDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showJobDropdown && (
+                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {savedJobs.map((job) => (
+                        <button
+                          key={job.id}
+                          type="button"
+                          onClick={() => handleSelectSavedJob(job.id)}
+                          className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                            selectedJobId === job.id ? 'bg-blue-50' : ''
+                          }`}
+                        >
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Building className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
+                            <p className="text-sm text-slate-500 truncate">{job.companyName}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {job.location && (
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {job.location}
+                                </span>
+                              )}
+                              {job.salary && (
+                                <span className="text-xs text-emerald-600 flex items-center gap-1">
+                                  <DollarSign className="h-3 w-3" />
+                                  {job.salary}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {savedJobs.length > 0 && (
+                <p className="mt-2 text-xs text-slate-500">
+                  {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} with descriptions •{' '}
+                  <Link href="/job-tracker" className="text-blue-600 hover:text-blue-700">Manage jobs</Link>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Form fields - shown when manual mode or when a saved job is selected */}
+          {(jobInputMode === 'manual' || (jobInputMode === 'saved' && selectedJobId)) && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Job Title</label>
+                <div className="relative">
+                  <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="e.g., Senior Software Engineer"
+                    className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    readOnly={jobInputMode === 'saved' && !!selectedJobId}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Job Description</label>
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the job description here..."
+                  rows={8}
+                  className={`w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none ${
+                    jobInputMode === 'saved' && selectedJobId ? 'bg-slate-50' : ''
+                  }`}
+                  readOnly={jobInputMode === 'saved' && !!selectedJobId}
+                />
+              </div>
+
+              <Button
+                variant="gradient"
+                className="w-full"
+                onClick={handleAnalyze}
+                disabled={isLoading || !selectedResumeId}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Analyzing Match...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-5 w-5 mr-2" />
+                    Calculate Match Score
+                  </>
+                )}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -361,11 +586,66 @@ function JobMatchTab({ resumes }: { resumes: any[] }) {
 }
 
 // Achievement Quantifier Tab
-function AchievementQuantifierTab() {
+function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[]; isLoadingResumes: boolean }) {
   const [bullets, setBullets] = useState<string[]>(['']);
   const [jobContext, setJobContext] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AchievementQuantifierResult | null>(null);
+
+  // Resume import state
+  const [bulletSource, setBulletSource] = useState<'manual' | 'resume'>('manual');
+  const [selectedResumeId, setSelectedResumeId] = useState('');
+  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const [resumeBullets, setResumeBullets] = useState<string[]>([]);
+  const [selectedBulletIndices, setSelectedBulletIndices] = useState<Set<number>>(new Set());
+
+  const handleSelectResume = async (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    setShowResumeDropdown(false);
+    setSelectedBulletIndices(new Set());
+
+    // Extract bullet points from resume
+    const resume = resumes.find((r) => r.id === resumeId);
+    if (resume?.parsedData?.experience) {
+      const allBullets: string[] = [];
+      resume.parsedData.experience.forEach((exp: any) => {
+        if (exp.description && Array.isArray(exp.description)) {
+          exp.description.forEach((desc: string) => {
+            const cleanBullet = desc.replace(/^[•\-\*▪◦›●○]\s*/, '').trim();
+            if (cleanBullet && cleanBullet.length > 10) {
+              allBullets.push(cleanBullet);
+            }
+          });
+        }
+      });
+      setResumeBullets(allBullets);
+    } else if (resume?.rawText) {
+      // Fallback: extract lines that look like bullet points
+      const lines = resume.rawText.split('\n');
+      const bulletLines = lines
+        .filter((line: string) => line.trim().match(/^[•\-\*▪◦›●○]/))
+        .map((line: string) => line.replace(/^[•\-\*▪◦›●○]\s*/, '').trim())
+        .filter((line: string) => line.length > 10);
+      setResumeBullets(bulletLines.slice(0, 20));
+    }
+  };
+
+  const toggleBulletSelection = (index: number) => {
+    const newSet = new Set(selectedBulletIndices);
+    if (newSet.has(index)) {
+      newSet.delete(index);
+    } else {
+      newSet.add(index);
+    }
+    setSelectedBulletIndices(newSet);
+  };
+
+  const importSelectedBullets = () => {
+    const selected = Array.from(selectedBulletIndices).map((i) => resumeBullets[i]);
+    setBullets(selected.length > 0 ? selected : ['']);
+    setBulletSource('manual');
+    toast.success(`Imported ${selected.length} bullet point${selected.length !== 1 ? 's' : ''}`);
+  };
 
   const addBullet = () => {
     if (bullets.length < 10) {
@@ -414,6 +694,8 @@ function AchievementQuantifierTab() {
     toast.success('Copied to clipboard!');
   };
 
+  const selectedResume = resumes.find((r) => r.id === selectedResumeId);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Input */}
@@ -426,71 +708,216 @@ function AchievementQuantifierTab() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               Target Job (Optional)
             </label>
-            <input
-              type="text"
-              value={jobContext}
-              onChange={(e) => setJobContext(e.target.value)}
-              placeholder="e.g., Senior Product Manager at Google"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Bullet Points to Quantify
-            </label>
-            <div className="space-y-2">
-              {bullets.map((bullet, idx) => (
-                <div key={idx} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={bullet}
-                    onChange={(e) => updateBullet(idx, e.target.value)}
-                    placeholder="e.g., Improved customer satisfaction"
-                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  {bullets.length > 1 && (
-                    <button
-                      onClick={() => removeBullet(idx)}
-                      className="p-2.5 text-slate-400 hover:text-red-500 transition-colors"
-                    >
-                      <XCircle className="h-5 w-5" />
-                    </button>
-                  )}
-                </div>
-              ))}
+            <div className="relative">
+              <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                value={jobContext}
+                onChange={(e) => setJobContext(e.target.value)}
+                placeholder="e.g., Senior Product Manager at Google"
+                className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+              />
             </div>
-            {bullets.length < 10 && (
-              <button
-                onClick={addBullet}
-                className="mt-2 text-sm text-green-600 hover:text-green-700 font-medium"
-              >
-                + Add another bullet point
-              </button>
-            )}
           </div>
 
-          <Button
-            variant="gradient"
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-500"
-            onClick={handleQuantify}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Quantifying...
-              </>
-            ) : (
-              <>
-                <TrendingUp className="h-5 w-5 mr-2" />
-                Quantify Achievements
-              </>
-            )}
-          </Button>
+          {/* Bullet Source Toggle */}
+          <SegmentedControl
+            options={[
+              { value: 'manual' as const, label: 'Enter Manually', icon: <Edit3 className="h-4 w-4" /> },
+              { value: 'resume' as const, label: 'From Resume', icon: <FileText className="h-4 w-4" />, count: resumes.length },
+            ]}
+            value={bulletSource}
+            onChange={setBulletSource}
+          />
+
+          {bulletSource === 'resume' ? (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Resume</label>
+                {isLoadingResumes ? (
+                  <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                    <Loader2 className="h-5 w-5 text-green-600 animate-spin" />
+                    <span className="text-slate-500">Loading resumes...</span>
+                  </div>
+                ) : resumes.length === 0 ? (
+                  <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                    <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
+                    <Link href="/resumes">
+                      <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                        Upload Resume
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all"
+                    >
+                      {selectedResume ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                            <FileText className="h-4 w-4 text-green-600" />
+                          </div>
+                          <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-500">Choose a resume to import from...</span>
+                      )}
+                      <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showResumeDropdown ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {showResumeDropdown && (
+                      <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {resumes.map((resume) => (
+                          <button
+                            key={resume.id}
+                            type="button"
+                            onClick={() => handleSelectResume(resume.id)}
+                            className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                              selectedResumeId === resume.id ? 'bg-green-50' : ''
+                            }`}
+                          >
+                            <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                              <FileText className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
+                              <p className="text-xs text-slate-500">{resume.fileName}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Bullet points from resume */}
+              {selectedResumeId && resumeBullets.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Select Bullets to Quantify ({selectedBulletIndices.size} selected)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (selectedBulletIndices.size === resumeBullets.length) {
+                          setSelectedBulletIndices(new Set());
+                        } else {
+                          setSelectedBulletIndices(new Set(resumeBullets.map((_, i) => i)));
+                        }
+                      }}
+                      className="text-xs text-green-600 font-medium"
+                    >
+                      {selectedBulletIndices.size === resumeBullets.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100">
+                    {resumeBullets.map((bullet, idx) => (
+                      <label
+                        key={idx}
+                        className={`flex items-start gap-3 px-3 py-2 cursor-pointer hover:bg-green-50 transition-colors ${
+                          selectedBulletIndices.has(idx) ? 'bg-green-50' : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedBulletIndices.has(idx)}
+                          onChange={() => toggleBulletSelection(idx)}
+                          className="mt-1 h-4 w-4 text-green-600 rounded border-slate-300 focus:ring-green-500"
+                        />
+                        <span className="text-sm text-slate-700">{bullet}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <Button
+                    variant="gradient"
+                    className="w-full mt-3 bg-gradient-to-r from-green-500 to-emerald-500"
+                    onClick={importSelectedBullets}
+                    disabled={selectedBulletIndices.size === 0}
+                  >
+                    Import {selectedBulletIndices.size} Bullet{selectedBulletIndices.size !== 1 ? 's' : ''} & Quantify
+                  </Button>
+                </div>
+              )}
+
+              {selectedResumeId && resumeBullets.length === 0 && (
+                <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                  <p className="text-slate-500 text-sm">No bullet points found in this resume</p>
+                  <button
+                    type="button"
+                    onClick={() => setBulletSource('manual')}
+                    className="text-green-600 text-sm font-medium mt-1"
+                  >
+                    Enter manually instead
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Bullet Points to Quantify
+                </label>
+                <div className="space-y-2">
+                  {bullets.map((bullet, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={bullet}
+                        onChange={(e) => updateBullet(idx, e.target.value)}
+                        placeholder="e.g., Improved customer satisfaction"
+                        className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                      />
+                      {bullets.length > 1 && (
+                        <button
+                          onClick={() => removeBullet(idx)}
+                          className="p-2.5 text-slate-400 hover:text-red-500 transition-colors"
+                        >
+                          <XCircle className="h-5 w-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {bullets.length < 10 && (
+                  <button
+                    onClick={addBullet}
+                    className="mt-2 text-sm text-green-600 hover:text-green-700 font-medium"
+                  >
+                    + Add another bullet point
+                  </button>
+                )}
+              </div>
+
+              <Button
+                variant="gradient"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-500"
+                onClick={handleQuantify}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Quantifying...
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp className="h-5 w-5 mr-2" />
+                    Quantify Achievements
+                  </>
+                )}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -572,7 +999,12 @@ function AchievementQuantifierTab() {
 }
 
 // Weakness Detector Tab
-function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
+function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs }: {
+  resumes: any[];
+  savedJobs: JobApplication[];
+  isLoadingResumes: boolean;
+  isLoadingSavedJobs: boolean;
+}) {
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -580,6 +1012,26 @@ function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
   const [expandedWeakness, setExpandedWeakness] = useState<number | null>(null);
   const [showQuickFixes, setShowQuickFixes] = useState(true);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  // Input mode and dropdowns
+  const [roleInputMode, setRoleInputMode] = useState<'saved' | 'manual'>('saved');
+  const [selectedJobId, setSelectedJobId] = useState('');
+  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const [showJobDropdown, setShowJobDropdown] = useState(false);
+
+  const handleSelectSavedJob = (jobId: string) => {
+    const job = savedJobs.find((j) => j.id === jobId);
+    if (job) {
+      setSelectedJobId(jobId);
+      setTargetRole(job.jobTitle);
+      setShowJobDropdown(false);
+    }
+  };
+
+  const handleSelectResume = (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    setShowResumeDropdown(false);
+  };
 
   const handleDetect = async () => {
     if (!selectedResumeId) {
@@ -624,6 +1076,9 @@ function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
+  const selectedResume = resumes.find((r) => r.id === selectedResumeId);
+  const selectedJob = savedJobs.find((j) => j.id === selectedJobId);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Input */}
@@ -635,38 +1090,162 @@ function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Resume Selection */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Select Resume</label>
-            <select
-              value={selectedResumeId}
-              onChange={(e) => setSelectedResumeId(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white text-slate-900"
-            >
-              <option value="" className="text-slate-500">Choose a resume...</option>
-              {resumes.map((resume) => (
-                <option key={resume.id} value={resume.id}>
-                  {resume.title || resume.fileName}
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Resume</label>
+            {isLoadingResumes ? (
+              <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />
+                <span className="text-slate-500">Loading resumes...</span>
+              </div>
+            ) : resumes.length === 0 ? (
+              <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
+                <Link href="/resumes">
+                  <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                    Upload Resume
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                >
+                  {selectedResume ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-amber-600" />
+                      </div>
+                      <span className="font-medium truncate">{selectedResume.title || selectedResume.fileName}</span>
+                    </div>
+                  ) : (
+                    <span className="text-slate-500">Choose a resume...</span>
+                  )}
+                  <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform flex-shrink-0 ${showResumeDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showResumeDropdown && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {resumes.map((resume) => (
+                      <button
+                        key={resume.id}
+                        type="button"
+                        onClick={() => handleSelectResume(resume.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                          selectedResumeId === resume.id ? 'bg-amber-50' : ''
+                        }`}
+                      >
+                        <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
+                          <FileText className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
+                          <p className="text-xs text-slate-500 truncate">{resume.fileName}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
+          {/* Target Role - with saved jobs option */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Target Role (Optional)</label>
-            <input
-              type="text"
-              value={targetRole}
-              onChange={(e) => setTargetRole(e.target.value)}
-              placeholder="e.g., Data Scientist"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Target Role (Optional)</label>
+            <SegmentedControl
+              options={[
+                { value: 'saved' as const, label: 'From Jobs', icon: <Heart className="h-4 w-4" />, count: savedJobs.length },
+                { value: 'manual' as const, label: 'Manual', icon: <Edit3 className="h-4 w-4" /> },
+              ]}
+              value={roleInputMode}
+              onChange={(mode) => {
+                setRoleInputMode(mode);
+                if (mode === 'manual') {
+                  setSelectedJobId('');
+                  setTargetRole('');
+                }
+              }}
+              className="mb-3"
             />
+
+            {roleInputMode === 'saved' ? (
+              isLoadingSavedJobs ? (
+                <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                  <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />
+                  <span className="text-slate-500 text-sm">Loading...</span>
+                </div>
+              ) : savedJobs.length === 0 ? (
+                <div className="p-3 border border-dashed border-slate-300 rounded-xl text-center">
+                  <p className="text-slate-500 text-sm">No saved jobs</p>
+                  <button
+                    type="button"
+                    onClick={() => setRoleInputMode('manual')}
+                    className="text-amber-600 text-sm font-medium mt-1"
+                  >
+                    Enter manually
+                  </button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowJobDropdown(!showJobDropdown)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all text-sm"
+                  >
+                    {selectedJob ? (
+                      <span className="truncate">{selectedJob.jobTitle}</span>
+                    ) : (
+                      <span className="text-slate-500">Select a job...</span>
+                    )}
+                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform flex-shrink-0 ${showJobDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showJobDropdown && (
+                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                      {savedJobs.map((job) => (
+                        <button
+                          key={job.id}
+                          type="button"
+                          onClick={() => handleSelectSavedJob(job.id)}
+                          className={`w-full flex items-center gap-2 px-3 py-2 hover:bg-amber-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                            selectedJobId === job.id ? 'bg-amber-50' : ''
+                          }`}
+                        >
+                          <Building className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 truncate">{job.jobTitle}</p>
+                            <p className="text-xs text-slate-500 truncate">{job.companyName}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="relative">
+                <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={targetRole}
+                  onChange={(e) => setTargetRole(e.target.value)}
+                  placeholder="e.g., Data Scientist"
+                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm"
+                />
+              </div>
+            )}
           </div>
 
           <Button
             variant="gradient"
             className="w-full bg-gradient-to-r from-amber-500 to-orange-500"
             onClick={handleDetect}
-            disabled={isLoading}
+            disabled={isLoading || !selectedResumeId}
           >
             {isLoading ? (
               <>
@@ -1006,7 +1585,7 @@ function WeaknessDetectorTab({ resumes }: { resumes: any[] }) {
 }
 
 // Follow-up Email Tab
-function FollowUpEmailTab() {
+function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApplication[]; isLoadingSavedJobs: boolean }) {
   const [emailType, setEmailType] = useState<FollowUpType>('thank_you');
   const [formData, setFormData] = useState({
     candidateName: '',
@@ -1021,6 +1600,11 @@ function FollowUpEmailTab() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<FollowUpEmailResult | null>(null);
 
+  // Job source state
+  const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('saved');
+  const [selectedJobId, setSelectedJobId] = useState('');
+  const [showJobDropdown, setShowJobDropdown] = useState(false);
+
   const emailTypes: { value: FollowUpType; label: string; description: string }[] = [
     { value: 'thank_you', label: 'Thank You', description: 'Send within 24 hours after interview' },
     { value: 'post_interview', label: 'Post Interview', description: 'Follow up 5-7 days after interview' },
@@ -1028,6 +1612,21 @@ function FollowUpEmailTab() {
     { value: 'after_rejection', label: 'After Rejection', description: 'Gracious response to rejection' },
     { value: 'networking', label: 'Networking', description: 'After informational interview' },
   ];
+
+  const handleSelectSavedJob = (jobId: string) => {
+    const job = savedJobs.find((j) => j.id === jobId);
+    if (job) {
+      setSelectedJobId(jobId);
+      setFormData((prev) => ({
+        ...prev,
+        companyName: job.companyName,
+        jobTitle: job.jobTitle,
+        recipientName: job.contactName || '',
+      }));
+      setShowJobDropdown(false);
+      toast.success('Job details loaded!');
+    }
+  };
 
   const handleGenerate = async () => {
     if (!formData.candidateName || !formData.companyName || !formData.jobTitle) {
@@ -1066,6 +1665,8 @@ function FollowUpEmailTab() {
     }
   };
 
+  const selectedJob = savedJobs.find((j) => j.id === selectedJobId);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Input */}
@@ -1102,77 +1703,185 @@ function FollowUpEmailTab() {
             <CardTitle className="text-base">Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Your Name *</label>
-                <input
-                  type="text"
-                  value={formData.candidateName}
-                  onChange={(e) => setFormData({ ...formData, candidateName: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Recipient Name</label>
-                <input
-                  type="text"
-                  value={formData.recipientName}
-                  onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-            </div>
+            {/* Job Source Toggle */}
+            <SegmentedControl
+              options={[
+                { value: 'saved' as const, label: 'From Job Tracker', icon: <Heart className="h-4 w-4" />, count: savedJobs.length },
+                { value: 'manual' as const, label: 'Enter Manually', icon: <Edit3 className="h-4 w-4" /> },
+              ]}
+              value={jobInputMode}
+              onChange={(mode) => {
+                setJobInputMode(mode);
+                if (mode === 'manual') {
+                  setSelectedJobId('');
+                }
+              }}
+            />
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Saved Jobs Dropdown */}
+            {jobInputMode === 'saved' && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Company *</label>
-                <input
-                  type="text"
-                  value={formData.companyName}
-                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Job Title *</label>
-                <input
-                  type="text"
-                  value={formData.jobTitle}
-                  onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-            </div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Application</label>
+                {isLoadingSavedJobs ? (
+                  <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+                    <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />
+                    <span className="text-slate-500">Loading...</span>
+                  </div>
+                ) : savedJobs.length === 0 ? (
+                  <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
+                    <Heart className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-slate-600 font-medium text-sm">No job applications</p>
+                    <p className="text-xs text-slate-500 mt-1">Add applications in the Job Tracker</p>
+                    <div className="flex justify-center gap-2 mt-3">
+                      <Link href="/job-tracker">
+                        <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                          Job Tracker
+                        </Button>
+                      </Link>
+                      <Button variant="outline" size="sm" onClick={() => setJobInputMode('manual')}>
+                        Enter Manually
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowJobDropdown(!showJobDropdown)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    >
+                      {selectedJob ? (
+                        <span className="text-slate-900">{selectedJob.jobTitle} at {selectedJob.companyName}</span>
+                      ) : (
+                        <span className="text-slate-500">Select a job application...</span>
+                      )}
+                      <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showJobDropdown ? 'rotate-180' : ''}`} />
+                    </button>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Interview Details</label>
-              <textarea
-                value={formData.interviewDetails}
-                onChange={(e) => setFormData({ ...formData, interviewDetails: e.target.value })}
-                placeholder="Topics discussed, projects mentioned, etc."
-                rows={3}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-              />
-            </div>
+                    {showJobDropdown && (
+                      <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {savedJobs.map((job) => (
+                          <button
+                            key={job.id}
+                            type="button"
+                            onClick={() => handleSelectSavedJob(job.id)}
+                            className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-purple-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                              selectedJobId === job.id ? 'bg-purple-50' : ''
+                            }`}
+                          >
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Building className="h-5 w-5 text-purple-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
+                              <p className="text-sm text-slate-500 truncate">{job.companyName}</p>
+                              <Badge className="mt-1 text-xs" variant={
+                                job.status === 'INTERVIEWING' ? 'info' :
+                                job.status === 'APPLIED' ? 'warning' :
+                                job.status === 'REJECTED' ? 'error' : 'secondary'
+                              }>
+                                {job.status.toLowerCase()}
+                              </Badge>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
-            <Button
-              variant="gradient"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
-              onClick={handleGenerate}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Send className="h-5 w-5 mr-2" />
-                  Generate Email
-                </>
-              )}
-            </Button>
+            {/* Show form when manual mode or job selected */}
+            {(jobInputMode === 'manual' || (jobInputMode === 'saved' && selectedJobId)) && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Your Name *</label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={formData.candidateName}
+                        onChange={(e) => setFormData({ ...formData, candidateName: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Recipient Name</label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={formData.recipientName}
+                        onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Company *</label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={formData.companyName}
+                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        readOnly={jobInputMode === 'saved' && !!selectedJobId}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Job Title *</label>
+                    <div className="relative">
+                      <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={formData.jobTitle}
+                        onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        readOnly={jobInputMode === 'saved' && !!selectedJobId}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Interview Details</label>
+                  <textarea
+                    value={formData.interviewDetails}
+                    onChange={(e) => setFormData({ ...formData, interviewDetails: e.target.value })}
+                    placeholder="Topics discussed, projects mentioned, etc."
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all resize-none"
+                  />
+                </div>
+
+                <Button
+                  variant="gradient"
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  onClick={handleGenerate}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-5 w-5 mr-2" />
+                      Generate Email
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
