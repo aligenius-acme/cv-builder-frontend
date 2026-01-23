@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import ResumeUploader from '@/components/resume/ResumeUploader';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import {
   FileText,
   Plus,
@@ -17,6 +18,9 @@ import {
   LayoutGrid,
   List,
   Sparkles,
+  SortAsc,
+  Clock,
+  ArrowDownAZ,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume } from '@/types';
@@ -29,6 +33,7 @@ export default function ResumesPage() {
   const [showUploader, setShowUploader] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest');
 
   useEffect(() => {
     loadResumes();
@@ -69,11 +74,21 @@ export default function ResumesPage() {
     }
   };
 
-  const filteredResumes = resumes.filter(
-    (resume) =>
-      (resume.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-      (resume.fileName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
-  );
+  const filteredResumes = resumes
+    .filter(
+      (resume) =>
+        (resume.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (resume.fileName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === 'newest') {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      if (sortBy === 'oldest') {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return (a.title || '').localeCompare(b.title || '');
+    });
 
   return (
     <div className="min-h-screen bg-mesh">
@@ -130,21 +145,24 @@ export default function ResumesPage() {
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant={viewMode === 'list' ? 'primary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'primary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-3">
+            <SegmentedControl
+              options={[
+                { value: 'newest', label: 'Newest', icon: <Clock className="h-4 w-4" /> },
+                { value: 'oldest', label: 'Oldest', icon: <Clock className="h-4 w-4" /> },
+                { value: 'name', label: 'Name', icon: <ArrowDownAZ className="h-4 w-4" /> },
+              ]}
+              value={sortBy}
+              onChange={setSortBy}
+            />
+            <SegmentedControl
+              options={[
+                { value: 'list', label: '', icon: <List className="h-4 w-4" /> },
+                { value: 'grid', label: '', icon: <LayoutGrid className="h-4 w-4" /> },
+              ]}
+              value={viewMode}
+              onChange={setViewMode}
+            />
           </div>
         </div>
 

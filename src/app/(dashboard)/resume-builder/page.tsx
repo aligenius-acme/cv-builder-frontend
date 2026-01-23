@@ -23,6 +23,15 @@ import {
   X,
   GripVertical,
   Palette,
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Github,
+  Globe,
+  Building2,
+  Calendar,
+  Link2,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -529,7 +538,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
       <h3 className="text-lg font-semibold text-slate-900">Contact Information</h3>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <User className="h-4 w-4 inline mr-1" />
+            Full Name
+          </label>
           <input
             type="text"
             value={data.name}
@@ -539,7 +551,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <Mail className="h-4 w-4 inline mr-1" />
+            Email
+          </label>
           <input
             type="email"
             value={data.email}
@@ -549,7 +564,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <Phone className="h-4 w-4 inline mr-1" />
+            Phone
+          </label>
           <input
             type="tel"
             value={data.phone}
@@ -559,7 +577,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <MapPin className="h-4 w-4 inline mr-1" />
+            Location
+          </label>
           <input
             type="text"
             value={data.location}
@@ -569,7 +590,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">LinkedIn</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <Linkedin className="h-4 w-4 inline mr-1" />
+            LinkedIn
+          </label>
           <input
             type="url"
             value={data.linkedin}
@@ -579,7 +603,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">GitHub</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <Github className="h-4 w-4 inline mr-1" />
+            GitHub
+          </label>
           <input
             type="url"
             value={data.github}
@@ -589,7 +616,10 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
           />
         </div>
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-slate-700 mb-1">Website/Portfolio</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            <Globe className="h-4 w-4 inline mr-1" />
+            Website/Portfolio
+          </label>
           <input
             type="url"
             value={data.website}
@@ -727,7 +757,10 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Briefcase className="h-4 w-4 inline mr-1" />
+                    Job Title
+                  </label>
                   <input
                     type="text"
                     value={exp.title}
@@ -737,7 +770,10 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Building2 className="h-4 w-4 inline mr-1" />
+                    Company
+                  </label>
                   <input
                     type="text"
                     value={exp.company}
@@ -747,7 +783,10 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <MapPin className="h-4 w-4 inline mr-1" />
+                    Location
+                  </label>
                   <input
                     type="text"
                     value={exp.location}
@@ -758,7 +797,10 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      <Calendar className="h-4 w-4 inline mr-1" />
+                      Start Date
+                    </label>
                     <input
                       type="text"
                       value={exp.startDate}
@@ -768,7 +810,10 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">End Date</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      <Calendar className="h-4 w-4 inline mr-1" />
+                      End Date
+                    </label>
                     <input
                       type="text"
                       value={exp.current ? 'Present' : exp.endDate}
@@ -879,7 +924,10 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Degree</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <GraduationCap className="h-4 w-4 inline mr-1" />
+                    Degree
+                  </label>
                   <input
                     type="text"
                     value={edu.degree}
@@ -889,7 +937,10 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Institution</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Building2 className="h-4 w-4 inline mr-1" />
+                    Institution
+                  </label>
                   <input
                     type="text"
                     value={edu.institution}
@@ -899,7 +950,10 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Graduation Date</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Calendar className="h-4 w-4 inline mr-1" />
+                    Graduation Date
+                  </label>
                   <input
                     type="text"
                     value={edu.graduationDate}
@@ -909,7 +963,10 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <MapPin className="h-4 w-4 inline mr-1" />
+                    Location
+                  </label>
                   <input
                     type="text"
                     value={edu.location}
@@ -919,7 +976,10 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">GPA (optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Award className="h-4 w-4 inline mr-1" />
+                    GPA (optional)
+                  </label>
                   <input
                     type="text"
                     value={edu.gpa}
@@ -1043,7 +1103,10 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Project Name</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <FolderOpen className="h-4 w-4 inline mr-1" />
+                    Project Name
+                  </label>
                   <input
                     type="text"
                     value={project.name}
@@ -1053,7 +1116,10 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">URL (optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Link2 className="h-4 w-4 inline mr-1" />
+                    URL (optional)
+                  </label>
                   <input
                     type="url"
                     value={project.url}
@@ -1063,7 +1129,10 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <FileText className="h-4 w-4 inline mr-1" />
+                    Description
+                  </label>
                   <AIWritingAssistant
                     value={project.description}
                     onChange={(val) => updateProject(index, { description: val })}
@@ -1074,7 +1143,10 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Technologies</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Code className="h-4 w-4 inline mr-1" />
+                    Technologies
+                  </label>
                   <input
                     type="text"
                     value={project.technologies.join(', ')}

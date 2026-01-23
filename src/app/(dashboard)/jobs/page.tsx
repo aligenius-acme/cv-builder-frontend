@@ -37,6 +37,7 @@ import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -332,41 +333,14 @@ export default function JobBoardPage() {
         />
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-xl shadow-sm w-fit">
-          <button
-            onClick={() => setActiveTab('search')}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
-              activeTab === 'search'
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            )}
-          >
-            <Search className="h-4 w-4" />
-            Search Jobs
-          </button>
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
-              activeTab === 'saved'
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            )}
-          >
-            <Heart className="h-4 w-4" />
-            Saved Jobs
-            {savedJobsCount > 0 && (
-              <Badge
-                variant={activeTab === 'saved' ? 'default' : 'gradient'}
-                size="sm"
-                className={cn(activeTab === 'saved' && 'bg-white/20 text-white')}
-              >
-                {savedJobsCount}
-              </Badge>
-            )}
-          </button>
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'search', label: 'Search Jobs', icon: <Search className="h-4 w-4" /> },
+            { value: 'saved', label: 'Saved Jobs', icon: <Heart className="h-4 w-4" />, count: savedJobsCount },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Search Tab Content */}
         {activeTab === 'search' && (

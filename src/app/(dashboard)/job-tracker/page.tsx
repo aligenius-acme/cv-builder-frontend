@@ -26,6 +26,10 @@ import {
   Target,
   TrendingUp,
   AlertCircle,
+  Search,
+  Link2,
+  Filter,
+  Flag,
 } from 'lucide-react';
 import api, { JobApplication, JobActivity } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -57,6 +61,7 @@ export default function JobTrackerPage() {
   const [editingApp, setEditingApp] = useState<Partial<JobApplication> | null>(null);
   const [draggedItem, setDraggedItem] = useState<JobApplication | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadApplications = useCallback(async () => {
     try {
@@ -173,6 +178,16 @@ export default function JobTrackerPage() {
     setShowDetailsPanel(true);
   };
 
+  // Filter applications by search query
+  const filteredGrouped = Object.entries(grouped).reduce((acc, [status, apps]) => {
+    const filtered = (apps || []).filter((app) =>
+      app.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.companyName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    acc[status] = filtered;
+    return acc;
+  }, {} as Record<string, JobApplication[]>);
+
   return (
     <div className="min-h-screen bg-mesh">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -206,6 +221,18 @@ export default function JobTrackerPage() {
               Add Application
             </Button>
           </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by job title or company..."
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          />
         </div>
 
         {/* Stats Row */}
@@ -274,7 +301,7 @@ export default function JobTrackerPage() {
                     {STATUS_CONFIG[status].label}
                   </h3>
                   <Badge variant="default" size="sm">
-                    {grouped[status]?.length || 0}
+                    {filteredGrouped[status]?.length || 0}
                   </Badge>
                 </div>
               </div>
@@ -289,7 +316,7 @@ export default function JobTrackerPage() {
                     ))}
                   </div>
                 ) : (
-                  grouped[status]?.map((app) => (
+                  filteredGrouped[status]?.map((app) => (
                     <div
                       key={app.id}
                       draggable
@@ -343,7 +370,7 @@ export default function JobTrackerPage() {
                     </div>
                   ))
                 )}
-                {!isLoading && (!grouped[status] || grouped[status].length === 0) && (
+                {!isLoading && (!filteredGrouped[status] || filteredGrouped[status].length === 0) && (
                   <div className="text-center py-8 text-slate-400">
                     <Briefcase className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No applications</p>
@@ -369,7 +396,7 @@ export default function JobTrackerPage() {
                       {STATUS_CONFIG[status].label}
                     </span>
                     <Badge variant="default" size="sm">
-                      {grouped[status]?.length || 0}
+                      {filteredGrouped[status]?.length || 0}
                     </Badge>
                   </div>
                 </div>
@@ -464,7 +491,10 @@ function ApplicationModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Job Title *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Briefcase className="h-4 w-4 inline mr-1" />
+                Job Title *
+              </label>
               <input
                 type="text"
                 required
@@ -475,7 +505,10 @@ function ApplicationModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Company *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Building2 className="h-4 w-4 inline mr-1" />
+                Company *
+              </label>
               <input
                 type="text"
                 required
@@ -489,7 +522,10 @@ function ApplicationModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <MapPin className="h-4 w-4 inline mr-1" />
+                Location
+              </label>
               <input
                 type="text"
                 value={formData.location || ''}
@@ -499,7 +535,10 @@ function ApplicationModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Salary</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <DollarSign className="h-4 w-4 inline mr-1" />
+                Salary
+              </label>
               <input
                 type="text"
                 value={formData.salary || ''}
@@ -511,7 +550,10 @@ function ApplicationModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Job URL</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              <Link2 className="h-4 w-4 inline mr-1" />
+              Job URL
+            </label>
             <input
               type="url"
               value={formData.jobUrl || ''}
@@ -523,7 +565,10 @@ function ApplicationModal({
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Target className="h-4 w-4 inline mr-1" />
+                Status
+              </label>
               <select
                 value={formData.status || 'WISHLIST'}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as ApplicationStatus })}
@@ -535,7 +580,10 @@ function ApplicationModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Priority</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Flag className="h-4 w-4 inline mr-1" />
+                Priority
+              </label>
               <select
                 value={formData.priority || 0}
                 onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
@@ -547,7 +595,10 @@ function ApplicationModal({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Source</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <ExternalLink className="h-4 w-4 inline mr-1" />
+                Source
+              </label>
               <select
                 value={formData.source || ''}
                 onChange={(e) => setFormData({ ...formData, source: e.target.value })}
@@ -566,7 +617,10 @@ function ApplicationModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <Calendar className="h-4 w-4 inline mr-1" />
+                Deadline
+              </label>
               <input
                 type="date"
                 value={formData.deadline?.split('T')[0] || ''}
@@ -575,7 +629,10 @@ function ApplicationModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Contact Name</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                <User className="h-4 w-4 inline mr-1" />
+                Contact Name
+              </label>
               <input
                 type="text"
                 value={formData.contactName || ''}
@@ -587,7 +644,10 @@ function ApplicationModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              <FileText className="h-4 w-4 inline mr-1" />
+              Notes
+            </label>
             <textarea
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

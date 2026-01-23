@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -13,6 +14,7 @@ import {
   FileText,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   Lightbulb,
   TrendingUp,
   Clock,
@@ -22,8 +24,13 @@ import {
   Loader2,
   Plus,
   X,
+  Briefcase,
+  Building2,
+  MapPin,
+  Sparkles,
 } from 'lucide-react';
-import api, { SkillGapAnalysis } from '@/lib/api';
+import api, { SkillGapAnalysis, JobApplication } from '@/lib/api';
+import { Resume } from '@/types';
 import toast from 'react-hot-toast';
 import PageHeader from '@/components/shared/PageHeader';
 import { ButtonSpinner } from '@/components/shared/LoadingSpinner';
@@ -50,6 +57,65 @@ export default function SkillGapPage() {
   const [industry, setIndustry] = useState('');
   const [analysis, setAnalysis] = useState<SkillGapAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Saved jobs and resumes state
+  const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [showJobDropdown, setShowJobDropdown] = useState(false);
+  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  useEffect(() => {
+    loadSupportingData();
+  }, []);
+
+  const loadSupportingData = async () => {
+    try {
+      const [jobsRes, resumesRes] = await Promise.all([
+        api.getJobApplications().catch(() => ({ success: false, data: null })),
+        api.getResumes().catch(() => ({ success: false, data: null })),
+      ]);
+
+      if (jobsRes.success && jobsRes.data) {
+        setSavedJobs(jobsRes.data.applications || []);
+      }
+      if (resumesRes.success && resumesRes.data) {
+        setResumes(resumesRes.data || []);
+      }
+    } catch (error) {
+      // Silent fail
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
+  const selectSavedJob = (job: JobApplication) => {
+    setTargetRole(job.jobTitle);
+    if (job.location) {
+      // Optionally extract industry from job info
+    }
+    setShowJobDropdown(false);
+    toast.success(`Using "${job.jobTitle}" as target role`);
+  };
+
+  const loadSkillsFromResume = async (resume: Resume) => {
+    try {
+      const response = await api.getResume(resume.id);
+      if (response.success && response.data?.parsedData) {
+        const skills = response.data.parsedData.skills || [];
+        if (skills.length > 0) {
+          const newSkills = skills.filter((s: string) => !currentSkills.includes(s));
+          setCurrentSkills([...currentSkills, ...newSkills]);
+          toast.success(`Added ${newSkills.length} skills from "${resume.title}"`);
+        } else {
+          toast.error('No skills found in this resume');
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to load resume skills');
+    }
+    setShowResumeDropdown(false);
+  };
 
   const addSkill = () => {
     if (skillInput.trim() && !currentSkills.includes(skillInput.trim())) {
@@ -117,17 +183,72 @@ export default function SkillGapPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Briefcase className="h-4 w-4 inline mr-1" />
                     Target Role *
                   </label>
-                  <input
-                    type="text"
-                    value={targetRole}
-                    onChange={(e) => setTargetRole(e.target.value)}
-                    placeholder="e.g., Senior Software Engineer"
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={targetRole}
+                      onChange={(e) => setTargetRole(e.target.value)}
+                      placeholder="e.g., Senior Software Engineer"
+                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    {savedJobs.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowJobDropdown(!showJobDropdown)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded-lg text-purple-600"
+                        title="Select from saved jobs"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  {showJobDropdown && savedJobs.length > 0 && (
+                    <div className="absolute z-20 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+                      <div className="p-2 border-b border-slate-100">
+                        <p className="text-xs text-slate-500 flex items-center gap-1">
+                          <Sparkles className="h-3 w-3" />
+                          {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} available
+                        </p>
+                      </div>
+                      {savedJobs.map((job) => (
+                        <button
+                          key={job.id}
+                          type="button"
+                          onClick={() => selectSavedJob(job)}
+                          className="w-full text-left px-3 py-2.5 hover:bg-purple-50 transition-colors flex items-start gap-3"
+                        >
+                          <Briefcase className="h-4 w-4 text-purple-600 mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
+                            <p className="text-xs text-slate-500 flex items-center gap-2">
+                              <span className="flex items-center gap-1">
+                                <Building2 className="h-3 w-3" />
+                                {job.companyName}
+                              </span>
+                              {job.location && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {job.location}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                      <div className="p-2 border-t border-slate-100 bg-slate-50">
+                        <Link href="/job-tracker">
+                          <p className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1">
+                            Manage jobs in Job Tracker <ChevronRight className="h-3 w-3" />
+                          </p>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -171,9 +292,49 @@ export default function SkillGapPage() {
 
             <Card variant="elevated">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-purple-600" />
-                  Your Current Skills
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-purple-600" />
+                    Your Current Skills
+                  </span>
+                  {resumes.length > 0 && (
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                        leftIcon={<FileText className="h-4 w-4" />}
+                      >
+                        Import from Resume
+                      </Button>
+                      {showResumeDropdown && (
+                        <div className="absolute z-20 right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+                          <div className="p-2 border-b border-slate-100">
+                            <p className="text-xs text-slate-500">Select a resume to import skills</p>
+                          </div>
+                          {resumes.filter(r => r.parseStatus === 'completed').map((resume) => (
+                            <button
+                              key={resume.id}
+                              type="button"
+                              onClick={() => loadSkillsFromResume(resume)}
+                              className="w-full text-left px-3 py-2.5 hover:bg-purple-50 transition-colors flex items-center gap-3"
+                            >
+                              <FileText className="h-4 w-4 text-purple-600" />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-slate-900 truncate">{resume.title}</p>
+                                <p className="text-xs text-slate-500">{resume.fileName}</p>
+                              </div>
+                            </button>
+                          ))}
+                          {resumes.filter(r => r.parseStatus === 'completed').length === 0 && (
+                            <div className="p-3 text-center text-sm text-slate-500">
+                              No parsed resumes available
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">

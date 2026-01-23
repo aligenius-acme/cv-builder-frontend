@@ -33,6 +33,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
+import PageHeader from '@/components/shared/PageHeader';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -250,43 +252,24 @@ export default function SalaryAnalyzerPage() {
     <div className="min-h-screen bg-mesh">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="h-5 w-5" />
-              <span className="text-white/80 text-sm font-medium">Compensation Intelligence</span>
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">Salary Analyzer</h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Research market rates, compare job offers, and get AI-powered negotiation scripts
-              to maximize your compensation.
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          icon={<DollarSign className="h-5 w-5" />}
+          label="Compensation Intelligence"
+          title="Salary Analyzer"
+          description="Research market rates, compare job offers, and get AI-powered negotiation scripts to maximize your compensation."
+          gradient="emerald"
+        />
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-slate-200 pb-2">
-          {[
-            { id: 'analyze' as TabType, label: 'Salary Research', icon: BarChart3 },
-            { id: 'compare' as TabType, label: 'Compare Offers', icon: Scale },
-            { id: 'negotiate' as TabType, label: 'Negotiation Script', icon: MessageSquare },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all',
-                activeTab === tab.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-600 hover:bg-slate-100'
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'analyze', label: 'Salary Research', icon: <BarChart3 className="h-4 w-4" /> },
+            { value: 'compare', label: 'Compare Offers', icon: <Scale className="h-4 w-4" /> },
+            { value: 'negotiate', label: 'Negotiation Script', icon: <MessageSquare className="h-4 w-4" /> },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Analyze Tab */}
         {activeTab === 'analyze' && (
