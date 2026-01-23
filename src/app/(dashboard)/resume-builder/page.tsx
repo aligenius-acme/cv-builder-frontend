@@ -208,8 +208,28 @@ export default function ResumeBuilderPage() {
 
   const handleSave = async (isAutoSave = false) => {
     if (!currentResumeId) {
-      // Create resume first
-      await handleCreateResume();
+      // Create resume first, then save data
+      try {
+        if (!isAutoSave) setIsSaving(true);
+        const response = await api.createBlankResume({ title: resumeTitle });
+        if (response.success && response.data) {
+          const newResumeId = response.data.id;
+          setCurrentResumeId(newResumeId);
+          router.replace(`/resume-builder?id=${newResumeId}`);
+
+          // Now save the actual data
+          await api.updateResumeContent(newResumeId, {
+            parsedData: resumeData,
+            title: resumeTitle,
+          });
+          setHasUnsavedChanges(false);
+          toast.success('Resume created and saved!');
+        }
+      } catch (error) {
+        toast.error(getErrorMessage(error, 'Failed to create resume'));
+      } finally {
+        if (!isAutoSave) setIsSaving(false);
+      }
       return;
     }
 
