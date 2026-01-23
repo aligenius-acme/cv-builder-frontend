@@ -753,7 +753,7 @@ export default function ResumeDetailPage() {
                     )}
 
                     <div className="pt-4 border-t border-slate-200">
-                      <Link href={`/resume-builder?resumeId=${resumeId}`}>
+                      <Link href={`/resume-builder?id=${resumeId}`}>
                         <Button size="sm" variant="outline">
                           <Edit2 className="h-4 w-4 mr-2" />
                           Edit in Resume Builder
@@ -782,7 +782,7 @@ export default function ResumeDetailPage() {
                   <p className="text-sm text-slate-500 mb-4">
                     Go to the Resume Builder to add your experience, education, skills, and other details.
                   </p>
-                  <Link href={`/resume-builder?resumeId=${resumeId}`}>
+                  <Link href={`/resume-builder?id=${resumeId}`}>
                     <Button size="sm" variant="primary">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Content
