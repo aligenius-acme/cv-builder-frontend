@@ -636,7 +636,33 @@ export default function ResumeDetailPage() {
           </Card>
         )}
 
-        {!resume.rawText && (
+        {(!resume.rawText || resume.rawText.length < 50) && resume.fileName === 'Created with Resume Builder' && (
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-indigo-600" />
+                Resume Content
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-indigo-300 mx-auto mb-4" />
+                <p className="text-slate-600 font-medium mb-2">Your resume is ready to be filled in</p>
+                <p className="text-sm text-slate-500 mb-4">
+                  Go to the Resume Builder to add your experience, education, skills, and other details.
+                </p>
+                <Link href={`/resume-builder?resumeId=${resumeId}`}>
+                  <Button size="sm" variant="primary">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Content
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!resume.rawText && resume.fileName !== 'Created with Resume Builder' && (
           <Card variant="elevated">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
