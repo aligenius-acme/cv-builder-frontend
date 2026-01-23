@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DollarSign,
   TrendingUp,
@@ -68,6 +68,46 @@ type TabType = 'analyze' | 'compare' | 'negotiate';
 export default function SalaryAnalyzerPage() {
   const [activeTab, setActiveTab] = useState<TabType>('analyze');
 
+  // Saved Jobs State
+  const [savedJobs, setSavedJobs] = useState<any[]>([]);
+  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(false);
+
+  // Load saved jobs on mount
+  useEffect(() => {
+    loadSavedJobs();
+  }, []);
+
+  const loadSavedJobs = async () => {
+    setIsLoadingSavedJobs(true);
+    try {
+      const response = await api.getSavedJobs();
+      if (response.success && response.data) {
+        setSavedJobs(response.data.jobs);
+      }
+    } catch (error) {
+      // Silent fail
+    } finally {
+      setIsLoadingSavedJobs(false);
+    }
+  };
+
+  // Analyze State
+  const [analyzeJobInputMode, setAnalyzeJobInputMode] = useState<'saved' | 'manual'>('manual');
+  const [selectedAnalyzeJobId, setSelectedAnalyzeJobId] = useState<string>('');
+
+  const handleSelectAnalyzeJob = (jobId: string) => {
+    setSelectedAnalyzeJobId(jobId);
+    const job = savedJobs.find(j => j.id === jobId);
+    if (job) {
+      setJobTitle(job.title || '');
+      setLocation(job.location || '');
+      // Optionally set currentOffer if salary is available
+      if (job.salary) {
+        setCurrentOffer(job.salary);
+      }
+    }
+  };
+
   // Analyze State
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
@@ -85,10 +125,31 @@ export default function SalaryAnalyzerPage() {
     { id: '1', company: '', position: '', baseSalary: 0, bonus: '', equity: '', benefits: [], remoteWork: '', ptoDays: 0, location: '' },
     { id: '2', company: '', position: '', baseSalary: 0, bonus: '', equity: '', benefits: [], remoteWork: '', ptoDays: 0, location: '' },
   ]);
+  const [offerJobInputModes, setOfferJobInputModes] = useState<Record<string, 'saved' | 'manual'>>({});
+  const [selectedOfferJobIds, setSelectedOfferJobIds] = useState<Record<string, string>>({});
   const [isComparing, setIsComparing] = useState(false);
   const [comparison, setComparison] = useState<any>(null);
 
+  const handleSelectOfferJob = (offerId: string, jobId: string) => {
+    setSelectedOfferJobIds(prev => ({ ...prev, [offerId]: jobId }));
+    const job = savedJobs.find(j => j.id === jobId);
+    if (job) {
+      updateOffer(offerId, 'company', job.company || '');
+      updateOffer(offerId, 'position', job.title || '');
+      updateOffer(offerId, 'location', job.location || '');
+      if (job.salary) {
+        // Try to parse salary if it's a string
+        const salaryMatch = job.salary.match(/\d+/);
+        if (salaryMatch) {
+          updateOffer(offerId, 'baseSalary', parseInt(salaryMatch[0]));
+        }
+      }
+    }
+  };
+
   // Negotiate State
+  const [negotiateJobInputMode, setNegotiateJobInputMode] = useState<'saved' | 'manual'>('manual');
+  const [selectedNegotiateJobId, setSelectedNegotiateJobId] = useState<string>('');
   const [negotiateOffer, setNegotiateOffer] = useState('');
   const [targetSalary, setTargetSalary] = useState('');
   const [negotiateJobTitle, setNegotiateJobTitle] = useState('');
@@ -98,6 +159,18 @@ export default function SalaryAnalyzerPage() {
   const [script, setScript] = useState<any>(null);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['opening', 'keyPoints']));
+
+  const handleSelectNegotiateJob = (jobId: string) => {
+    setSelectedNegotiateJobId(jobId);
+    const job = savedJobs.find(j => j.id === jobId);
+    if (job) {
+      setNegotiateJobTitle(job.title || '');
+      setNegotiateCompany(job.company || '');
+      if (job.salary) {
+        setNegotiateOffer(job.salary);
+      }
+    }
+  };
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -283,24 +356,89 @@ export default function SalaryAnalyzerPage() {
                 <CardDescription>Get market salary data for your target role</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Saved Jobs Integration */}
+                {savedJobs.length > 0 && (
+                  <div className="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-slate-700">Import from Saved Jobs</span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAnalyzeJobInputMode('saved')}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                            analyzeJobInputMode === 'saved'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                          }`}
+                        >
+                          Saved Jobs
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAnalyzeJobInputMode('manual');
+                            setSelectedAnalyzeJobId('');
+                          }}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                            analyzeJobInputMode === 'manual'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                          }`}
+                        >
+                          Manual Entry
+                        </button>
+                      </div>
+                    </div>
+                    {analyzeJobInputMode === 'saved' && (
+                      <div>
+                        {isLoadingSavedJobs ? (
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+                          </div>
+                        ) : (
+                          <>
+                            <select
+                              value={selectedAnalyzeJobId}
+                              onChange={(e) => handleSelectAnalyzeJob(e.target.value)}
+                              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                            >
+                              <option value="">Select a saved job...</option>
+                              {savedJobs.map((job) => (
+                                <option key={job.id} value={job.id}>
+                                  {job.title} at {job.company}
+                                </option>
+                              ))}
+                            </select>
+                            {selectedAnalyzeJobId && (
+                              <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                                <Check className="h-3 w-3 text-emerald-600" />
+                                Job details imported. You can edit any field below.
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1"><Briefcase className="h-4 w-4 inline mr-1" />Job Title *</label>
-                    <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="e.g. Software Engineer" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="e.g. Software Engineer" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1"><MapPin className="h-4 w-4 inline mr-1" />Location *</label>
-                    <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. San Francisco, CA" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. San Francisco, CA" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Years of Experience</label>
-                    <input type="number" value={experienceYears} onChange={(e) => setExperienceYears(e.target.value ? parseInt(e.target.value) : '')} placeholder="e.g. 5" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="number" value={experienceYears} onChange={(e) => setExperienceYears(e.target.value ? parseInt(e.target.value) : '')} placeholder="e.g. 5" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Industry</label>
-                    <input type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="e.g. Technology" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="e.g. Technology" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Company Size</label>
@@ -317,14 +455,14 @@ export default function SalaryAnalyzerPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Key Skills</label>
                   <div className="flex gap-2 mb-2">
-                    <input type="text" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())} placeholder="Add a skill" className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())} placeholder="Add a skill" className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                     <Button variant="outline" onClick={addSkill}>Add</Button>
                   </div>
                   {skills.length > 0 && (<div className="flex flex-wrap gap-2">{skills.map((skill) => (<Badge key={skill} variant="info" size="lg">{skill}<button onClick={() => removeSkill(skill)} className="ml-1"><X className="h-3 w-3" /></button></Badge>))}</div>)}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1"><DollarSign className="h-4 w-4 inline mr-1" />Current Offer (optional)</label>
-                  <input type="text" value={currentOffer} onChange={(e) => setCurrentOffer(e.target.value)} placeholder="e.g. $120,000" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input type="text" value={currentOffer} onChange={(e) => setCurrentOffer(e.target.value)} placeholder="e.g. $120,000" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                 </div>
                 <Button variant="gradient" size="lg" onClick={handleAnalyze} disabled={isAnalyzing} leftIcon={isAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <TrendingUp className="h-5 w-5" />} className="w-full">{isAnalyzing ? 'Analyzing...' : 'Analyze Salary'}</Button>
               </CardContent>
@@ -397,15 +535,71 @@ export default function SalaryAnalyzerPage() {
                 {offers.map((offer, index) => (
                   <div key={offer.id} className="p-4 border border-slate-200 rounded-xl space-y-4">
                     <div className="flex items-center justify-between"><h4 className="font-semibold text-slate-900">Offer {index + 1}</h4>{offers.length > 2 && (<Button variant="ghost" size="sm" onClick={() => removeOffer(offer.id)}><X className="h-4 w-4" /></Button>)}</div>
+
+                    {/* Saved Jobs Import for this offer */}
+                    {savedJobs.length > 0 && (
+                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium text-slate-700">Import from Saved Jobs</span>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setOfferJobInputModes(prev => ({ ...prev, [offer.id]: 'saved' }))}
+                              className={`px-2 py-1 text-xs font-medium rounded transition-all ${
+                                offerJobInputModes[offer.id] === 'saved'
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                              }`}
+                            >
+                              Saved
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOfferJobInputModes(prev => ({ ...prev, [offer.id]: 'manual' }));
+                                setSelectedOfferJobIds(prev => ({ ...prev, [offer.id]: '' }));
+                              }}
+                              className={`px-2 py-1 text-xs font-medium rounded transition-all ${
+                                offerJobInputModes[offer.id] === 'manual' || !offerJobInputModes[offer.id]
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                              }`}
+                            >
+                              Manual
+                            </button>
+                          </div>
+                        </div>
+                        {offerJobInputModes[offer.id] === 'saved' && (
+                          <select
+                            value={selectedOfferJobIds[offer.id] || ''}
+                            onChange={(e) => handleSelectOfferJob(offer.id, e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="">Select a saved job...</option>
+                            {savedJobs.map((job) => (
+                              <option key={job.id} value={job.id}>
+                                {job.title} at {job.company}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        {selectedOfferJobIds[offer.id] && (
+                          <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Imported - edit details below
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <input type="text" value={offer.company} onChange={(e) => updateOffer(offer.id, 'company', e.target.value)} placeholder="Company" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                      <input type="text" value={offer.position} onChange={(e) => updateOffer(offer.id, 'position', e.target.value)} placeholder="Position" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                      <input type="number" value={offer.baseSalary || ''} onChange={(e) => updateOffer(offer.id, 'baseSalary', parseInt(e.target.value) || 0)} placeholder="Base Salary" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                      <input type="text" value={offer.company} onChange={(e) => updateOffer(offer.id, 'company', e.target.value)} placeholder="Company" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
+                      <input type="text" value={offer.position} onChange={(e) => updateOffer(offer.id, 'position', e.target.value)} placeholder="Position" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
+                      <input type="number" value={offer.baseSalary || ''} onChange={(e) => updateOffer(offer.id, 'baseSalary', parseInt(e.target.value) || 0)} placeholder="Base Salary" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <input type="text" value={offer.bonus} onChange={(e) => updateOffer(offer.id, 'bonus', e.target.value)} placeholder="Bonus (e.g. 10%)" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                      <input type="text" value={offer.equity} onChange={(e) => updateOffer(offer.id, 'equity', e.target.value)} placeholder="Equity (e.g. 50k RSUs)" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                      <input type="text" value={offer.location} onChange={(e) => updateOffer(offer.id, 'location', e.target.value)} placeholder="Location" className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                      <input type="text" value={offer.bonus} onChange={(e) => updateOffer(offer.id, 'bonus', e.target.value)} placeholder="Bonus (e.g. 10%)" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
+                      <input type="text" value={offer.equity} onChange={(e) => updateOffer(offer.id, 'equity', e.target.value)} placeholder="Equity (e.g. 50k RSUs)" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
+                      <input type="text" value={offer.location} onChange={(e) => updateOffer(offer.id, 'location', e.target.value)} placeholder="Location" className="px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" />
                     </div>
                   </div>
                 ))}
@@ -458,13 +652,78 @@ export default function SalaryAnalyzerPage() {
                 <CardDescription>Get a comprehensive toolkit to negotiate your salary</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Saved Jobs Integration */}
+                {savedJobs.length > 0 && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-slate-700">Import from Saved Jobs</span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setNegotiateJobInputMode('saved')}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                            negotiateJobInputMode === 'saved'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                          }`}
+                        >
+                          Saved Jobs
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNegotiateJobInputMode('manual');
+                            setSelectedNegotiateJobId('');
+                          }}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                            negotiateJobInputMode === 'manual'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                          }`}
+                        >
+                          Manual Entry
+                        </button>
+                      </div>
+                    </div>
+                    {negotiateJobInputMode === 'saved' && (
+                      <div>
+                        {isLoadingSavedJobs ? (
+                          <div className="flex items-center justify-center py-4">
+                            <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+                          </div>
+                        ) : (
+                          <>
+                            <select
+                              value={selectedNegotiateJobId}
+                              onChange={(e) => handleSelectNegotiateJob(e.target.value)}
+                              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                            >
+                              <option value="">Select a saved job...</option>
+                              {savedJobs.map((job) => (
+                                <option key={job.id} value={job.id}>
+                                  {job.title} at {job.company}
+                                </option>
+                              ))}
+                            </select>
+                            {selectedNegotiateJobId && (
+                              <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                                <Check className="h-3 w-3 text-emerald-600" />
+                                Job details imported. Add offer amounts below.
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Current Offer *</label><input type="text" value={negotiateOffer} onChange={(e) => setNegotiateOffer(e.target.value)} placeholder="e.g. $120,000" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Target Salary *</label><input type="text" value={targetSalary} onChange={(e) => setTargetSalary(e.target.value)} placeholder="e.g. $140,000" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Current Offer *</label><input type="text" value={negotiateOffer} onChange={(e) => setNegotiateOffer(e.target.value)} placeholder="e.g. $120,000" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" /></div>
+                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Target Salary *</label><input type="text" value={targetSalary} onChange={(e) => setTargetSalary(e.target.value)} placeholder="e.g. $140,000" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" /></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label><input type="text" value={negotiateJobTitle} onChange={(e) => setNegotiateJobTitle(e.target.value)} placeholder="e.g. Senior Software Engineer" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" /></div>
-                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Company</label><input type="text" value={negotiateCompany} onChange={(e) => setNegotiateCompany(e.target.value)} placeholder="e.g. Google" className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label><input type="text" value={negotiateJobTitle} onChange={(e) => setNegotiateJobTitle(e.target.value)} placeholder="e.g. Senior Software Engineer" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" /></div>
+                  <div><label className="block text-sm font-medium text-slate-700 mb-1">Company</label><input type="text" value={negotiateCompany} onChange={(e) => setNegotiateCompany(e.target.value)} placeholder="e.g. Google" className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" /></div>
                 </div>
                 <Button variant="gradient" size="lg" onClick={handleGenerateScript} disabled={isGeneratingScript} leftIcon={isGeneratingScript ? <Loader2 className="h-5 w-5 animate-spin" /> : <MessageSquare className="h-5 w-5" />} className="w-full">{isGeneratingScript ? 'Generating...' : 'Generate Negotiation Toolkit'}</Button>
               </CardContent>
