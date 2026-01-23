@@ -41,6 +41,7 @@ import {
   Search,
   ChevronDown,
   ExternalLink,
+  Edit2,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -636,31 +637,162 @@ export default function ResumeDetailPage() {
           </Card>
         )}
 
-        {(!resume.rawText || resume.rawText.length < 50) && resume.fileName === 'Created with Resume Builder' && (
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-indigo-600" />
-                Resume Content
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-indigo-300 mx-auto mb-4" />
-                <p className="text-slate-600 font-medium mb-2">Your resume is ready to be filled in</p>
-                <p className="text-sm text-slate-500 mb-4">
-                  Go to the Resume Builder to add your experience, education, skills, and other details.
-                </p>
-                <Link href={`/resume-builder?resumeId=${resumeId}`}>
-                  <Button size="sm" variant="primary">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Content
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {(!resume.rawText || resume.rawText.length < 50) && resume.fileName === 'Created with Resume Builder' && (() => {
+          // Check if parsedData has any actual content
+          const hasContent = resume.parsedData && (
+            resume.parsedData.contact?.name ||
+            resume.parsedData.contact?.email ||
+            resume.parsedData.summary ||
+            (resume.parsedData.experience && resume.parsedData.experience.length > 0) ||
+            (resume.parsedData.education && resume.parsedData.education.length > 0) ||
+            (resume.parsedData.skills && resume.parsedData.skills.length > 0)
+          );
+
+          if (hasContent) {
+            // Show structured content from parsedData
+            return (
+              <Card variant="elevated">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-indigo-600" />
+                    Resume Content
+                  </CardTitle>
+                  <CardDescription>Content from Resume Builder</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Contact */}
+                    {resume.parsedData.contact && (resume.parsedData.contact.name || resume.parsedData.contact.email) && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Contact
+                        </h3>
+                        <div className="text-sm text-slate-600 space-y-1">
+                          {resume.parsedData.contact.name && <p className="font-medium">{resume.parsedData.contact.name}</p>}
+                          {resume.parsedData.contact.email && <p>{resume.parsedData.contact.email}</p>}
+                          {resume.parsedData.contact.phone && <p>{resume.parsedData.contact.phone}</p>}
+                          {resume.parsedData.contact.location && <p>{resume.parsedData.contact.location}</p>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Summary */}
+                    {resume.parsedData.summary && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Summary
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{resume.parsedData.summary}</p>
+                      </div>
+                    )}
+
+                    {/* Experience */}
+                    {resume.parsedData.experience && resume.parsedData.experience.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Experience
+                        </h3>
+                        <div className="space-y-4">
+                          {resume.parsedData.experience.map((exp: any, i: number) => (
+                            <div key={i}>
+                              <p className="font-semibold text-slate-700">{exp.title}</p>
+                              {exp.company && <p className="text-sm text-indigo-600">{exp.company}</p>}
+                              {exp.startDate && (
+                                <p className="text-xs text-slate-500">
+                                  {exp.startDate} - {exp.current ? 'Present' : exp.endDate || 'Present'}
+                                </p>
+                              )}
+                              {exp.description && exp.description.length > 0 && (
+                                <ul className="mt-2 space-y-1 text-sm text-slate-600">
+                                  {exp.description.map((desc: string, j: number) => (
+                                    <li key={j} className="flex items-start gap-2">
+                                      <span className="text-slate-400 mt-1">•</span>
+                                      <span>{desc}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Education */}
+                    {resume.parsedData.education && resume.parsedData.education.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Education
+                        </h3>
+                        <div className="space-y-3">
+                          {resume.parsedData.education.map((edu: any, i: number) => (
+                            <div key={i}>
+                              <p className="font-semibold text-slate-700">{edu.degree}</p>
+                              {edu.institution && <p className="text-sm text-indigo-600">{edu.institution}</p>}
+                              {edu.graduationDate && <p className="text-xs text-slate-500">{edu.graduationDate}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Skills */}
+                    {resume.parsedData.skills && resume.parsedData.skills.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Skills
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {resume.parsedData.skills.map((skill: string, i: number) => (
+                            <Badge key={i} variant="secondary" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="pt-4 border-t border-slate-200">
+                      <Link href={`/resume-builder?resumeId=${resumeId}`}>
+                        <Button size="sm" variant="outline">
+                          <Edit2 className="h-4 w-4 mr-2" />
+                          Edit in Resume Builder
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          // No content yet - show add content message
+          return (
+            <Card variant="elevated">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-indigo-600" />
+                  Resume Content
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 text-indigo-300 mx-auto mb-4" />
+                  <p className="text-slate-600 font-medium mb-2">Your resume is ready to be filled in</p>
+                  <p className="text-sm text-slate-500 mb-4">
+                    Go to the Resume Builder to add your experience, education, skills, and other details.
+                  </p>
+                  <Link href={`/resume-builder?resumeId=${resumeId}`}>
+                    <Button size="sm" variant="primary">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Content
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {!resume.rawText && resume.fileName !== 'Created with Resume Builder' && (
           <Card variant="elevated">
