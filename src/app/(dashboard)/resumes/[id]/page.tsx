@@ -565,7 +565,7 @@ export default function ResumeDetailPage() {
         )}
 
         {/* Original Resume Content */}
-        {resume.rawText && (
+        {resume.rawText && resume.rawText.length > 50 && (
           <Card variant="elevated">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
