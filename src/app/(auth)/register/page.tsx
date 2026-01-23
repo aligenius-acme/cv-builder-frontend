@@ -95,7 +95,7 @@ export default function RegisterPage() {
             {/* Testimonial */}
             <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm">
               <p className="text-white/90 italic mb-4">
-                "ResumeAI helped me tailor my resume for each application. I got 3x more interviews!"
+                "JobTools AI helped me tailor my resume for each application. I got 3x more interviews!"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                 </div>
               </div>
               <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                ResumeAI
+                JobTools AI
               </span>
             </Link>
           </div>

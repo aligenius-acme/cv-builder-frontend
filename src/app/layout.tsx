@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Resume & CV Customizer',
-  description: 'Tailor your resume for any job with AI-powered customization. Get higher ATS scores and more interviews.',
-  keywords: ['resume', 'cv', 'ats', 'job application', 'ai', 'customizer'],
+  title: 'JobTools AI - AI-Powered Job Search Platform',
+  description: 'Complete toolkit for your job search. AI-powered resume customization, ATS optimization, interview prep, job tracking, salary analysis, and more.',
+  keywords: ['job search', 'resume', 'cv', 'ats', 'interview prep', 'ai', 'career tools', 'job application', 'job tracker', 'salary analyzer'],
 };
 
 export default function RootLayout({

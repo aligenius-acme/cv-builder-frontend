@@ -496,7 +496,7 @@ export default function DashboardPage() {
         {/* Footer Disclaimer */}
         <div className="text-center py-8 border-t border-slate-200/60">
           <p className="text-sm text-slate-500 max-w-2xl mx-auto">
-            ResumeAI helps you present your real experience effectively. We never fabricate experience
+            JobTools AI helps you present your real experience effectively. We never fabricate experience
             or guarantee hiring outcomes. All AI-generated content is based on your provided information.
           </p>
         </div>

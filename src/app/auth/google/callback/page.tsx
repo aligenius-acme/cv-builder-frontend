@@ -39,7 +39,7 @@ export default function GoogleCallbackPage() {
           setUser(response.data.user);
 
           if (response.data.isNewUser) {
-            toast.success('Welcome to ResumeAI! Your account has been created.');
+            toast.success('Welcome to JobTools AI! Your account has been created.');
           } else {
             toast.success('Welcome back!');
           }

@@ -228,7 +228,7 @@ export default function Home() {
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-xl font-bold text-white">ResumeAI</span>
+              <span className="ml-3 text-xl font-bold text-white">JobTools AI</span>
             </div>
             <div className="text-sm text-center md:text-right max-w-md">
               <p className="mb-2">

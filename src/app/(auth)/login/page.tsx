@@ -91,7 +91,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                ResumeAI
+                JobTools AI
               </span>
             </Link>
           </div>
@@ -258,7 +258,7 @@ export default function LoginPage() {
               Land your dream job with AI-powered resumes
             </h2>
             <p className="text-white/80 text-lg mb-8">
-              Join thousands of professionals who use ResumeAI to create tailored, ATS-optimized resumes that get results.
+              Join thousands of professionals who use JobTools AI to create tailored, ATS-optimized resumes that get results.
             </p>
 
             {/* Features */}
