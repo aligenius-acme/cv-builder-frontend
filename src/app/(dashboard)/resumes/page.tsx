@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume } from '@/types';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function ResumesPage() {
@@ -46,7 +46,7 @@ export default function ResumesPage() {
         setResumes(response.data);
       }
     } catch (error) {
-      toast.error('Failed to load resumes');
+      toast.error(getErrorMessage(error, 'Failed to load resumes'));
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +70,7 @@ export default function ResumesPage() {
       setResumes((prev) => prev.filter((r) => r.id !== id));
       toast.success('Resume deleted');
     } catch (error) {
-      toast.error('Failed to delete resume');
+      toast.error(getErrorMessage(error, 'Failed to delete resume'));
     }
   };
 

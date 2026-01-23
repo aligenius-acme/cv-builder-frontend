@@ -57,3 +57,30 @@ export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
   return str.slice(0, length) + '...';
 }
+
+/**
+ * Extracts error message from API error response
+ * Handles Axios errors and extracts the backend error message
+ * @param error - The error object from catch block
+ * @param fallback - Fallback message if no specific error found
+ * @returns The error message to display
+ */
+export function getErrorMessage(error: any, fallback: string = 'An error occurred'): string {
+  // Check for axios error response with error field
+  if (error?.response?.data?.error) {
+    return error.response.data.error;
+  }
+
+  // Check for axios error response with message field
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
+  }
+
+  // Check for standard error message
+  if (error?.message) {
+    return error.message;
+  }
+
+  // Return fallback
+  return fallback;
+}

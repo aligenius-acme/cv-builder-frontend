@@ -44,7 +44,7 @@ import {
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
-import { formatDate, downloadBlob, getScoreColor } from '@/lib/utils';
+import { formatDate, downloadBlob, getScoreColor, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function ResumeDetailPage() {
@@ -126,7 +126,7 @@ export default function ResumeDetailPage() {
         setResume(response.data);
       }
     } catch (error) {
-      toast.error('Failed to load resume');
+      toast.error(getErrorMessage(error, 'Failed to load resume'));
       router.push('/resumes');
     } finally {
       setIsLoading(false);
@@ -159,7 +159,7 @@ export default function ResumeDetailPage() {
         loadResume();
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to customize resume');
+      toast.error(getErrorMessage(error, 'Failed to customize resume'));
     } finally {
       setIsCustomizing(false);
     }
@@ -173,7 +173,7 @@ export default function ResumeDetailPage() {
       downloadBlob(blob, filename);
       toast.success('Download started');
     } catch (error) {
-      toast.error('Failed to download resume');
+      toast.error(getErrorMessage(error, 'Failed to download resume'));
     }
   };
 

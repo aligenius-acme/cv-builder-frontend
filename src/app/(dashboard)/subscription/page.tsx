@@ -8,6 +8,7 @@ import Badge from '@/components/ui/Badge';
 import { Check, Crown, Zap, Building, Loader2, Sparkles, Star } from 'lucide-react';
 import api from '@/lib/api';
 import { Plan } from '@/types';
+import { getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function SubscriptionPage() {
@@ -35,7 +36,7 @@ export default function SubscriptionPage() {
         setSubscription(subRes.data);
       }
     } catch (error) {
-      toast.error('Failed to load subscription data');
+      toast.error(getErrorMessage(error, 'Failed to load subscription data'));
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +50,7 @@ export default function SubscriptionPage() {
         window.location.href = response.data.checkoutUrl;
       }
     } catch (error) {
-      toast.error('Failed to start checkout');
+      toast.error(getErrorMessage(error, 'Failed to start checkout'));
       setIsProcessing(false);
     }
   };
@@ -62,7 +63,7 @@ export default function SubscriptionPage() {
         window.location.href = response.data.portalUrl;
       }
     } catch (error) {
-      toast.error('Failed to open billing portal');
+      toast.error(getErrorMessage(error, 'Failed to open billing portal'));
       setIsProcessing(false);
     }
   };

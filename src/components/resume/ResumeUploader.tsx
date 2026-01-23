@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -35,7 +35,7 @@ export default function ResumeUploader({ onUploadComplete }: ResumeUploaderProps
         }
       } catch (error: any) {
         setUploadStatus('error');
-        toast.error(error.response?.data?.error || error.message || 'Failed to upload resume');
+        toast.error(getErrorMessage(error, 'Failed to upload resume'));
       } finally {
         setIsUploading(false);
       }

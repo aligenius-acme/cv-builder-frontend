@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import api, { JobApplication } from '@/lib/api';
 import { CoverLetter, Resume } from '@/types';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -152,7 +152,7 @@ export default function CoverLettersPage() {
         toast.success('Cover letter generated!');
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to generate cover letter');
+      toast.error(getErrorMessage(error, 'Failed to generate cover letter'));
     } finally {
       setIsGenerating(false);
     }
@@ -168,7 +168,7 @@ export default function CoverLettersPage() {
       setCoverLetters((prev) => prev.filter((cl) => cl.id !== id));
       toast.success('Cover letter deleted');
     } catch (error) {
-      toast.error('Failed to delete cover letter');
+      toast.error(getErrorMessage(error, 'Failed to delete cover letter'));
     }
   };
 
@@ -184,7 +184,7 @@ export default function CoverLettersPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      toast.error('Failed to download cover letter');
+      toast.error(getErrorMessage(error, 'Failed to download cover letter'));
     }
   };
 

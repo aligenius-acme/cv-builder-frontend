@@ -37,7 +37,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import AIWritingAssistant from '@/components/resume/AIWritingAssistant';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 import api from '@/lib/api';
 import { downloadBlob } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -158,7 +158,7 @@ export default function ResumeBuilderPage() {
           }
         }
       } catch (error) {
-        toast.error('Failed to load resume');
+        toast.error(getErrorMessage(error, 'Failed to load resume'));
       } finally {
         setIsLoading(false);
       }
@@ -200,7 +200,7 @@ export default function ResumeBuilderPage() {
         toast.success('Resume created!');
       }
     } catch (error) {
-      toast.error('Failed to create resume');
+      toast.error(getErrorMessage(error, 'Failed to create resume'));
     } finally {
       setIsSaving(false);
     }
@@ -228,7 +228,7 @@ export default function ResumeBuilderPage() {
         }
       }
     } catch (error) {
-      if (!isAutoSave) toast.error('Failed to save resume');
+      if (!isAutoSave) toast.error(getErrorMessage(error, 'Failed to save resume'));
     } finally {
       if (!isAutoSave) setIsSaving(false);
     }
@@ -245,7 +245,7 @@ export default function ResumeBuilderPage() {
       downloadBlob(blob, `${resumeTitle}.${format}`);
       toast.success('Download started!');
     } catch (error) {
-      toast.error('Failed to download resume');
+      toast.error(getErrorMessage(error, 'Failed to download resume'));
     }
   };
 
@@ -260,7 +260,7 @@ export default function ResumeBuilderPage() {
       const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
     } catch (error) {
-      toast.error('Failed to load preview');
+      toast.error(getErrorMessage(error, 'Failed to load preview'));
     } finally {
       setIsLoadingPreview(false);
     }

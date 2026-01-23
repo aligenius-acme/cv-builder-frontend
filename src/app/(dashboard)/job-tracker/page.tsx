@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import api, { JobApplication, JobActivity } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getErrorMessage } from '@/lib/utils';
 
 type ApplicationStatus = JobApplication['status'];
 
@@ -72,7 +72,7 @@ export default function JobTrackerPage() {
         setStats(response.data.stats);
       }
     } catch (error) {
-      toast.error('Failed to load applications');
+      toast.error(getErrorMessage(error, 'Failed to load applications'));
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +120,7 @@ export default function JobTrackerPage() {
       await api.updateJobApplicationStatus(draggedItem.id, newStatus);
       toast.success(`Moved to ${STATUS_CONFIG[newStatus].label}`);
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error(getErrorMessage(error, 'Failed to update status'));
       loadApplications();
     }
 
@@ -137,7 +137,7 @@ export default function JobTrackerPage() {
         setEditingApp(null);
       }
     } catch (error) {
-      toast.error('Failed to add application');
+      toast.error(getErrorMessage(error, 'Failed to add application'));
     }
   };
 
@@ -153,7 +153,7 @@ export default function JobTrackerPage() {
         setEditingApp(null);
       }
     } catch (error) {
-      toast.error('Failed to update application');
+      toast.error(getErrorMessage(error, 'Failed to update application'));
     }
   };
 
@@ -169,7 +169,7 @@ export default function JobTrackerPage() {
         setShowDetailsPanel(false);
       }
     } catch (error) {
-      toast.error('Failed to delete application');
+      toast.error(getErrorMessage(error, 'Failed to delete application'));
     }
   };
 
@@ -697,7 +697,7 @@ function DetailsPanel({
       setNewNote('');
       setShowNoteInput(false);
     } catch (error) {
-      toast.error('Failed to add note');
+      toast.error(getErrorMessage(error, 'Failed to add note'));
     }
   };
 
