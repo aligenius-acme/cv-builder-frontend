@@ -417,7 +417,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     placeholder="e.g., Senior Software Engineer"
-                    className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className="w-full pl-11 pr-4 py-3 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                     readOnly={jobInputMode === 'saved' && !!selectedJobId}
                   />
                 </div>
@@ -718,7 +718,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                 value={jobContext}
                 onChange={(e) => setJobContext(e.target.value)}
                 placeholder="e.g., Senior Product Manager at Google"
-                className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400"
               />
             </div>
           </div>
@@ -875,7 +875,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                         value={bullet}
                         onChange={(e) => updateBullet(idx, e.target.value)}
                         placeholder="e.g., Improved customer satisfaction"
-                        className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                        className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400"
                       />
                       {bullets.length > 1 && (
                         <button
@@ -1235,7 +1235,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="e.g., Data Scientist"
-                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm placeholder:text-slate-400"
                 />
               </div>
             )}
@@ -1804,7 +1804,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
                         type="text"
                         value={formData.candidateName}
                         onChange={(e) => setFormData({ ...formData, candidateName: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
@@ -1816,7 +1816,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
                         type="text"
                         value={formData.recipientName}
                         onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
@@ -1831,7 +1831,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
                         type="text"
                         value={formData.companyName}
                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-slate-400"
                         readOnly={jobInputMode === 'saved' && !!selectedJobId}
                       />
                     </div>
@@ -1844,7 +1844,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
                         type="text"
                         value={formData.jobTitle}
                         onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-slate-400"
                         readOnly={jobInputMode === 'saved' && !!selectedJobId}
                       />
                     </div>
@@ -2050,10 +2050,10 @@ function NetworkingMessageTab() {
                   <button
                     key={p.value}
                     onClick={() => setPlatform(p.value)}
-                    className={`flex-1 py-2 px-4 rounded-xl border transition-all ${
+                    className={`flex-1 py-2 px-4 rounded-xl border font-medium transition-all ${
                       platform === p.value
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-200 hover:border-indigo-200'
+                        : 'border-slate-200 bg-white text-slate-900 hover:border-indigo-200 hover:text-indigo-700'
                     }`}
                   >
                     {p.label}
@@ -2088,7 +2088,7 @@ function NetworkingMessageTab() {
                 type="text"
                 value={formData.senderName}
                 onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -2108,7 +2108,7 @@ function NetworkingMessageTab() {
                 value={formData.targetRole}
                 onChange={(e) => setFormData({ ...formData, targetRole: e.target.value })}
                 placeholder="e.g., Senior Product Manager"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
               />
             </div>
           </CardContent>
@@ -2126,7 +2126,7 @@ function NetworkingMessageTab() {
                   type="text"
                   value={formData.recipientName}
                   onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                 />
               </div>
               <div>
@@ -2135,7 +2135,7 @@ function NetworkingMessageTab() {
                   type="text"
                   value={formData.recipientTitle}
                   onChange={(e) => setFormData({ ...formData, recipientTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -2145,7 +2145,7 @@ function NetworkingMessageTab() {
                 type="text"
                 value={formData.recipientCompany}
                 onChange={(e) => setFormData({ ...formData, recipientCompany: e.target.value })}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -2155,7 +2155,7 @@ function NetworkingMessageTab() {
                 value={formData.commonGround}
                 onChange={(e) => setFormData({ ...formData, commonGround: e.target.value })}
                 placeholder="Same university, mutual connection, etc. (comma-separated)"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
               />
             </div>
 

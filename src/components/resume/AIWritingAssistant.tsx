@@ -188,9 +188,9 @@ export default function AIWritingAssistant({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'w-full px-4 py-3 pr-12 border border-slate-200 rounded-xl',
+            'w-full px-4 py-3 pr-12 bg-white text-slate-900 border border-slate-200 rounded-xl',
             'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-            'resize-none text-slate-700',
+            'resize-none placeholder:text-slate-400',
             'transition-all duration-200'
           )}
           style={{ lineHeight: '24px' }}

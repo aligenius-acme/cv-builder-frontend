@@ -368,16 +368,16 @@ export default function ResumeBuilderPage() {
               >
                 Download
               </Button>
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block min-w-[120px]">
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block min-w-[120px] z-50">
                 <button
                   onClick={() => handleDownload('pdf')}
-                  className="w-full px-4 py-2 text-sm text-left hover:bg-slate-50"
+                  className="w-full px-4 py-2 text-sm text-slate-900 font-medium text-left hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
                 >
                   Download PDF
                 </button>
                 <button
                   onClick={() => handleDownload('docx')}
-                  className="w-full px-4 py-2 text-sm text-left hover:bg-slate-50"
+                  className="w-full px-4 py-2 text-sm text-slate-900 font-medium text-left hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
                 >
                   Download DOCX
                 </button>
@@ -567,7 +567,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.name}
             onChange={(e) => onChange({ ...data, name: e.target.value })}
             placeholder="John Doe"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -580,7 +580,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.email}
             onChange={(e) => onChange({ ...data, email: e.target.value })}
             placeholder="john@example.com"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -593,7 +593,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.phone}
             onChange={(e) => onChange({ ...data, phone: e.target.value })}
             placeholder="+1 (555) 123-4567"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
@@ -606,7 +606,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.location}
             onChange={(e) => onChange({ ...data, location: e.target.value })}
             placeholder="San Francisco, CA"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -619,7 +619,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.linkedin}
             onChange={(e) => onChange({ ...data, linkedin: e.target.value })}
             placeholder="linkedin.com/in/johndoe"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -632,7 +632,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.github}
             onChange={(e) => onChange({ ...data, github: e.target.value })}
             placeholder="github.com/johndoe"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
@@ -645,7 +645,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.website}
             onChange={(e) => onChange({ ...data, website: e.target.value })}
             placeholder="johndoe.com"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
           />
         </div>
       </div>
@@ -786,7 +786,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.title}
                     onChange={(e) => updateExperience(index, { title: e.target.value })}
                     placeholder="Software Engineer"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -799,7 +799,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.company}
                     onChange={(e) => updateExperience(index, { company: e.target.value })}
                     placeholder="Google"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -812,7 +812,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.location}
                     onChange={(e) => updateExperience(index, { location: e.target.value })}
                     placeholder="San Francisco, CA"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -826,7 +826,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                       value={exp.startDate}
                       onChange={(e) => updateExperience(index, { startDate: e.target.value })}
                       placeholder="Jan 2020"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                     />
                   </div>
                   <div className="flex-1">
@@ -839,7 +839,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                       value={exp.current ? 'Present' : exp.endDate}
                       onChange={(e) => updateExperience(index, { endDate: e.target.value, current: e.target.value === 'Present' })}
                       placeholder="Present"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -953,7 +953,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.degree}
                     onChange={(e) => updateEducation(index, { degree: e.target.value })}
                     placeholder="Bachelor of Science in Computer Science"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -966,7 +966,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.institution}
                     onChange={(e) => updateEducation(index, { institution: e.target.value })}
                     placeholder="Stanford University"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -979,7 +979,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.graduationDate}
                     onChange={(e) => updateEducation(index, { graduationDate: e.target.value })}
                     placeholder="May 2020"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -992,7 +992,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.location}
                     onChange={(e) => updateEducation(index, { location: e.target.value })}
                     placeholder="Stanford, CA"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -1005,7 +1005,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.gpa}
                     onChange={(e) => updateEducation(index, { gpa: e.target.value })}
                     placeholder="3.8/4.0"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -1042,7 +1042,7 @@ function SkillsEditor({ data, onChange }: { data: string[]; onChange: (data: str
           onChange={(e) => setNewSkill(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
           placeholder="Add a skill (e.g., JavaScript, Project Management)"
-          className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addSkill}>Add</Button>
       </div>
@@ -1132,7 +1132,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.name}
                     onChange={(e) => updateProject(index, { name: e.target.value })}
                     placeholder="My Awesome Project"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -1145,7 +1145,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.url}
                     onChange={(e) => updateProject(index, { url: e.target.value })}
                     placeholder="github.com/user/project"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="col-span-2">
@@ -1172,7 +1172,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.technologies.join(', ')}
                     onChange={(e) => updateProject(index, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
                     placeholder="React, Node.js, PostgreSQL"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -1209,7 +1209,7 @@ function CertificationsEditor({ data, onChange }: { data: string[]; onChange: (d
           onChange={(e) => setNewCert(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCertification())}
           placeholder="Add a certification (e.g., AWS Solutions Architect)"
-          className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addCertification}>Add</Button>
       </div>

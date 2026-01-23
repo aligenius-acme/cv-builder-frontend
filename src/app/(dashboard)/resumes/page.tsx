@@ -142,7 +142,7 @@ export default function ResumesPage() {
               placeholder="Search resumes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder:text-slate-400"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -258,7 +258,7 @@ export default function ResumesPage() {
                         </div>
                         <button
                           onClick={(e) => handleDelete(resume.id, e)}
-                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all"
                         >
                           <Trash2 className="h-5 w-5" />
                         </button>
@@ -335,7 +335,7 @@ export default function ResumesPage() {
 
                         <button
                           onClick={(e) => handleDelete(resume.id, e)}
-                          className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                          className="p-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all"
                         >
                           <Trash2 className="h-5 w-5" />
                         </button>

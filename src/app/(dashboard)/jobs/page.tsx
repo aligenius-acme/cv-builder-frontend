@@ -344,7 +344,7 @@ export default function JobBoardPage() {
 
         {/* Search Tab Content */}
         {activeTab === 'search' && (
-          <>
+          <div className="space-y-6">
             {/* Search Section */}
             <Card variant="elevated">
           <CardContent className="p-6">
@@ -359,7 +359,7 @@ export default function JobBoardPage() {
                     onChange={(e) => setKeywords(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="Job title, skills, or keywords"
-                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex-1 relative">
@@ -370,7 +370,7 @@ export default function JobBoardPage() {
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="City, state, or 'remote'"
-                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -411,7 +411,7 @@ export default function JobBoardPage() {
                       <select
                         value={experienceLevel}
                         onChange={(e) => setExperienceLevel(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                       >
                         <option value="" className="text-slate-500">Any level</option>
                         <option value="entry">Entry Level</option>
@@ -428,7 +428,7 @@ export default function JobBoardPage() {
                       <select
                         value={jobType}
                         onChange={(e) => setJobType(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                       >
                         <option value="" className="text-slate-500">Any type</option>
                         <option value="full-time">Full-time</option>
@@ -584,11 +584,12 @@ export default function JobBoardPage() {
             )}
           </div>
         </div>
-          </>
+          </div>
         )}
 
         {/* Saved Jobs Tab Content */}
         {activeTab === 'saved' && (
+          <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Saved Jobs List - 2 columns */}
             <div className={cn('lg:col-span-2 space-y-4', selectedJob && 'hidden lg:block')}>
@@ -666,6 +667,7 @@ export default function JobBoardPage() {
                 </Card>
               )}
             </div>
+          </div>
           </div>
         )}
       </div>

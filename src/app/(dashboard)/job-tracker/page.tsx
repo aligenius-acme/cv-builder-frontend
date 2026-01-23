@@ -30,6 +30,7 @@ import {
   Link2,
   Filter,
   Flag,
+  Check,
 } from 'lucide-react';
 import api, { JobApplication, JobActivity } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -224,14 +225,14 @@ export default function JobTrackerPage() {
         </div>
 
         {/* Search Bar */}
-        <div className="relative max-w-md">
+        <div className="relative max-w-md mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by job title or company..."
-            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-slate-400"
           />
         </div>
 
@@ -471,6 +472,54 @@ function ApplicationModal({
     }
   );
 
+  // Saved jobs state
+  const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('manual');
+  const [savedJobs, setSavedJobs] = useState<any[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(false);
+
+  // Load saved jobs on mount (only if not editing existing application)
+  useEffect(() => {
+    if (!application?.id) {
+      loadSavedJobs();
+    }
+  }, [application?.id]);
+
+  const loadSavedJobs = async () => {
+    setIsLoadingSavedJobs(true);
+    try {
+      const response = await api.getSavedJobs();
+      if (response.success && response.data) {
+        setSavedJobs(response.data.jobs);
+        if (response.data.jobs.length > 0) {
+          setJobInputMode('saved');
+        }
+      }
+    } catch (error) {
+      // Silent fail, fallback to manual mode
+      setJobInputMode('manual');
+    } finally {
+      setIsLoadingSavedJobs(false);
+    }
+  };
+
+  const handleSelectSavedJob = (jobId: string) => {
+    setSelectedJobId(jobId);
+    const job = savedJobs.find(j => j.id === jobId);
+    if (job) {
+      setFormData({
+        ...formData,
+        jobTitle: job.title || '',
+        companyName: job.company || '',
+        location: job.location || '',
+        salary: job.salary || '',
+        jobUrl: job.url || '',
+        jobDescription: job.description || '',
+        source: job.source || 'Saved Jobs',
+      });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
@@ -489,6 +538,76 @@ function ApplicationModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Job Source Selection - Only show when adding new application */}
+          {!application?.id && savedJobs.length > 0 && (
+            <div className="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-slate-700">Import from Saved Jobs</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setJobInputMode('saved')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                      jobInputMode === 'saved'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    Saved Jobs
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setJobInputMode('manual');
+                      setSelectedJobId('');
+                    }}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                      jobInputMode === 'manual'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    Manual Entry
+                  </button>
+                </div>
+              </div>
+
+              {jobInputMode === 'saved' && (
+                <div>
+                  {isLoadingSavedJobs ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="flex items-center gap-2 text-slate-500">
+                        <div className="w-4 h-4 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <span className="text-sm">Loading saved jobs...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <select
+                        value={selectedJobId}
+                        onChange={(e) => handleSelectSavedJob(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      >
+                        <option value="">Select a saved job...</option>
+                        {savedJobs.map((job) => (
+                          <option key={job.id} value={job.id}>
+                            {job.title} at {job.company}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedJobId && (
+                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          Job details imported. You can edit any field below before saving.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -500,7 +619,7 @@ function ApplicationModal({
                 required
                 value={formData.jobTitle || ''}
                 onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="Software Engineer"
               />
             </div>
@@ -514,7 +633,7 @@ function ApplicationModal({
                 required
                 value={formData.companyName || ''}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="Google"
               />
             </div>
@@ -530,7 +649,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.location || ''}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -543,7 +662,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.salary || ''}
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="$150,000 - $180,000"
               />
             </div>
@@ -625,7 +744,7 @@ function ApplicationModal({
                 type="date"
                 value={formData.deadline?.split('T')[0] || ''}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -637,7 +756,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.contactName || ''}
                 onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="Hiring Manager"
               />
             </div>
@@ -652,7 +771,7 @@ function ApplicationModal({
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
               placeholder="Any notes about this application..."
             />
           </div>
@@ -857,7 +976,7 @@ function DetailsPanel({
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 rows={2}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
                 placeholder="Add a note..."
               />
               <div className="flex justify-end gap-2 mt-2">
