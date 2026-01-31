@@ -1,0 +1,642 @@
+[
+  {
+    "templateId": "corporate-standard",
+    "templateName": "Corporate Standard",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\corporate-standard-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\corporate-standard-thumb.png"
+  },
+  {
+    "templateId": "finance-professional",
+    "templateName": "Finance Professional",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\finance-professional-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\finance-professional-thumb.png"
+  },
+  {
+    "templateId": "legal-traditional",
+    "templateName": "Legal Traditional",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\legal-traditional-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\legal-traditional-thumb.png"
+  },
+  {
+    "templateId": "healthcare-clean",
+    "templateName": "Healthcare Clean",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\healthcare-clean-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\healthcare-clean-thumb.png"
+  },
+  {
+    "templateId": "consulting-classic",
+    "templateName": "Consulting Classic",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\consulting-classic-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\consulting-classic-thumb.png"
+  },
+  {
+    "templateId": "executive-formal",
+    "templateName": "Executive Formal",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\executive-formal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\executive-formal-thumb.png"
+  },
+  {
+    "templateId": "business-elegant",
+    "templateName": "Business Elegant",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\business-elegant-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\business-elegant-thumb.png"
+  },
+  {
+    "templateId": "banking-conservative",
+    "templateName": "Banking Conservative",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\banking-conservative-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\banking-conservative-thumb.png"
+  },
+  {
+    "templateId": "insurance-professional",
+    "templateName": "Insurance Professional",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\insurance-professional-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\insurance-professional-thumb.png"
+  },
+  {
+    "templateId": "accounting-standard",
+    "templateName": "Accounting Standard",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\accounting-standard-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\accounting-standard-thumb.png"
+  },
+  {
+    "templateId": "corporate-modern",
+    "templateName": "Corporate Modern",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\corporate-modern-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\corporate-modern-thumb.png"
+  },
+  {
+    "templateId": "finance-executive",
+    "templateName": "Finance Executive",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\finance-executive-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\finance-executive-thumb.png"
+  },
+  {
+    "templateId": "legal-minimal",
+    "templateName": "Legal Minimal",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\legal-minimal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\legal-minimal-thumb.png"
+  },
+  {
+    "templateId": "consulting-refined",
+    "templateName": "Consulting Refined",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\consulting-refined-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\consulting-refined-thumb.png"
+  },
+  {
+    "templateId": "professional-elite",
+    "templateName": "Professional Elite",
+    "category": "ats-professional",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\professional-elite-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\professional-elite-thumb.png"
+  },
+  {
+    "templateId": "silicon-valley",
+    "templateName": "Silicon Valley",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\silicon-valley-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\silicon-valley-thumb.png"
+  },
+  {
+    "templateId": "developer-focused",
+    "templateName": "Developer Focused",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\developer-focused-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\developer-focused-thumb.png"
+  },
+  {
+    "templateId": "startup-minimal",
+    "templateName": "Startup Minimal",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\startup-minimal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\startup-minimal-thumb.png"
+  },
+  {
+    "templateId": "tech-modern",
+    "templateName": "Tech Modern",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\tech-modern-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\tech-modern-thumb.png"
+  },
+  {
+    "templateId": "code-centric",
+    "templateName": "Code Centric",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\code-centric-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\code-centric-thumb.png"
+  },
+  {
+    "templateId": "product-manager",
+    "templateName": "Product Manager",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\product-manager-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\product-manager-thumb.png"
+  },
+  {
+    "templateId": "devops-engineer",
+    "templateName": "DevOps Engineer",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\devops-engineer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\devops-engineer-thumb.png"
+  },
+  {
+    "templateId": "data-scientist",
+    "templateName": "Data Scientist",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\data-scientist-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\data-scientist-thumb.png"
+  },
+  {
+    "templateId": "software-architect",
+    "templateName": "Software Architect",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\software-architect-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\software-architect-thumb.png"
+  },
+  {
+    "templateId": "tech-lead",
+    "templateName": "Tech Lead",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\tech-lead-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\tech-lead-thumb.png"
+  },
+  {
+    "templateId": "full-stack-dev",
+    "templateName": "Full Stack Developer",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\full-stack-dev-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\full-stack-dev-thumb.png"
+  },
+  {
+    "templateId": "mobile-developer",
+    "templateName": "Mobile Developer",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\mobile-developer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\mobile-developer-thumb.png"
+  },
+  {
+    "templateId": "frontend-specialist",
+    "templateName": "Frontend Specialist",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\frontend-specialist-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\frontend-specialist-thumb.png"
+  },
+  {
+    "templateId": "backend-engineer",
+    "templateName": "Backend Engineer",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\backend-engineer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\backend-engineer-thumb.png"
+  },
+  {
+    "templateId": "tech-minimalist",
+    "templateName": "Tech Minimalist",
+    "category": "tech-startup",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\tech-minimalist-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\tech-minimalist-thumb.png"
+  },
+  {
+    "templateId": "c-suite-executive",
+    "templateName": "C-Suite Executive",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\c-suite-executive-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\c-suite-executive-thumb.png"
+  },
+  {
+    "templateId": "vp-leadership",
+    "templateName": "VP Leadership",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\vp-leadership-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\vp-leadership-thumb.png"
+  },
+  {
+    "templateId": "director-level",
+    "templateName": "Director Level",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\director-level-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\director-level-thumb.png"
+  },
+  {
+    "templateId": "strategic-leader",
+    "templateName": "Strategic Leader",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\strategic-leader-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\strategic-leader-thumb.png"
+  },
+  {
+    "templateId": "board-ready",
+    "templateName": "Board Ready",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\board-ready-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\board-ready-thumb.png"
+  },
+  {
+    "templateId": "ceo-founder",
+    "templateName": "CEO/Founder",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\ceo-founder-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\ceo-founder-thumb.png"
+  },
+  {
+    "templateId": "cto-technical",
+    "templateName": "CTO Technical",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\cto-technical-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\cto-technical-thumb.png"
+  },
+  {
+    "templateId": "cfo-financial",
+    "templateName": "CFO Financial",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\cfo-financial-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\cfo-financial-thumb.png"
+  },
+  {
+    "templateId": "coo-operations",
+    "templateName": "COO Operations",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\coo-operations-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\coo-operations-thumb.png"
+  },
+  {
+    "templateId": "executive-minimal",
+    "templateName": "Executive Minimal",
+    "category": "executive-leadership",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\executive-minimal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\executive-minimal-thumb.png"
+  },
+  {
+    "templateId": "academic-cv",
+    "templateName": "Academic CV",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\academic-cv-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\academic-cv-thumb.png"
+  },
+  {
+    "templateId": "research-scientist",
+    "templateName": "Research Scientist",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\research-scientist-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\research-scientist-thumb.png"
+  },
+  {
+    "templateId": "professor-tenure",
+    "templateName": "Professor (Tenure Track)",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\professor-tenure-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\professor-tenure-thumb.png"
+  },
+  {
+    "templateId": "postdoc-researcher",
+    "templateName": "Postdoc Researcher",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\postdoc-researcher-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\postdoc-researcher-thumb.png"
+  },
+  {
+    "templateId": "phd-candidate",
+    "templateName": "PhD Candidate",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\phd-candidate-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\phd-candidate-thumb.png"
+  },
+  {
+    "templateId": "publications-focused",
+    "templateName": "Publications Focused",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\publications-focused-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\publications-focused-thumb.png"
+  },
+  {
+    "templateId": "grants-research",
+    "templateName": "Grants & Research",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\grants-research-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\grants-research-thumb.png"
+  },
+  {
+    "templateId": "teaching-focused",
+    "templateName": "Teaching Focused",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\teaching-focused-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\teaching-focused-thumb.png"
+  },
+  {
+    "templateId": "stem-researcher",
+    "templateName": "STEM Researcher",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\stem-researcher-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\stem-researcher-thumb.png"
+  },
+  {
+    "templateId": "humanities-scholar",
+    "templateName": "Humanities Scholar",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\humanities-scholar-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\humanities-scholar-thumb.png"
+  },
+  {
+    "templateId": "social-sciences",
+    "templateName": "Social Sciences",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\social-sciences-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\social-sciences-thumb.png"
+  },
+  {
+    "templateId": "medical-researcher",
+    "templateName": "Medical Researcher",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\medical-researcher-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\medical-researcher-thumb.png"
+  },
+  {
+    "templateId": "lab-director",
+    "templateName": "Lab Director",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\lab-director-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\lab-director-thumb.png"
+  },
+  {
+    "templateId": "academic-administrator",
+    "templateName": "Academic Administrator",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\academic-administrator-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\academic-administrator-thumb.png"
+  },
+  {
+    "templateId": "interdisciplinary",
+    "templateName": "Interdisciplinary",
+    "category": "academic-research",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\interdisciplinary-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\interdisciplinary-thumb.png"
+  },
+  {
+    "templateId": "designer-portfolio",
+    "templateName": "Designer Portfolio",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\designer-portfolio-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\designer-portfolio-thumb.png"
+  },
+  {
+    "templateId": "ux-ui-designer",
+    "templateName": "UX/UI Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\ux-ui-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\ux-ui-designer-thumb.png"
+  },
+  {
+    "templateId": "graphic-designer",
+    "templateName": "Graphic Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\graphic-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\graphic-designer-thumb.png"
+  },
+  {
+    "templateId": "creative-director",
+    "templateName": "Creative Director",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\creative-director-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\creative-director-thumb.png"
+  },
+  {
+    "templateId": "brand-designer",
+    "templateName": "Brand Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\brand-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\brand-designer-thumb.png"
+  },
+  {
+    "templateId": "product-designer",
+    "templateName": "Product Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\product-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\product-designer-thumb.png"
+  },
+  {
+    "templateId": "motion-designer",
+    "templateName": "Motion Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\motion-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\motion-designer-thumb.png"
+  },
+  {
+    "templateId": "illustrator",
+    "templateName": "Illustrator",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\illustrator-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\illustrator-thumb.png"
+  },
+  {
+    "templateId": "art-director",
+    "templateName": "Art Director",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\art-director-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\art-director-thumb.png"
+  },
+  {
+    "templateId": "web-designer",
+    "templateName": "Web Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\web-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\web-designer-thumb.png"
+  },
+  {
+    "templateId": "visual-designer",
+    "templateName": "Visual Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\visual-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\visual-designer-thumb.png"
+  },
+  {
+    "templateId": "interaction-designer",
+    "templateName": "Interaction Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\interaction-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\interaction-designer-thumb.png"
+  },
+  {
+    "templateId": "design-systems",
+    "templateName": "Design Systems",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\design-systems-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\design-systems-thumb.png"
+  },
+  {
+    "templateId": "freelance-designer",
+    "templateName": "Freelance Designer",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\freelance-designer-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\freelance-designer-thumb.png"
+  },
+  {
+    "templateId": "creative-minimal",
+    "templateName": "Creative Minimal",
+    "category": "creative-design",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\creative-minimal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\creative-minimal-thumb.png"
+  },
+  {
+    "templateId": "college-grad",
+    "templateName": "College Graduate",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\college-grad-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\college-grad-thumb.png"
+  },
+  {
+    "templateId": "intern-seeker",
+    "templateName": "Intern Seeker",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\intern-seeker-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\intern-seeker-thumb.png"
+  },
+  {
+    "templateId": "recent-grad",
+    "templateName": "Recent Graduate",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\recent-grad-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\recent-grad-thumb.png"
+  },
+  {
+    "templateId": "entry-level-tech",
+    "templateName": "Entry Level Tech",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\entry-level-tech-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\entry-level-tech-thumb.png"
+  },
+  {
+    "templateId": "career-starter",
+    "templateName": "Career Starter",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\career-starter-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\career-starter-thumb.png"
+  },
+  {
+    "templateId": "student-athlete",
+    "templateName": "Student Athlete",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\student-athlete-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\student-athlete-thumb.png"
+  },
+  {
+    "templateId": "scholarship-focused",
+    "templateName": "Scholarship Focused",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\scholarship-focused-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\scholarship-focused-thumb.png"
+  },
+  {
+    "templateId": "first-job",
+    "templateName": "First Job",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\first-job-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\first-job-thumb.png"
+  },
+  {
+    "templateId": "bootcamp-grad",
+    "templateName": "Bootcamp Graduate",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\bootcamp-grad-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\bootcamp-grad-thumb.png"
+  },
+  {
+    "templateId": "entry-minimal",
+    "templateName": "Entry Minimal",
+    "category": "entry-student",
+    "success": true,
+    "fullPreviewPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\full\\entry-minimal-full.png",
+    "thumbnailPath": "C:\\Projects\\CV Builder\\frontend\\public\\template-previews\\thumbnails\\entry-minimal-thumb.png"
+  }
+]

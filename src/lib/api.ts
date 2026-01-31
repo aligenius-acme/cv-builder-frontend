@@ -492,8 +492,53 @@ class ApiClient {
   }
 
   // Template endpoints
-  async getTemplates() {
-    const response = await this.client.get<ApiResponse<ResumeTemplate[]>>('/templates');
+  async getTemplates(filters?: {
+    category?: string;
+    atsCompatibility?: string;
+    industry?: string;
+    experienceLevel?: string;
+    designStyle?: string;
+    search?: string;
+    sortBy?: string;
+    limit?: number;
+  }) {
+    const response = await this.client.get<ApiResponse<ResumeTemplate[]>>('/templates', {
+      params: filters,
+    });
+    return response.data;
+  }
+
+  async getTemplateById(id: string) {
+    const response = await this.client.get<ApiResponse<ResumeTemplate>>(`/templates/${id}`);
+    return response.data;
+  }
+
+  async getRecommendedTemplates(userData?: {
+    resumeId?: string;
+    industry?: string;
+    experienceLevel?: string;
+    skills?: string[];
+  }) {
+    const response = await this.client.post<ApiResponse<{
+      templates: ResumeTemplate[];
+      reason?: string;
+      basedOn?: {
+        industry?: string;
+        experienceLevel?: string;
+        skills?: string[];
+      };
+    }>>('/templates/recommended', userData || {});
+    return response.data;
+  }
+
+  async getTemplateFilters() {
+    const response = await this.client.get<ApiResponse<{
+      categories: string[];
+      atsCompatibilityLevels: string[];
+      industries: string[];
+      experienceLevels: string[];
+      designStyles: string[];
+    }>>('/templates/filters');
     return response.data;
   }
 

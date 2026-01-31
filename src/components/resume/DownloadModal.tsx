@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter } from 'lucide-react';
+import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter, Sparkles, ArrowUpDown } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
-import { ResumeTemplate } from '@/types';
+import { ResumeTemplate, PrimaryCategory, ATSCompatibility, ExperienceLevel, DesignStyle } from '@/types';
 import { downloadBlob, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import TemplateCard from './TemplateCard';
 
 interface DownloadModalProps {
   isOpen: boolean;
@@ -19,23 +20,21 @@ interface DownloadModalProps {
   companyName: string;
 }
 
-// Layout types matching backend
-type LayoutType = 'single-column' | 'two-column' | 'one-page';
-type TemplateFeature = 'ats-optimized' | 'photo-ready' | 'academic' | 'entry-level' | 'executive';
-
-// Extended template type with new fields
-interface ExtendedTemplate extends ResumeTemplate {
-  category?: 'Professional' | 'Modern' | 'Creative' | 'Simple';
-  layoutType?: LayoutType;
-  features?: TemplateFeature[];
-  colorHex?: string;
-  colorName?: string;
-  layoutName?: string;
-  isPopular?: boolean;
-  isNew?: boolean;
-  isATSSafe?: boolean;
-  hasPhoto?: boolean;
-}
+// INDUSTRY_TAGS matching backend
+const INDUSTRY_TAGS = {
+  technology: 'Technology',
+  business: 'Business',
+  creative: 'Creative',
+  healthcare: 'Healthcare',
+  education: 'Education',
+  sales: 'Sales',
+  operations: 'Operations',
+  legal: 'Legal',
+  engineering: 'Engineering',
+  hospitality: 'Hospitality',
+  nonprofit: 'Nonprofit',
+  government: 'Government',
+} as const;
 
 export default function DownloadModal({
   isOpen,
@@ -46,7 +45,8 @@ export default function DownloadModal({
   companyName,
 }: DownloadModalProps) {
   const { user } = useAuthStore();
-  const [templates, setTemplates] = useState<ExtendedTemplate[]>([]);
+  const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
+  const [recommendedTemplates, setRecommendedTemplates] = useState<ResumeTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState('classic-navy');
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -55,67 +55,134 @@ export default function DownloadModal({
   const [anonymize, setAnonymize] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedLayoutType, setSelectedLayoutType] = useState<string>('All');
-  const [selectedFeature, setSelectedFeature] = useState<string>('All');
+  const [selectedATS, setSelectedATS] = useState<string>('All');
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
+  const [selectedExperience, setSelectedExperience] = useState<string>('All');
+  const [selectedDesignStyle, setSelectedDesignStyle] = useState<string>('All');
+  const [sortBy, setSortBy] = useState<string>('popular');
+  const [showRecommended, setShowRecommended] = useState(true);
 
   // B2B feature - only available for org users or business plan
   const canAnonymize = user?.organizationId || user?.planType === 'BUSINESS';
 
-  // Categories for filtering (matches resume.io)
-  const categories = ['All', 'Professional', 'Modern', 'Creative', 'Simple'];
-
-  // Layout types
-  const layoutTypes = [
-    { id: 'All', label: 'All Layouts' },
-    { id: 'single-column', label: 'Single Column' },
-    { id: 'two-column', label: 'Two Column' },
-    { id: 'one-page', label: 'One Page' },
+  // New 6-category system
+  const categories: Array<{ id: string; label: string }> = [
+    { id: 'All', label: 'All Templates' },
+    { id: 'ATS-Professional', label: 'ATS-Professional' },
+    { id: 'Tech-Startup', label: 'Tech-Startup' },
+    { id: 'Creative-Design', label: 'Creative-Design' },
+    { id: 'Academic-Research', label: 'Academic-Research' },
+    { id: 'Entry-Student', label: 'Entry-Student' },
+    { id: 'Executive-Leadership', label: 'Executive-Leadership' },
   ];
 
-  // Special features
-  const features = [
-    { id: 'All', label: 'All Types' },
-    { id: 'ats-optimized', label: 'ATS-Optimized' },
-    { id: 'photo-ready', label: 'Photo Ready' },
-    { id: 'executive', label: 'Executive' },
-    { id: 'entry-level', label: 'Entry Level' },
-    { id: 'academic', label: 'Academic' },
+  // ATS Compatibility levels
+  const atsLevels = [
+    { id: 'All', label: 'All ATS Levels' },
+    { id: 'ATS-Safe', label: 'ATS-Safe' },
+    { id: 'ATS-Friendly', label: 'ATS-Friendly' },
+    { id: 'Visual-First', label: 'Visual-First' },
   ];
 
-  // Filter templates
+  // Industry filter options
+  const industries = [
+    { id: 'All', label: 'All Industries' },
+    ...Object.entries(INDUSTRY_TAGS).map(([key, label]) => ({ id: key, label })),
+  ];
+
+  // Experience levels
+  const experienceLevels = [
+    { id: 'All', label: 'All Experience' },
+    { id: 'Entry', label: 'Entry Level' },
+    { id: 'Mid', label: 'Mid Level' },
+    { id: 'Senior', label: 'Senior' },
+    { id: 'Executive', label: 'Executive' },
+  ];
+
+  // Design styles
+  const designStyles = [
+    { id: 'All', label: 'All Styles' },
+    { id: 'Minimal', label: 'Minimal' },
+    { id: 'Modern', label: 'Modern' },
+    { id: 'Bold', label: 'Bold' },
+    { id: 'Traditional', label: 'Traditional' },
+  ];
+
+  // Sort options
+  const sortOptions = [
+    { id: 'popular', label: 'Popular' },
+    { id: 'newest', label: 'Newest' },
+    { id: 'name', label: 'Name' },
+    { id: 'ats-score', label: 'ATS Score' },
+  ];
+
+  // Filter and sort templates
   const filteredTemplates = useMemo(() => {
-    return templates.filter(t => {
+    let filtered = templates.filter(t => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = t.name.toLowerCase().includes(query);
-        const matchesTags = t.tags.some(tag => tag.toLowerCase().includes(query));
-        const matchesDescription = t.description?.toLowerCase().includes(query);
-        if (!matchesName && !matchesTags && !matchesDescription) return false;
+        const matchesTags = t.tags?.some(tag => tag.toLowerCase().includes(query)) || false;
+        const matchesDescription = t.description?.toLowerCase().includes(query) || false;
+        const matchesIndustry = t.industryTags?.some(tag => tag.toLowerCase().includes(query)) || false;
+        if (!matchesName && !matchesTags && !matchesDescription && !matchesIndustry) return false;
       }
 
-      // Category filter (Professional, Modern, Creative, Simple)
-      if (selectedCategory !== 'All' && t.category !== selectedCategory) {
+      // Primary Category filter
+      if (selectedCategory !== 'All' && t.primaryCategory !== selectedCategory) {
         return false;
       }
 
-      // Layout type filter (single-column, two-column, one-page)
-      if (selectedLayoutType !== 'All' && t.layoutType !== selectedLayoutType) {
+      // ATS Compatibility filter
+      if (selectedATS !== 'All' && t.atsCompatibility !== selectedATS) {
         return false;
       }
 
-      // Feature filter (ats-optimized, photo-ready, etc.)
-      if (selectedFeature !== 'All' && !t.features?.includes(selectedFeature as TemplateFeature)) {
+      // Industry filter
+      if (selectedIndustry !== 'All') {
+        if (!t.industryTags?.some(tag => tag.toLowerCase() === selectedIndustry.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // Experience level filter
+      if (selectedExperience !== 'All' && t.experienceLevel !== selectedExperience) {
+        return false;
+      }
+
+      // Design style filter
+      if (selectedDesignStyle !== 'All' && t.designStyle !== selectedDesignStyle) {
         return false;
       }
 
       return true;
     });
-  }, [templates, searchQuery, selectedCategory, selectedLayoutType, selectedFeature]);
+
+    // Sort templates
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'popular':
+          return (b.popularityScore || 0) - (a.popularityScore || 0);
+        case 'newest':
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'ats-score':
+          const aScore = a.atsCompatibility === 'ATS-Safe' ? 3 : a.atsCompatibility === 'ATS-Friendly' ? 2 : 1;
+          const bScore = b.atsCompatibility === 'ATS-Safe' ? 3 : b.atsCompatibility === 'ATS-Friendly' ? 2 : 1;
+          return bScore - aScore;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [templates, searchQuery, selectedCategory, selectedATS, selectedIndustry, selectedExperience, selectedDesignStyle, sortBy]);
 
   // Group templates by layout for display
   const groupedTemplates = useMemo(() => {
-    const groups: Record<string, ExtendedTemplate[]> = {};
+    const groups: Record<string, ResumeTemplate[]> = {};
     for (const t of filteredTemplates) {
       const layoutName = t.layoutName || t.name.split(' ')[0];
       if (!groups[layoutName]) groups[layoutName] = [];
@@ -127,12 +194,27 @@ export default function DownloadModal({
   // Get layout info for grouped display
   const getLayoutCategory = (layoutName: string): string => {
     const template = templates.find(t => t.layoutName === layoutName);
-    return template?.category || 'Professional';
+    return template?.primaryCategory || template?.category || 'ATS-Professional';
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = searchQuery || selectedCategory !== 'All' || selectedATS !== 'All' ||
+    selectedIndustry !== 'All' || selectedExperience !== 'All' || selectedDesignStyle !== 'All';
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('All');
+    setSelectedATS('All');
+    setSelectedIndustry('All');
+    setSelectedExperience('All');
+    setSelectedDesignStyle('All');
   };
 
   useEffect(() => {
     if (isOpen) {
       loadTemplates();
+      loadRecommendedTemplates();
     }
   }, [isOpen]);
 
@@ -156,7 +238,7 @@ export default function DownloadModal({
       if (response.success && response.data) {
         setTemplates(response.data);
         // Select first popular template or first template
-        const popular = response.data.find((t: ExtendedTemplate) => t.isPopular);
+        const popular = response.data.find((t: ResumeTemplate) => t.isPopular);
         if (popular) {
           setSelectedTemplate(popular.id);
         } else if (response.data.length > 0) {
@@ -167,6 +249,18 @@ export default function DownloadModal({
       toast.error('Failed to load templates');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadRecommendedTemplates = async () => {
+    try {
+      const response = await api.getRecommendedTemplates({ resumeId });
+      if (response.success && response.data) {
+        setRecommendedTemplates(response.data.templates || []);
+      }
+    } catch (error) {
+      // Silently fail - recommendations are optional
+      console.error('Failed to load recommended templates:', error);
     }
   };
 
@@ -247,69 +341,103 @@ export default function DownloadModal({
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search templates (e.g., London, tech, creative...)"
+                    placeholder="Search templates..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
-                {/* Style Category filters (Professional, Modern, Creative, Simple) */}
-                <div className="flex items-center gap-2 flex-wrap">
+                {/* Primary Category chips */}
+                <div className="flex items-center gap-1.5 flex-wrap">
                   {categories.map(cat => (
                     <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
                       className={cn(
-                        'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
-                        selectedCategory === cat
+                        'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors',
+                        selectedCategory === cat.id
                           ? 'bg-blue-600 text-white'
                           : 'bg-white text-gray-600 hover:bg-gray-100 border'
                       )}
                     >
-                      {cat}
+                      {cat.label}
                     </button>
                   ))}
                 </div>
 
-                {/* Layout Type & Feature filters */}
-                <div className="flex items-center gap-2">
-                  {/* Layout Type dropdown */}
+                {/* Advanced Filters Row 1 */}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* ATS Compatibility dropdown */}
                   <select
-                    value={selectedLayoutType}
-                    onChange={(e) => setSelectedLayoutType(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
+                    value={selectedATS}
+                    onChange={(e) => setSelectedATS(e.target.value)}
+                    className="px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
                   >
-                    {layoutTypes.map(lt => (
-                      <option key={lt.id} value={lt.id}>{lt.label}</option>
+                    {atsLevels.map(ats => (
+                      <option key={ats.id} value={ats.id}>{ats.label}</option>
                     ))}
                   </select>
 
-                  {/* Feature dropdown */}
+                  {/* Industry dropdown */}
                   <select
-                    value={selectedFeature}
-                    onChange={(e) => setSelectedFeature(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
+                    value={selectedIndustry}
+                    onChange={(e) => setSelectedIndustry(e.target.value)}
+                    className="px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
                   >
-                    {features.map(f => (
-                      <option key={f.id} value={f.id}>{f.label}</option>
+                    {industries.map(ind => (
+                      <option key={ind.id} value={ind.id}>{ind.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Advanced Filters Row 2 */}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Experience Level dropdown */}
+                  <select
+                    value={selectedExperience}
+                    onChange={(e) => setSelectedExperience(e.target.value)}
+                    className="px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    {experienceLevels.map(exp => (
+                      <option key={exp.id} value={exp.id}>{exp.label}</option>
+                    ))}
+                  </select>
+
+                  {/* Design Style dropdown */}
+                  <select
+                    value={selectedDesignStyle}
+                    onChange={(e) => setSelectedDesignStyle(e.target.value)}
+                    className="px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    {designStyles.map(style => (
+                      <option key={style.id} value={style.id}>{style.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Sort dropdown */}
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-3.5 w-3.5 text-gray-500" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="flex-1 px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    {sortOptions.map(opt => (
+                      <option key={opt.id} value={opt.id}>Sort by: {opt.label}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Active filters indicator */}
-                {(selectedCategory !== 'All' || selectedLayoutType !== 'All' || selectedFeature !== 'All' || searchQuery) && (
+                {hasActiveFilters && (
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">
-                      {filteredTemplates.length} templates found
+                      {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
                     </span>
                     <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCategory('All');
-                        setSelectedLayoutType('All');
-                        setSelectedFeature('All');
-                      }}
+                      onClick={clearAllFilters}
                       className="text-blue-600 hover:underline"
                     >
                       Clear all filters
@@ -324,107 +452,86 @@ export default function DownloadModal({
                   <div className="flex items-center justify-center h-32">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
                   </div>
-                ) : filteredTemplates.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>No templates match your filters</p>
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCategory('All');
-                        setSelectedLayoutType('All');
-                        setSelectedFeature('All');
-                      }}
-                      className="text-blue-600 text-sm mt-2 hover:underline"
-                    >
-                      Clear all filters
-                    </button>
-                  </div>
                 ) : (
                   <div className="space-y-4">
-                    {Object.entries(groupedTemplates).map(([layoutName, layoutTemplates]) => {
-                      const category = getLayoutCategory(layoutName);
-                      const categoryColors: Record<string, string> = {
-                        Professional: 'bg-blue-100 text-blue-700',
-                        Modern: 'bg-emerald-100 text-emerald-700',
-                        Creative: 'bg-purple-100 text-purple-700',
-                        Simple: 'bg-gray-100 text-gray-700',
-                      };
-                      return (
-                      <div key={layoutName}>
-                        <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                          {layoutName}
-                          <span className={cn('px-1.5 py-0.5 rounded text-[9px] font-medium', categoryColors[category] || categoryColors.Professional)}>
-                            {category}
-                          </span>
-                          <span className="text-gray-400 font-normal">({layoutTemplates.length} colors)</span>
-                        </h4>
-                        <div className="grid grid-cols-4 gap-2">
-                          {layoutTemplates.map((template) => {
-                            const isSelected = selectedTemplate === template.id;
-
-                            return (
-                              <button
-                                key={template.id}
-                                onClick={() => setSelectedTemplate(template.id)}
-                                className={cn(
-                                  'group relative aspect-square rounded-lg border-2 transition-all overflow-hidden',
-                                  isSelected
-                                    ? 'border-blue-500 ring-2 ring-blue-200'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                )}
-                                title={template.name}
-                              >
-                                {/* Color preview */}
-                                <div
-                                  className="absolute inset-0"
-                                  style={{ backgroundColor: template.colorHex || '#1e3a5f' }}
-                                />
-
-                                {/* Template pattern overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-
-                                {/* Selection check */}
-                                {isSelected && (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                    <Check className="h-5 w-5 text-white drop-shadow-lg" />
-                                  </div>
-                                )}
-
-                                {/* Badges */}
-                                <div className="absolute top-1 right-1 flex flex-col gap-0.5">
-                                  {template.isNew && (
-                                    <span className="bg-pink-400 text-[8px] px-1 py-0.5 rounded text-white font-medium">
-                                      NEW
-                                    </span>
-                                  )}
-                                  {template.isPopular && (
-                                    <span className="bg-amber-400 text-[8px] px-1 py-0.5 rounded text-amber-900 font-medium">
-                                      ★
-                                    </span>
-                                  )}
-                                  {template.isATSSafe && (
-                                    <span className="bg-green-400 text-[8px] px-1 py-0.5 rounded text-green-900 font-medium">
-                                      ATS
-                                    </span>
-                                  )}
-                                  {template.hasPhoto && (
-                                    <span className="bg-blue-400 text-[8px] px-1 py-0.5 rounded text-white font-medium">
-                                      📷
-                                    </span>
-                                  )}
-                                </div>
-
-                                {/* Color name on hover */}
-                                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[9px] py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity truncate px-1">
-                                  {template.colorName || template.name.split(' ').slice(1).join(' ')}
-                                </div>
-                              </button>
-                            );
-                          })}
+                    {/* Recommended Templates Section */}
+                    {recommendedTemplates.length > 0 && showRecommended && !hasActiveFilters && (
+                      <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="h-4 w-4 text-indigo-600" />
+                          <h3 className="text-sm font-semibold text-gray-900">Recommended for you</h3>
+                        </div>
+                        <div className="space-y-2 bg-gradient-to-br from-indigo-50 to-purple-50 p-3 rounded-lg border border-indigo-200">
+                          {recommendedTemplates.slice(0, 6).map((template) => (
+                            <TemplateCard
+                              key={template.id}
+                              template={template}
+                              selected={selectedTemplate === template.id}
+                              onClick={() => setSelectedTemplate(template.id)}
+                              variant="default"
+                            />
+                          ))}
                         </div>
                       </div>
-                    );
-                    })}
+                    )}
+
+                    {/* All Templates */}
+                    {filteredTemplates.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>No templates match your filters</p>
+                        <button
+                          onClick={clearAllFilters}
+                          className="text-blue-600 text-sm mt-2 hover:underline"
+                        >
+                          Clear all filters
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {hasActiveFilters && (
+                          <div className="mb-3">
+                            <h3 className="text-sm font-semibold text-gray-900">Filtered Results</h3>
+                          </div>
+                        )}
+                        {Object.entries(groupedTemplates).map(([layoutName, layoutTemplates]) => {
+                          const category = getLayoutCategory(layoutName);
+                          const categoryColors: Record<string, string> = {
+                            'ATS-Professional': 'bg-blue-100 text-blue-700',
+                            'Tech-Startup': 'bg-emerald-100 text-emerald-700',
+                            'Creative-Design': 'bg-purple-100 text-purple-700',
+                            'Academic-Research': 'bg-amber-100 text-amber-700',
+                            'Entry-Student': 'bg-pink-100 text-pink-700',
+                            'Executive-Leadership': 'bg-indigo-100 text-indigo-700',
+                            Professional: 'bg-blue-100 text-blue-700',
+                            Modern: 'bg-emerald-100 text-emerald-700',
+                            Creative: 'bg-purple-100 text-purple-700',
+                            Simple: 'bg-gray-100 text-gray-700',
+                          };
+                          return (
+                            <div key={layoutName}>
+                              <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                {layoutName}
+                                <span className={cn('px-1.5 py-0.5 rounded text-[9px] font-medium', categoryColors[category] || categoryColors['ATS-Professional'])}>
+                                  {category}
+                                </span>
+                                <span className="text-gray-400 font-normal">({layoutTemplates.length} variant{layoutTemplates.length !== 1 ? 's' : ''})</span>
+                              </h4>
+                              <div className="grid grid-cols-4 gap-2">
+                                {layoutTemplates.map((template) => (
+                                  <TemplateCard
+                                    key={template.id}
+                                    template={template}
+                                    selected={selectedTemplate === template.id}
+                                    onClick={() => setSelectedTemplate(template.id)}
+                                    variant="compact"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
                   </div>
                 )}
               </div>

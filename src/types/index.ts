@@ -194,12 +194,74 @@ export interface PaginatedResponse<T> {
 }
 
 // Template types
+export type PrimaryCategory =
+  | 'ATS-Professional'
+  | 'Tech-Startup'
+  | 'Creative-Design'
+  | 'Academic-Research'
+  | 'Entry-Student'
+  | 'Executive-Leadership';
+
+export type DesignStyle = 'Minimal' | 'Modern' | 'Bold' | 'Traditional';
+
+export type ATSCompatibility = 'ATS-Safe' | 'ATS-Friendly' | 'Visual-First';
+
+export type ExperienceLevel = 'Entry' | 'Mid' | 'Senior' | 'Executive';
+
 export interface ResumeTemplate {
   id: string;
   name: string;
   description: string;
-  preview: string;
+  preview?: string;
   tags: string[];
+
+  // New enhanced fields
+  primaryCategory?: PrimaryCategory;
+  designStyle?: DesignStyle;
+  atsCompatibility?: ATSCompatibility;
+  experienceLevel?: ExperienceLevel;
+  industryTags?: string[];
+  colorHex?: string;
+  colorName?: string;
+  layoutName?: string;
+
+  // Metadata
+  popularityScore?: number;
+  isFeatured?: boolean;
+  isPopular?: boolean;
+  isNew?: boolean;
+  supportedFormats?: string[];
+  supportsDocx?: boolean;
+
+  // Legacy fields
+  category?: string;
+  layoutType?: 'single-column' | 'two-column' | 'one-page';
+  features?: string[];
+  isATSSafe?: boolean;
+  hasPhoto?: boolean;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TemplateFilters {
+  category?: PrimaryCategory;
+  atsCompatibility?: ATSCompatibility;
+  industry?: string;
+  experienceLevel?: ExperienceLevel;
+  designStyle?: DesignStyle;
+  search?: string;
+  sortBy?: 'popular' | 'newest' | 'name' | 'ats-score';
+}
+
+export interface RecommendedTemplatesResponse {
+  templates: ResumeTemplate[];
+  reason?: string;
+  basedOn?: {
+    industry?: string;
+    experienceLevel?: string;
+    skills?: string[];
+  };
 }
 
 // Admin types

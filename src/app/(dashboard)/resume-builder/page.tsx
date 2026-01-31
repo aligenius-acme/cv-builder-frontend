@@ -95,14 +95,15 @@ interface ResumeData {
 
 type Section = 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'projects';
 
-const TEMPLATES = [
-  { id: 'london-navy', name: 'London', color: 'Navy', category: 'Professional' },
-  { id: 'berlin-slate', name: 'Berlin', color: 'Slate', category: 'Modern' },
-  { id: 'tokyo-indigo', name: 'Tokyo', color: 'Indigo', category: 'Creative' },
-  { id: 'toronto-emerald', name: 'Toronto', color: 'Emerald', category: 'Simple' },
-  { id: 'chicago-sky', name: 'Chicago', color: 'Sky', category: 'Professional' },
-  { id: 'amsterdam-violet', name: 'Amsterdam', color: 'Violet', category: 'Modern' },
-];
+// Template categories
+const TEMPLATE_CATEGORIES = [
+  'ATS-Professional',
+  'Tech-Startup',
+  'Creative-Design',
+  'Academic-Research',
+  'Entry-Student',
+  'Executive-Leadership',
+] as const;
 
 export default function ResumeBuilderPage() {
   const router = useRouter();
@@ -120,6 +121,8 @@ export default function ResumeBuilderPage() {
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -166,6 +169,27 @@ export default function ResumeBuilderPage() {
 
     initResume();
   }, [resumeId]);
+
+  // Load templates
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        setIsLoadingTemplates(true);
+        const response = await api.getTemplates({ limit: 500 });
+        if (response.success && response.data) {
+          setTemplates(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load templates:', error);
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+
+    if (showTemplates && templates.length === 0) {
+      loadTemplates();
+    }
+  }, [showTemplates]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -388,25 +412,146 @@ export default function ResumeBuilderPage() {
 
         {/* Template Selector */}
         {showTemplates && (
-          <div className="border-t border-slate-200 bg-slate-50 p-4">
+          <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6 max-h-[500px] overflow-y-auto shadow-inner">
             <div className="max-w-7xl mx-auto">
-              <p className="text-sm font-medium text-slate-700 mb-3">Select Template</p>
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {TEMPLATES.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => setSelectedTemplate(template.id)}
-                    className={cn(
-                      'px-4 py-2 rounded-lg border-2 text-sm whitespace-nowrap transition-all',
-                      selectedTemplate === template.id
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                    )}
-                  >
-                    {template.name} - {template.color}
-                  </button>
-                ))}
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                    <Palette className="h-4 w-4 text-indigo-600" />
+                    Choose Your Template
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <Sparkles className="inline h-3 w-3" />
+                    {templates.length} professional templates • Unique layouts & styles
+                  </p>
+                </div>
+                <div className="text-xs text-slate-400">
+                  Scroll to see more ↓
+                </div>
               </div>
+
+              {isLoadingTemplates ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-3" />
+                  <p className="text-sm text-slate-500">Loading templates...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {TEMPLATE_CATEGORIES.map((category) => {
+                    const categoryTemplates = templates.filter(
+                      (t) =>
+                        t.primaryCategory?.toLowerCase() === category.toLowerCase() ||
+                        t.category?.toLowerCase() === category.toLowerCase()
+                    );
+                    if (categoryTemplates.length === 0) return null;
+
+                    return (
+                      <div key={category} className="group/category">
+                        {/* Category Header */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+                          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider px-3 py-1 bg-white rounded-full shadow-sm border border-slate-200">
+                            {category.replace(/-/g, ' ')}
+                            <span className="ml-1.5 text-indigo-600">({categoryTemplates.length})</span>
+                          </h4>
+                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+                        </div>
+
+                        {/* Template Grid */}
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                          {categoryTemplates.map((template) => (
+                            <button
+                              key={template.id}
+                              onClick={() => setSelectedTemplate(template.id)}
+                              className={cn(
+                                'group/card relative aspect-[3/4] rounded-xl transition-all duration-200 overflow-hidden shadow-sm hover:shadow-lg',
+                                selectedTemplate === template.id
+                                  ? 'ring-2 ring-indigo-500 ring-offset-2 scale-105 shadow-xl'
+                                  : 'hover:scale-105 hover:-translate-y-0.5'
+                              )}
+                              title={template.name}
+                            >
+                              {/* Preview Image */}
+                              <div className="absolute inset-0 bg-white">
+                                {template.previewImageUrl ? (
+                                  <img
+                                    src={template.previewImageUrl}
+                                    alt={template.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div
+                                    className="w-full h-full"
+                                    style={{ backgroundColor: template.colorHex || '#1e3a8a' }}
+                                  />
+                                )}
+                              </div>
+
+                              {/* Overlay Gradient */}
+                              <div className={cn(
+                                "absolute inset-0 bg-gradient-to-t transition-opacity duration-200",
+                                selectedTemplate === template.id
+                                  ? "from-indigo-900/80 via-indigo-900/20 to-transparent"
+                                  : "from-black/60 via-black/10 to-transparent opacity-0 group-hover/card:opacity-100"
+                              )} />
+
+                              {/* Feature Badges */}
+                              <div className="absolute top-1.5 right-1.5 flex flex-col gap-1">
+                                {template.atsCompatibility === 'ats-safe' && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 bg-emerald-500 text-white rounded font-semibold shadow-sm">
+                                    <Check className="h-2 w-2" />
+                                    ATS
+                                  </span>
+                                )}
+                                {template.templateConfig?.layout === 'two-column' && (
+                                  <span className="text-[9px] px-1.5 py-0.5 bg-purple-500 text-white rounded font-semibold shadow-sm">
+                                    2-COL
+                                  </span>
+                                )}
+                                {template.isPremium && (
+                                  <span className="text-[9px] px-1.5 py-0.5 bg-amber-500 text-white rounded font-semibold shadow-sm">
+                                    PRO
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Selected Checkmark */}
+                              {selectedTemplate === template.id && (
+                                <div className="absolute top-1.5 left-1.5">
+                                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-500 shadow-lg">
+                                    <Check className="h-3 w-3 text-white stroke-[3]" />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Template Name */}
+                              <div className={cn(
+                                "absolute inset-x-0 bottom-0 px-1.5 py-1.5 text-center transition-all duration-200",
+                                selectedTemplate === template.id
+                                  ? "translate-y-0 opacity-100"
+                                  : "translate-y-1 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100"
+                              )}>
+                                <p className="text-[10px] font-semibold text-white drop-shadow-lg truncate leading-tight">
+                                  {template.name}
+                                </p>
+                              </div>
+
+                              {/* Hover Border Glow */}
+                              <div className={cn(
+                                "absolute inset-0 rounded-xl transition-opacity duration-200 pointer-events-none",
+                                selectedTemplate === template.id
+                                  ? "opacity-0"
+                                  : "opacity-0 group-hover/card:opacity-100 ring-1 ring-indigo-400/50"
+                              )} />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
