@@ -18,6 +18,7 @@ interface DownloadModalProps {
   versionId: string;
   versionNumber: number;
   companyName: string;
+  isResumeBuilder?: boolean; // Flag to indicate if used from resume-builder
 }
 
 // INDUSTRY_TAGS matching backend
@@ -43,6 +44,7 @@ export default function DownloadModal({
   versionId,
   versionNumber,
   companyName,
+  isResumeBuilder = false,
 }: DownloadModalProps) {
   const { user } = useAuthStore();
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
@@ -313,11 +315,17 @@ export default function DownloadModal({
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
-      const blob = await api.previewTemplate(selectedTemplate, resumeId, versionId);
+
+      // Use different API method based on context
+      const blob = isResumeBuilder
+        ? await api.previewBuiltResume(resumeId, selectedTemplate)
+        : await api.previewTemplate(selectedTemplate, resumeId, versionId);
+
       const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
     } catch (error) {
       console.error('Failed to load preview:', error);
+      toast.error('Failed to load preview');
     } finally {
       setIsPreviewLoading(false);
     }
@@ -326,9 +334,17 @@ export default function DownloadModal({
   const handleDownload = async (format: 'pdf' | 'docx') => {
     try {
       setIsDownloading(true);
-      const blob = await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize);
+
+      // Use different API method based on context
+      const blob = isResumeBuilder
+        ? await api.downloadBuiltResume(resumeId, format, selectedTemplate)
+        : await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize);
+
       const prefix = anonymize ? 'anonymous-resume' : 'resume';
-      const filename = `${prefix}-${companyName || 'tailored'}-v${versionNumber}.${format}`;
+      const filename = isResumeBuilder
+        ? `${companyName || 'resume'}.${format}`
+        : `${prefix}-${companyName || 'tailored'}-v${versionNumber}.${format}`;
+
       downloadBlob(blob, filename);
       toast.success(`Downloaded ${anonymize ? 'anonymized ' : ''}${format.toUpperCase()}`);
       onClose();

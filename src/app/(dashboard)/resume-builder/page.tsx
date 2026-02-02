@@ -16,13 +16,11 @@ import {
   ChevronDown,
   Save,
   Download,
-  Eye,
   Sparkles,
   Loader2,
   Check,
   X,
   GripVertical,
-  Palette,
   Mail,
   Phone,
   MapPin,
@@ -37,6 +35,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import AIWritingAssistant from '@/components/resume/AIWritingAssistant';
+import DownloadModal from '@/components/resume/DownloadModal';
 import { cn, getErrorMessage } from '@/lib/utils';
 import api from '@/lib/api';
 import { downloadBlob } from '@/lib/utils';
@@ -95,16 +94,6 @@ interface ResumeData {
 
 type Section = 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'projects';
 
-// Template categories
-const TEMPLATE_CATEGORIES = [
-  'ATS-Professional',
-  'Tech-Startup',
-  'Creative-Design',
-  'Academic-Research',
-  'Entry-Student',
-  'Executive-Leadership',
-] as const;
-
 export default function ResumeBuilderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -114,15 +103,9 @@ export default function ResumeBuilderPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(resumeId);
   const [resumeTitle, setResumeTitle] = useState('Untitled Resume');
-  const [selectedTemplate, setSelectedTemplate] = useState('london-navy');
   const [activeSection, setActiveSection] = useState<Section>('contact');
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -170,26 +153,6 @@ export default function ResumeBuilderPage() {
     initResume();
   }, [resumeId]);
 
-  // Load templates
-  useEffect(() => {
-    const loadTemplates = async () => {
-      try {
-        setIsLoadingTemplates(true);
-        const response = await api.getTemplates({ limit: 500 });
-        if (response.success && response.data) {
-          setTemplates(response.data);
-        }
-      } catch (error) {
-        console.error('Failed to load templates:', error);
-      } finally {
-        setIsLoadingTemplates(false);
-      }
-    };
-
-    if (showTemplates && templates.length === 0) {
-      loadTemplates();
-    }
-  }, [showTemplates]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -266,10 +229,6 @@ export default function ResumeBuilderPage() {
       setHasUnsavedChanges(false);
       if (!isAutoSave) {
         toast.success('Resume saved!');
-        // Refresh preview after manual save
-        if (showPreview) {
-          loadPreview();
-        }
       }
     } catch (error) {
       if (!isAutoSave) toast.error(getErrorMessage(error, 'Failed to save resume'));
@@ -278,43 +237,15 @@ export default function ResumeBuilderPage() {
     }
   };
 
-  const handleDownload = async (format: 'pdf' | 'docx') => {
+  const handleOpenDownloadModal = async () => {
     if (!currentResumeId) {
       toast.error('Please save your resume first');
       return;
     }
-
-    try {
-      const blob = await api.downloadBuiltResume(currentResumeId, format, selectedTemplate);
-      downloadBlob(blob, `${resumeTitle}.${format}`);
-      toast.success('Download started!');
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to download resume'));
-    }
+    // Save before opening modal to ensure latest data
+    await handleSave(true);
+    setShowDownloadModal(true);
   };
-
-  const loadPreview = async () => {
-    if (!currentResumeId) return;
-
-    setIsLoadingPreview(true);
-    try {
-      // Save first to ensure preview is up to date
-      await handleSave(true);
-      const blob = await api.previewBuiltResume(currentResumeId, selectedTemplate);
-      const url = URL.createObjectURL(blob);
-      setPreviewUrl(url);
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to load preview'));
-    } finally {
-      setIsLoadingPreview(false);
-    }
-  };
-
-  useEffect(() => {
-    if (showPreview && currentResumeId) {
-      loadPreview();
-    }
-  }, [showPreview, selectedTemplate, currentResumeId]);
 
   // Section navigation
   const sections = [
@@ -362,199 +293,23 @@ export default function ResumeBuilderPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowTemplates(!showTemplates)}
-              leftIcon={<Palette className="h-4 w-4" />}
-            >
-              Template
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-              leftIcon={<Eye className="h-4 w-4" />}
-            >
-              {showPreview ? 'Hide Preview' : 'Preview'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={() => handleSave()}
               disabled={isSaving}
               leftIcon={isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             >
               Save
             </Button>
-            <div className="relative group">
-              <Button
-                variant="gradient"
-                size="sm"
-                leftIcon={<Download className="h-4 w-4" />}
-              >
-                Download
-              </Button>
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-slate-200 py-1 hidden group-hover:block min-w-[120px] z-50">
-                <button
-                  onClick={() => handleDownload('pdf')}
-                  className="w-full px-4 py-2 text-sm text-slate-900 font-medium text-left hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
-                >
-                  Download PDF
-                </button>
-                <button
-                  onClick={() => handleDownload('docx')}
-                  className="w-full px-4 py-2 text-sm text-slate-900 font-medium text-left hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
-                >
-                  Download DOCX
-                </button>
-              </div>
-            </div>
+            <Button
+              variant="gradient"
+              size="sm"
+              onClick={handleOpenDownloadModal}
+              leftIcon={<Download className="h-4 w-4" />}
+            >
+              Download
+            </Button>
           </div>
         </div>
 
-        {/* Template Selector */}
-        {showTemplates && (
-          <div className="border-t border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6 max-h-[500px] overflow-y-auto shadow-inner">
-            <div className="max-w-7xl mx-auto">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
-                <div>
-                  <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-                    <Palette className="h-4 w-4 text-indigo-600" />
-                    Choose Your Template
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                    <Sparkles className="inline h-3 w-3" />
-                    {templates.length} professional templates • Unique layouts & styles
-                  </p>
-                </div>
-                <div className="text-xs text-slate-400">
-                  Scroll to see more ↓
-                </div>
-              </div>
-
-              {isLoadingTemplates ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-3" />
-                  <p className="text-sm text-slate-500">Loading templates...</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {TEMPLATE_CATEGORIES.map((category) => {
-                    const categoryTemplates = templates.filter(
-                      (t) =>
-                        t.primaryCategory?.toLowerCase() === category.toLowerCase() ||
-                        t.category?.toLowerCase() === category.toLowerCase()
-                    );
-                    if (categoryTemplates.length === 0) return null;
-
-                    return (
-                      <div key={category} className="group/category">
-                        {/* Category Header */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
-                          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider px-3 py-1 bg-white rounded-full shadow-sm border border-slate-200">
-                            {category.replace(/-/g, ' ')}
-                            <span className="ml-1.5 text-indigo-600">({categoryTemplates.length})</span>
-                          </h4>
-                          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
-                        </div>
-
-                        {/* Template Grid */}
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                          {categoryTemplates.map((template) => (
-                            <button
-                              key={template.id}
-                              onClick={() => setSelectedTemplate(template.id)}
-                              className={cn(
-                                'group/card relative aspect-[3/4] rounded-xl transition-all duration-200 overflow-hidden shadow-sm hover:shadow-lg',
-                                selectedTemplate === template.id
-                                  ? 'ring-2 ring-indigo-500 ring-offset-2 scale-105 shadow-xl'
-                                  : 'hover:scale-105 hover:-translate-y-0.5'
-                              )}
-                              title={template.name}
-                            >
-                              {/* Preview Image */}
-                              <div className="absolute inset-0 bg-white">
-                                {template.previewImageUrl ? (
-                                  <img
-                                    src={template.previewImageUrl}
-                                    alt={template.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div
-                                    className="w-full h-full"
-                                    style={{ backgroundColor: template.colorHex || '#1e3a8a' }}
-                                  />
-                                )}
-                              </div>
-
-                              {/* Overlay Gradient */}
-                              <div className={cn(
-                                "absolute inset-0 bg-gradient-to-t transition-opacity duration-200",
-                                selectedTemplate === template.id
-                                  ? "from-indigo-900/80 via-indigo-900/20 to-transparent"
-                                  : "from-black/60 via-black/10 to-transparent opacity-0 group-hover/card:opacity-100"
-                              )} />
-
-                              {/* Feature Badges */}
-                              <div className="absolute top-1.5 right-1.5 flex flex-col gap-1">
-                                {template.atsCompatibility === 'ats-safe' && (
-                                  <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 bg-emerald-500 text-white rounded font-semibold shadow-sm">
-                                    <Check className="h-2 w-2" />
-                                    ATS
-                                  </span>
-                                )}
-                                {template.templateConfig?.layout === 'two-column' && (
-                                  <span className="text-[9px] px-1.5 py-0.5 bg-purple-500 text-white rounded font-semibold shadow-sm">
-                                    2-COL
-                                  </span>
-                                )}
-                                {template.isPremium && (
-                                  <span className="text-[9px] px-1.5 py-0.5 bg-amber-500 text-white rounded font-semibold shadow-sm">
-                                    PRO
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Selected Checkmark */}
-                              {selectedTemplate === template.id && (
-                                <div className="absolute top-1.5 left-1.5">
-                                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-500 shadow-lg">
-                                    <Check className="h-3 w-3 text-white stroke-[3]" />
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Template Name */}
-                              <div className={cn(
-                                "absolute inset-x-0 bottom-0 px-1.5 py-1.5 text-center transition-all duration-200",
-                                selectedTemplate === template.id
-                                  ? "translate-y-0 opacity-100"
-                                  : "translate-y-1 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100"
-                              )}>
-                                <p className="text-[10px] font-semibold text-white drop-shadow-lg truncate leading-tight">
-                                  {template.name}
-                                </p>
-                              </div>
-
-                              {/* Hover Border Glow */}
-                              <div className={cn(
-                                "absolute inset-0 rounded-xl transition-opacity duration-200 pointer-events-none",
-                                selectedTemplate === template.id
-                                  ? "opacity-0"
-                                  : "opacity-0 group-hover/card:opacity-100 ring-1 ring-indigo-400/50"
-                              )} />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Hero Banner */}
@@ -599,7 +354,7 @@ export default function ResumeBuilderPage() {
           </div>
 
           {/* Editor */}
-          <div className={cn('flex-1', showPreview && 'max-w-xl')}>
+          <div className="flex-1">
             <Card variant="elevated">
               <CardContent className="p-6">
                 {activeSection === 'contact' && (
@@ -654,44 +409,21 @@ export default function ResumeBuilderPage() {
             </Card>
           </div>
 
-          {/* Preview */}
-          {showPreview && (
-            <div className="w-96 shrink-0">
-              <div className="sticky top-32">
-                <Card variant="elevated">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-slate-700">Preview</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={loadPreview}
-                        disabled={isLoadingPreview}
-                      >
-                        {isLoadingPreview ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
-                      </Button>
-                    </div>
-                    {isLoadingPreview ? (
-                      <div className="h-[500px] flex items-center justify-center bg-slate-50 rounded-lg">
-                        <Loader2 className="h-6 w-6 text-indigo-600 animate-spin" />
-                      </div>
-                    ) : previewUrl ? (
-                      <iframe
-                        src={previewUrl}
-                        className="w-full h-[500px] rounded-lg border border-slate-200"
-                      />
-                    ) : (
-                      <div className="h-[500px] flex items-center justify-center bg-slate-50 rounded-lg text-slate-500 text-sm">
-                        Save to see preview
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Download Modal */}
+      {currentResumeId && (
+        <DownloadModal
+          isOpen={showDownloadModal}
+          onClose={() => setShowDownloadModal(false)}
+          resumeId={currentResumeId}
+          versionId={currentResumeId} // Using resumeId as versionId for resume builder
+          versionNumber={1}
+          companyName={resumeTitle}
+          isResumeBuilder={true}
+        />
+      )}
     </div>
   );
 }
