@@ -35,6 +35,7 @@ import {
   Code,
   Monitor,
   ScanLine,
+  AlertOctagon,
 } from 'lucide-react';
 import { ATSAnalysis } from '@/types';
 import api from '@/lib/api';
@@ -419,7 +420,267 @@ export default function ATSSimulator({
         </Card>
       )}
 
-      {/* Recommendations */}
+      {/* Quick Wins - Most Important Section */}
+      {analysis.quickWins && analysis.quickWins.length > 0 && (
+        <div className="relative overflow-hidden rounded-2xl border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 shadow-xl">
+          <div className="absolute top-0 right-0 -mt-4 -mr-4">
+            <div className="w-24 h-24 bg-yellow-400/20 rounded-full blur-2xl" />
+          </div>
+          <div className="relative bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm ring-4 ring-white/30 animate-pulse">
+                  <Zap className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-2xl font-black text-white">⚡ QUICK WINS</h3>
+                    <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-bounce">
+                      START HERE
+                    </span>
+                  </div>
+                  <p className="text-yellow-100 text-sm mt-1 font-medium">
+                    Make these changes NOW for instant score boost!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-3">
+            {analysis.quickWins.map((win, i) => (
+              <div
+                key={i}
+                className="relative group bg-white rounded-xl p-5 border-2 border-yellow-200 hover:border-yellow-400 shadow-md hover:shadow-xl transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-slate-800 font-medium leading-relaxed">{win}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <span className="inline-flex items-center px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
+                      &lt;5 min
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Action Plan */}
+      {analysis.actionPlan && (
+        <div className="relative overflow-hidden rounded-2xl border border-blue-200/50 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+          <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                <Target className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">📋 Your Action Plan</h3>
+                <p className="text-blue-100 text-sm mt-1">
+                  Follow these steps to maximize your ATS score
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="bg-white rounded-xl p-5 border-l-4 border-l-red-500 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded">STEP 1</span>
+                <span className="text-xs text-slate-500">⏱️ 5 minutes</span>
+              </div>
+              <p className="text-slate-700 font-medium">{analysis.actionPlan.step1}</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-l-4 border-l-orange-500 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-bold rounded">STEP 2</span>
+                <span className="text-xs text-slate-500">⏱️ 15 minutes</span>
+              </div>
+              <p className="text-slate-700 font-medium">{analysis.actionPlan.step2}</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-l-4 border-l-yellow-500 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">STEP 3</span>
+                <span className="text-xs text-slate-500">⏱️ 30 minutes</span>
+              </div>
+              <p className="text-slate-700 font-medium">{analysis.actionPlan.step3}</p>
+            </div>
+            <div className="mt-6 p-5 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-xl border border-emerald-300">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-700 font-medium">Expected Result:</span>
+                <span className="text-2xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  {analysis.actionPlan.estimatedScoreAfterFixes}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Critical Issues - Before/After Examples */}
+      {analysis.detailedRecommendations?.criticalIssues && analysis.detailedRecommendations.criticalIssues.length > 0 && (
+        <div className="relative overflow-hidden rounded-2xl border border-red-200/50 bg-gradient-to-br from-white via-red-50/30 to-rose-50/20 shadow-lg">
+          <div className="relative bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 p-6">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                <AlertOctagon className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">🚨 Critical Issues</h3>
+                <p className="text-red-100 text-sm mt-1">
+                  These are blocking your resume from passing ATS
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            {analysis.detailedRecommendations.criticalIssues.map((issue, i) => (
+              <div key={i} className="bg-white rounded-xl overflow-hidden border-2 border-red-200 shadow-md">
+                <div className="bg-gradient-to-r from-red-100 to-rose-100 px-5 py-3 border-b border-red-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={cn(
+                        "px-2 py-1 rounded-md text-xs font-bold",
+                        issue.priority === 'CRITICAL' ? "bg-red-500 text-white" :
+                        issue.priority === 'HIGH' ? "bg-orange-500 text-white" :
+                        "bg-yellow-500 text-white"
+                      )}>
+                        {issue.priority}
+                      </span>
+                      <span className="text-sm font-medium text-slate-600">{issue.location}</span>
+                    </div>
+                    <span className="text-sm font-bold text-emerald-600">{issue.estimatedScoreImpact}</span>
+                  </div>
+                </div>
+                <div className="p-5 space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-red-700 mb-2">❌ PROBLEM:</p>
+                    <p className="text-slate-700">{issue.issue}</p>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-bold text-slate-500 uppercase mb-2">Current (Bad):</p>
+                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                        <p className="text-sm text-slate-600 italic">&quot;{issue.currentText}&quot;</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-600 uppercase mb-2">✅ Improved:</p>
+                      <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                        <p className="text-sm text-slate-700 font-medium">&quot;{issue.suggestedText}&quot;</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <p className="text-xs font-bold text-blue-700 uppercase mb-2">💡 WHY THIS MATTERS:</p>
+                    <p className="text-sm text-slate-700">{issue.reasoning}</p>
+                  </div>
+                  {issue.keywords.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold text-purple-600 uppercase mb-2">🔑 Keywords Added:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {issue.keywords.map((kw, ki) => (
+                          <span key={ki} className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                            {kw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="pt-3 border-t border-slate-200">
+                    <p className="text-xs font-bold text-slate-600 uppercase mb-1">Step-by-step:</p>
+                    <p className="text-sm text-slate-600">{issue.implementation}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Missing Keywords with Examples */}
+      {analysis.detailedRecommendations?.missingKeywordDetails && analysis.detailedRecommendations.missingKeywordDetails.length > 0 && (
+        <div className="relative overflow-hidden rounded-2xl border border-purple-200/50 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/20 shadow-lg">
+          <div className="relative bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 p-6">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
+                <XCircle className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">🔍 Missing Critical Keywords</h3>
+                <p className="text-purple-100 text-sm mt-1">
+                  Add these to dramatically improve your match rate
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-3">
+            {analysis.detailedRecommendations.missingKeywordDetails.map((kw, i) => (
+              <div key={i} className="bg-white rounded-xl p-5 border border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-purple-500 text-white rounded-lg font-bold text-lg">
+                      {kw.keyword}
+                    </span>
+                    <span className="text-sm text-slate-500">{kw.importance}</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs font-bold text-slate-600 uppercase mb-1">📍 Where to add:</p>
+                    <p className="text-sm text-slate-700">{kw.suggestedLocation}</p>
+                  </div>
+                  <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                    <p className="text-xs font-bold text-emerald-700 uppercase mb-1">✅ Example usage:</p>
+                    <p className="text-sm text-slate-700 font-medium italic">&quot;{kw.exampleUsage}&quot;</p>
+                  </div>
+                  {kw.relatedKeywords.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold text-indigo-600 uppercase mb-1">Also include:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {kw.relatedKeywords.map((rk, rki) => (
+                          <span key={rki} className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs">
+                            {rk}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t border-slate-100">
+                    <p className="text-xs text-red-600 font-medium">⚠️ {kw.currentGap}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Competitor Comparison */}
+      {analysis.competitorComparison && (
+        <div className="relative overflow-hidden rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg">
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                <Award className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900">📊 Competitor Comparison</h4>
+                <p className="text-xs text-slate-500">How you stack up against top candidates</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-amber-200">
+              <p className="text-slate-700 leading-relaxed">{analysis.competitorComparison}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Original Recommendations */}
       {analysis.recommendations.length > 0 && (
         <div className="relative overflow-hidden rounded-2xl border border-indigo-200/50 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 shadow-lg">
           {/* Header with gradient */}
@@ -432,11 +693,11 @@ export default function ATSSimulator({
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    Boost Your ATS Score
+                    All Recommendations
                     <Sparkles className="h-5 w-5 text-yellow-300" />
                   </h3>
                   <p className="text-indigo-200 text-sm mt-1">
-                    {analysis.recommendations.length} actionable improvements identified
+                    {analysis.recommendations.length} total improvements identified
                   </p>
                 </div>
               </div>
@@ -491,7 +752,7 @@ export default function ATSSimulator({
                           {config.label}
                         </span>
                       </div>
-                      <p className="text-slate-700 leading-relaxed">{rec}</p>
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{rec}</p>
                     </div>
 
                     {/* Action arrow */}

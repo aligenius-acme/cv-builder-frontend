@@ -124,6 +124,57 @@ export interface ResumeVersion extends ResumeVersionSummary {
   truthGuardWarnings?: TruthGuardWarning[];
 }
 
+// Detailed recommendation types
+export interface DetailedRecommendation {
+  issue: string;
+  location: string;
+  currentText: string;
+  suggestedText: string;
+  reasoning: string;
+  estimatedScoreImpact: string;
+  priority: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+  keywords: string[];
+  implementation: string;
+}
+
+export interface MissingKeywordDetail {
+  keyword: string;
+  importance: string;
+  suggestedLocation: string;
+  exampleUsage: string;
+  relatedKeywords: string[];
+  currentGap: string;
+}
+
+export interface SectionImprovement {
+  change: string;
+  before: string;
+  after: string;
+  impact: string;
+}
+
+export interface BulletImprovement {
+  bulletPoint: string;
+  weaknesses: string[];
+  enhanced: string;
+  impact: string;
+  keywordsAdded: string[];
+}
+
+export interface SectionAnalysis {
+  currentScore: number;
+  issues: string[];
+  improvements: SectionImprovement[] | BulletImprovement[];
+}
+
+export interface SkillsAnalysis {
+  currentScore: number;
+  matched: string[];
+  missing: string[];
+  irrelevant: string[];
+  reorder: string;
+}
+
 export interface ATSAnalysis {
   score: number;
   keywordMatchPercentage: number;
@@ -140,6 +191,25 @@ export interface ATSAnalysis {
   recommendations: string[];
   atsExtractedView: string;
   riskyElements: string[];
+  honestAssessment?: string;
+  competitorComparison?: string;
+  detailedRecommendations?: {
+    criticalIssues: DetailedRecommendation[];
+    missingKeywordDetails: MissingKeywordDetail[];
+    sectionBySection: {
+      summary?: SectionAnalysis;
+      experience?: SectionAnalysis;
+      skills?: SkillsAnalysis;
+      education?: SectionAnalysis;
+    };
+  };
+  quickWins?: string[];
+  actionPlan?: {
+    step1: string;
+    step2: string;
+    step3: string;
+    estimatedScoreAfterFixes: string;
+  };
 }
 
 export interface TruthGuardWarning {
