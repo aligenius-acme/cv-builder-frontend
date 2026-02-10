@@ -138,8 +138,77 @@ export default function VersionDetailPage() {
     return null;
   }
 
-  const originalData = (version as any).originalData as ParsedResumeData | undefined;
-  const tailoredData = version.tailoredData as ParsedResumeData | undefined;
+  // CRITICAL FIX: Transform experience objects to remove ALL database fields
+  // Database has: {id, current, endDate, startDate, description}
+  // Frontend needs: {dates, description} ONLY
+  const cleanExperience = (exp: any) => {
+    if (!exp || typeof exp !== 'object') return exp;
+
+    // Create COMPLETELY NEW object with ONLY allowed fields
+    const cleaned: any = {
+      title: String(exp.title || ''),
+      company: String(exp.company || ''),
+      location: String(exp.location || ''),
+      description: []
+    };
+
+    // Convert database date fields to frontend 'dates' field
+    if (exp.dates) {
+      cleaned.dates = String(exp.dates);
+    } else if (exp.startDate || exp.endDate || exp.current !== undefined) {
+      const start = String(exp.startDate || '');
+      const end = exp.current ? 'Present' : String(exp.endDate || '');
+      cleaned.dates = start && end ? `${start} - ${end}` : (start || end);
+    }
+
+    // Ensure description is array of strings ONLY
+    if (Array.isArray(exp.description)) {
+      cleaned.description = exp.description.map((d: any) =>
+        typeof d === 'string' ? d : String(d)
+      );
+    }
+
+    // DO NOT copy any other fields - only return what we explicitly set
+    return cleaned;
+  };
+
+  const deepCleanData = (data: any): any => {
+    if (!data) return undefined;
+    if (typeof data !== 'object') return data;
+    if (Array.isArray(data)) return data.map(deepCleanData);
+
+    const cleaned: any = {};
+    for (const key in data) {
+      if (key === 'experience' && Array.isArray(data[key])) {
+        // Clean experience arrays
+        cleaned[key] = data[key].map(cleanExperience);
+      } else if (typeof data[key] === 'object' && data[key] !== null) {
+        // Recursively clean nested objects
+        cleaned[key] = deepCleanData(data[key]);
+      } else {
+        // Copy primitive values
+        cleaned[key] = data[key];
+      }
+    }
+    return cleaned;
+  };
+
+  // Deep clean ALL data in the version object
+  const originalData = deepCleanData((version as any).originalData) as ParsedResumeData | undefined;
+  const tailoredData = deepCleanData(version.tailoredData) as ParsedResumeData | undefined;
+
+  // EMERGENCY: Verify no raw objects remain
+  if (tailoredData?.experience) {
+    tailoredData.experience.forEach((exp, i) => {
+      const keys = Object.keys(exp);
+      if (keys.includes('id') || keys.includes('current') || keys.includes('startDate') || keys.includes('endDate')) {
+        console.error(`CRITICAL: Experience ${i} still has database fields:`, keys);
+        console.error('Raw object:', exp);
+        // Force clean it again
+        tailoredData.experience[i] = cleanExperience(exp);
+      }
+    });
+  }
 
   return (
     <div className="min-h-screen bg-mesh">
@@ -395,7 +464,7 @@ export default function VersionDetailPage() {
                 )}
 
                 {/* Experience Comparison */}
-                {((originalData.experience && originalData.experience.length > 0) || (tailoredData.experience && tailoredData.experience.length > 0)) && (
+                {((originalData?.experience && originalData.experience.length > 0) || (tailoredData?.experience && tailoredData.experience.length > 0)) && (
                   <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <button
                       onClick={() => toggleSection('experience')}
@@ -676,7 +745,7 @@ export default function VersionDetailPage() {
                             <Eye className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
                             <div>
                               <span className="font-medium text-slate-500">Original text:</span>
-                              <p className="text-slate-600 italic mt-0.5">&quot;{warning.original}&quot;</p>
+                              <p className="text-slate-600 italic mt-0.5">&quot;{typeof warning.original === 'string' ? warning.original : JSON.stringify(warning.original)}&quot;</p>
                             </div>
                           </div>
                         )}
