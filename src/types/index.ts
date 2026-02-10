@@ -50,6 +50,7 @@ export interface ParsedResumeData {
   languages?: string[];
   awards?: AwardEntry[];
   contact: ContactInfo;
+  photoUrl?: string; // Profile photo URL
 }
 
 export interface ExperienceEntry {
@@ -101,6 +102,7 @@ export interface ContactInfo {
   linkedin?: string;
   github?: string;
   website?: string;
+  photoUrl?: string; // Profile photo URL
 }
 
 export interface ResumeVersionSummary {
@@ -302,6 +304,9 @@ export interface ResumeTemplate {
   isNew?: boolean;
   supportedFormats?: string[];
   supportsDocx?: boolean;
+
+  // Photo support
+  photoSupport?: boolean;
 
   // Legacy fields
   category?: string;

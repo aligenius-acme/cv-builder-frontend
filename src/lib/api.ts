@@ -919,11 +919,12 @@ class ApiClient {
     return response.data;
   }
 
-  async updateResumeContent(id: string, data: { parsedData?: any; title?: string }) {
+  async updateResumeContent(id: string, data: { parsedData?: any; title?: string; photoUrl?: string }) {
     const response = await this.client.put<ApiResponse<{
       id: string;
       title: string;
       parsedData: any;
+      photoUrl?: string;
       updatedAt: string;
     }>>(`/resumes/${id}/content`, data);
     return response.data;

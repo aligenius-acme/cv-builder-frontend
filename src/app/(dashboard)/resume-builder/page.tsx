@@ -36,6 +36,7 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import AIWritingAssistant from '@/components/resume/AIWritingAssistant';
 import DownloadModal from '@/components/resume/DownloadModal';
+import { PhotoUpload } from '@/components/resume/PhotoUpload';
 import { cn, getErrorMessage } from '@/lib/utils';
 import api from '@/lib/api';
 import { downloadBlob } from '@/lib/utils';
@@ -49,6 +50,7 @@ interface Contact {
   linkedin: string;
   github: string;
   website: string;
+  photoUrl?: string;
 }
 
 interface Experience {
@@ -117,6 +119,7 @@ export default function ResumeBuilderPage() {
       linkedin: '',
       github: '',
       website: '',
+      photoUrl: '',
     },
     summary: '',
     experience: [],
@@ -208,6 +211,7 @@ export default function ResumeBuilderPage() {
           await api.updateResumeContent(newResumeId, {
             parsedData: resumeData,
             title: resumeTitle,
+            photoUrl: resumeData.contact.photoUrl,
           });
           setHasUnsavedChanges(false);
           toast.success('Resume created and saved!');
@@ -225,6 +229,7 @@ export default function ResumeBuilderPage() {
       await api.updateResumeContent(currentResumeId, {
         parsedData: resumeData,
         title: resumeTitle,
+        photoUrl: resumeData.contact.photoUrl,
       });
       setHasUnsavedChanges(false);
       if (!isAutoSave) {
@@ -431,8 +436,15 @@ export default function ResumeBuilderPage() {
 // Contact Editor Component
 function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Contact) => void }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-semibold text-slate-900">Contact Information</h3>
+
+      {/* Photo Upload */}
+      <PhotoUpload
+        photoUrl={data.photoUrl}
+        onPhotoChange={(url) => onChange({ ...data, photoUrl: url || '' })}
+      />
+
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
           <label className="block text-sm font-medium text-slate-700 mb-1">
