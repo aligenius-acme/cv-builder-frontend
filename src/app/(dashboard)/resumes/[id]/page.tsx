@@ -752,6 +752,119 @@ export default function ResumeDetailPage() {
                       </div>
                     )}
 
+                    {/* Projects */}
+                    {resume.parsedData.projects && resume.parsedData.projects.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Projects
+                        </h3>
+                        <div className="space-y-3">
+                          {resume.parsedData.projects.map((project: any, i: number) => (
+                            <div key={i}>
+                              <p className="font-semibold text-slate-700">{project.name}</p>
+                              {project.description && <p className="text-sm text-slate-600 mt-1">{project.description}</p>}
+                              {project.technologies && project.technologies.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {project.technologies.map((tech: string, j: number) => (
+                                    <Badge key={j} variant="secondary" className="text-xs">
+                                      {tech}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                              {project.url && (
+                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline mt-1 inline-block">
+                                  {project.url}
+                                </a>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Certifications */}
+                    {resume.parsedData.certifications && resume.parsedData.certifications.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Certifications
+                        </h3>
+                        <ul className="space-y-1 text-sm text-slate-600">
+                          {resume.parsedData.certifications.map((cert: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="text-indigo-600 mt-1">•</span>
+                              <span>{cert}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Languages */}
+                    {resume.parsedData.languages && resume.parsedData.languages.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Languages
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {resume.parsedData.languages.map((lang: string, i: number) => (
+                            <Badge key={i} variant="info" className="text-xs">
+                              {lang}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Awards */}
+                    {resume.parsedData.awards && resume.parsedData.awards.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Awards & Honors
+                        </h3>
+                        <ul className="space-y-1 text-sm text-slate-600">
+                          {resume.parsedData.awards.map((award: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <Trophy className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <span>{award}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Volunteer Work */}
+                    {resume.parsedData.volunteerWork && resume.parsedData.volunteerWork.length > 0 && (
+                      <div>
+                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
+                          Volunteer Work
+                        </h3>
+                        <div className="space-y-3">
+                          {resume.parsedData.volunteerWork.map((vol: any, i: number) => (
+                            <div key={i}>
+                              <p className="font-semibold text-slate-700">{vol.role}</p>
+                              {vol.organization && <p className="text-sm text-indigo-600">{vol.organization}</p>}
+                              {vol.startDate && (
+                                <p className="text-xs text-slate-500">
+                                  {vol.startDate} - {vol.current ? 'Present' : vol.endDate}
+                                </p>
+                              )}
+                              {vol.description && vol.description.length > 0 && (
+                                <ul className="mt-2 space-y-1 text-sm text-slate-600">
+                                  {vol.description.map((desc: string, j: number) => (
+                                    <li key={j} className="flex items-start gap-2">
+                                      <span className="text-indigo-600 mt-1">•</span>
+                                      <span>{desc}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="pt-4 border-t border-slate-200">
                       <Link href={`/resume-builder?id=${resumeId}`}>
                         <Button size="sm" variant="outline">

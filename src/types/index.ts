@@ -48,7 +48,8 @@ export interface ParsedResumeData {
   certifications?: CertificationEntry[];
   projects?: ProjectEntry[];
   languages?: string[];
-  awards?: AwardEntry[];
+  awards?: AwardEntry[] | string[];
+  volunteerWork?: VolunteerWorkEntry[] | string[];
   contact: ContactInfo;
   photoUrl?: string; // Profile photo URL
 }
@@ -92,6 +93,16 @@ export interface AwardEntry {
   name: string;
   issuer?: string;
   date?: string;
+}
+
+export interface VolunteerWorkEntry {
+  role: string;
+  organization: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
+  description?: string[];
 }
 
 export interface ContactInfo {

@@ -30,6 +30,8 @@ import {
   Building2,
   Calendar,
   Link2,
+  Languages,
+  Heart,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -82,6 +84,17 @@ interface Project {
   url: string;
 }
 
+interface VolunteerWork {
+  id: string;
+  role: string;
+  organization: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string[];
+}
+
 interface ResumeData {
   contact: Contact;
   summary: string;
@@ -92,9 +105,10 @@ interface ResumeData {
   projects: Project[];
   languages: string[];
   awards: string[];
+  volunteerWork: VolunteerWork[];
 }
 
-type Section = 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'projects';
+type Section = 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'projects' | 'languages' | 'awards' | 'volunteerWork';
 
 export default function ResumeBuilderPage() {
   const router = useRouter();
@@ -129,6 +143,7 @@ export default function ResumeBuilderPage() {
     projects: [],
     languages: [],
     awards: [],
+    volunteerWork: [],
   });
 
   // Load existing resume or create new one
@@ -142,7 +157,13 @@ export default function ResumeBuilderPage() {
             setCurrentResumeId(resumeId);
             setResumeTitle(response.data.title || 'Untitled Resume');
             if (response.data.parsedData) {
-              setResumeData(response.data.parsedData as ResumeData);
+              // Merge loaded data with defaults to ensure new fields exist
+              setResumeData({
+                ...response.data.parsedData,
+                languages: response.data.parsedData.languages || [],
+                awards: response.data.parsedData.awards || [],
+                volunteerWork: response.data.parsedData.volunteerWork || [],
+              } as ResumeData);
             }
           }
         }
@@ -261,6 +282,9 @@ export default function ResumeBuilderPage() {
     { id: 'skills' as Section, label: 'Skills', icon: Code },
     { id: 'projects' as Section, label: 'Projects', icon: FolderOpen },
     { id: 'certifications' as Section, label: 'Certifications', icon: Award },
+    { id: 'languages' as Section, label: 'Languages', icon: Languages },
+    { id: 'awards' as Section, label: 'Awards', icon: Award },
+    { id: 'volunteerWork' as Section, label: 'Volunteer Work', icon: Heart },
   ];
 
   if (isLoading) {
@@ -408,6 +432,27 @@ export default function ResumeBuilderPage() {
                   <CertificationsEditor
                     data={resumeData.certifications}
                     onChange={(certifications) => updateData({ certifications })}
+                  />
+                )}
+
+                {activeSection === 'languages' && (
+                  <LanguagesEditor
+                    data={resumeData.languages}
+                    onChange={(languages) => updateData({ languages })}
+                  />
+                )}
+
+                {activeSection === 'awards' && (
+                  <AwardsEditor
+                    data={resumeData.awards}
+                    onChange={(awards) => updateData({ awards })}
+                  />
+                )}
+
+                {activeSection === 'volunteerWork' && (
+                  <VolunteerWorkEditor
+                    data={resumeData.volunteerWork}
+                    onChange={(volunteerWork) => updateData({ volunteerWork })}
                   />
                 )}
               </CardContent>
@@ -1116,6 +1161,320 @@ function CertificationsEditor({ data, onChange }: { data: string[]; onChange: (d
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  );
+}
+
+// Languages Editor Component
+function LanguagesEditor({ data, onChange }: { data: string[]; onChange: (data: string[]) => void }) {
+  const [newLanguage, setNewLanguage] = useState('');
+
+  const addLanguage = () => {
+    if (newLanguage.trim() && !data.includes(newLanguage.trim())) {
+      onChange([...data, newLanguage.trim()]);
+      setNewLanguage('');
+    }
+  };
+
+  const removeLanguage = (index: number) => {
+    onChange(data.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-slate-900">Languages</h3>
+      <p className="text-sm text-slate-500">Add languages you speak and your proficiency level (e.g., "English (Native)", "Spanish (Fluent)")</p>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newLanguage}
+          onChange={(e) => setNewLanguage(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addLanguage())}
+          placeholder="e.g., English (Native), Spanish (Fluent)"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+        />
+        <Button variant="outline" onClick={addLanguage}>Add</Button>
+      </div>
+      {data.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {data.map((language, index) => (
+            <Badge key={index} variant="info" size="lg" className="group">
+              {language}
+              <button
+                onClick={() => removeLanguage(index)}
+                className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Awards Editor Component
+function AwardsEditor({ data, onChange }: { data: string[]; onChange: (data: string[]) => void }) {
+  const [newAward, setNewAward] = useState('');
+
+  const addAward = () => {
+    if (newAward.trim() && !data.includes(newAward.trim())) {
+      onChange([...data, newAward.trim()]);
+      setNewAward('');
+    }
+  };
+
+  const removeAward = (index: number) => {
+    onChange(data.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-slate-900">Awards & Honors</h3>
+      <p className="text-sm text-slate-500">Add awards, honors, or recognitions you've received</p>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newAward}
+          onChange={(e) => setNewAward(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addAward())}
+          placeholder="e.g., Employee of the Year 2023, Dean's List"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+        />
+        <Button variant="outline" onClick={addAward}>Add</Button>
+      </div>
+      {data.length > 0 && (
+        <ul className="space-y-2">
+          {data.map((award, index) => (
+            <li key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Award className="h-4 w-4 text-amber-600" />
+                <span className="text-slate-700">{award}</span>
+              </div>
+              <button
+                onClick={() => removeAward(index)}
+                className="p-1 hover:bg-red-100 rounded text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// Volunteer Work Editor Component
+function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChange: (data: VolunteerWork[]) => void }) {
+  const addVolunteerWork = () => {
+    onChange([
+      ...data,
+      {
+        id: Date.now().toString(),
+        role: '',
+        organization: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        current: false,
+        description: [''],
+      },
+    ]);
+  };
+
+  const updateVolunteerWork = (index: number, updates: Partial<VolunteerWork>) => {
+    const newData = [...data];
+    newData[index] = { ...newData[index], ...updates };
+    onChange(newData);
+  };
+
+  const removeVolunteerWork = (index: number) => {
+    onChange(data.filter((_, i) => i !== index));
+  };
+
+  const moveVolunteerWork = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= data.length) return;
+    const newData = [...data];
+    [newData[index], newData[newIndex]] = [newData[newIndex], newData[index]];
+    onChange(newData);
+  };
+
+  const addBullet = (volIndex: number) => {
+    const newData = [...data];
+    newData[volIndex].description.push('');
+    onChange(newData);
+  };
+
+  const updateBullet = (volIndex: number, bulletIndex: number, value: string) => {
+    const newData = [...data];
+    newData[volIndex].description[bulletIndex] = value;
+    onChange(newData);
+  };
+
+  const removeBullet = (volIndex: number, bulletIndex: number) => {
+    const newData = [...data];
+    newData[volIndex].description = newData[volIndex].description.filter((_, i) => i !== bulletIndex);
+    onChange(newData);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-slate-900">Volunteer Work</h3>
+        <Button variant="outline" size="sm" onClick={addVolunteerWork} leftIcon={<Plus className="h-4 w-4" />}>
+          Add Volunteer Work
+        </Button>
+      </div>
+
+      {data.length === 0 ? (
+        <div className="text-center py-8 text-slate-500">
+          <Heart className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+          <p>No volunteer work added yet</p>
+          <Button variant="ghost" size="sm" onClick={addVolunteerWork} className="mt-2">
+            Add your volunteer experience
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {data.map((vol, index) => (
+            <div key={vol.id} className="p-4 border border-slate-200 rounded-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <GripVertical className="h-4 w-4 text-slate-400" />
+                  <span className="font-medium text-slate-900">Volunteer Position {index + 1}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => moveVolunteerWork(index, 'up')}
+                    disabled={index === 0}
+                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => moveVolunteerWork(index, 'down')}
+                    disabled={index === data.length - 1}
+                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => removeVolunteerWork(index)}
+                    className="p-1 hover:bg-red-100 rounded text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Heart className="h-4 w-4 inline mr-1" />
+                    Role
+                  </label>
+                  <input
+                    type="text"
+                    value={vol.role}
+                    onChange={(e) => updateVolunteerWork(index, { role: e.target.value })}
+                    placeholder="Volunteer Tutor"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Building2 className="h-4 w-4 inline mr-1" />
+                    Organization
+                  </label>
+                  <input
+                    type="text"
+                    value={vol.organization}
+                    onChange={(e) => updateVolunteerWork(index, { organization: e.target.value })}
+                    placeholder="Local Community Center"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <MapPin className="h-4 w-4 inline mr-1" />
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={vol.location}
+                    onChange={(e) => updateVolunteerWork(index, { location: e.target.value })}
+                    placeholder="San Francisco, CA"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      <Calendar className="h-4 w-4 inline mr-1" />
+                      Start Date
+                    </label>
+                    <input
+                      type="text"
+                      value={vol.startDate}
+                      onChange={(e) => updateVolunteerWork(index, { startDate: e.target.value })}
+                      placeholder="Jan 2020"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      <Calendar className="h-4 w-4 inline mr-1" />
+                      End Date
+                    </label>
+                    <input
+                      type="text"
+                      value={vol.current ? 'Present' : vol.endDate}
+                      onChange={(e) => updateVolunteerWork(index, { endDate: e.target.value, current: e.target.value === 'Present' })}
+                      placeholder="Present"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-slate-700">Responsibilities & Impact</label>
+                  <Button variant="ghost" size="sm" onClick={() => addBullet(index)}>
+                    <Plus className="h-3 w-3 mr-1" /> Add Bullet
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {vol.description.map((bullet, bIndex) => (
+                    <div key={bIndex} className="flex gap-2">
+                      <AIWritingAssistant
+                        value={bullet}
+                        onChange={(val) => updateBullet(index, bIndex, val)}
+                        placeholder="Describe your contribution..."
+                        context={{ section: 'volunteerWork', role: vol.role }}
+                        className="flex-1"
+                        minRows={1}
+                        maxRows={3}
+                      />
+                      {vol.description.length > 1 && (
+                        <button
+                          onClick={() => removeBullet(index, bIndex)}
+                          className="p-2 hover:bg-red-100 rounded text-red-600 self-start"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
