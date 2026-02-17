@@ -744,7 +744,7 @@ export default function ResumeDetailPage() {
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {resume.parsedData.skills.map((skill: string, i: number) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
+                            <Badge key={i} variant="default" className="text-xs text-slate-800">
                               {skill}
                             </Badge>
                           ))}
@@ -766,7 +766,7 @@ export default function ResumeDetailPage() {
                               {project.technologies && project.technologies.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-2">
                                   {project.technologies.map((tech: string, j: number) => (
-                                    <Badge key={j} variant="secondary" className="text-xs">
+                                    <Badge key={j} variant="default" className="text-xs text-slate-800">
                                       {tech}
                                     </Badge>
                                   ))}
@@ -1049,7 +1049,7 @@ export default function ResumeDetailPage() {
                           {project.technologies && project.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
                               {project.technologies.map((tech, j) => (
-                                <Badge key={j} variant="secondary" size="sm">
+                                <Badge key={j} variant="default" size="sm" className="text-slate-800">
                                   {tech}
                                 </Badge>
                               ))}

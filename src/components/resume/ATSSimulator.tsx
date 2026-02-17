@@ -144,6 +144,14 @@ export default function ATSSimulator({
   const passStatus = getPassStatus(analysis.score);
   const PassIcon = passStatus.icon;
 
+  // Parse potential score from actionPlan (e.g. "42/100 → 75/100" or "42 → 75")
+  const potentialScore = (() => {
+    const raw = analysis.actionPlan?.estimatedScoreAfterFixes || '';
+    const match = raw.match(/→\s*(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  })();
+  const scoreGain = potentialScore !== null ? potentialScore - analysis.score : null;
+
   return (
     <div className="space-y-6">
       {/* Hero Score Section */}
@@ -235,6 +243,50 @@ export default function ATSSimulator({
         </div>
       </Card>
 
+      {/* Potential Score Banner */}
+      {potentialScore !== null && scoreGain !== null && scoreGain > 0 && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 p-5 shadow-lg">
+          <div className="absolute inset-0 opacity-10" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3C/g%3E%3C/svg%3E\")"}} />
+          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm flex-shrink-0">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <p className="text-white/80 text-sm font-medium">Your potential score if you apply the fixes below</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-white/70 text-xl font-bold">{analysis.score}</span>
+                  <ArrowRight className="h-5 w-5 text-white/60" />
+                  <span className="text-white text-2xl font-black">{potentialScore}</span>
+                  <span className="bg-white/20 text-white text-sm font-bold px-2 py-0.5 rounded-full">
+                    +{scoreGain} pts
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="text-center bg-white/10 rounded-xl px-5 py-3">
+                <div className="text-white/70 text-xs mb-1">Quick wins available</div>
+                <div className="text-white text-xl font-bold">{analysis.quickWins?.length ?? 0}</div>
+              </div>
+              <div className="text-center bg-white/10 rounded-xl px-5 py-3">
+                <div className="text-white/70 text-xs mb-1">Gap to close</div>
+                <div className={cn(
+                  "text-xl font-bold",
+                  scoreGain >= 25 ? "text-amber-300" : "text-emerald-300"
+                )}>{scoreGain} pts</div>
+              </div>
+            </div>
+          </div>
+          <div className="relative mt-4 pt-4 border-t border-white/20">
+            <div className="flex items-center gap-2 text-white/80 text-sm">
+              <Lightbulb className="h-4 w-4 text-yellow-300 flex-shrink-0" />
+              <span>{analysis.actionPlan?.step1 || 'Follow the action plan below to improve your score step by step.'}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Section Scores - Visual Gauges */}
       <Card variant="elevated">
         <CardHeader>
@@ -246,7 +298,7 @@ export default function ATSSimulator({
               </CardTitle>
               <CardDescription>How each section of your resume scores</CardDescription>
             </div>
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-emerald-500" /> 80+</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500" /> 60-79</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500" /> &lt;60</span>
