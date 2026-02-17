@@ -67,7 +67,7 @@ export default function DownloadModal({
   // B2B feature - only available for org users or business plan
   const canAnonymize = user?.organizationId || user?.planType === 'BUSINESS';
 
-  // New 6-category system - IDs match template data (lowercase with hyphens)
+  // All categories matching database - IDs match template data (lowercase with hyphens)
   const categories: Array<{ id: string; label: string }> = [
     { id: 'All', label: 'All Templates' },
     { id: 'ats-professional', label: 'ATS Professional' },
@@ -76,6 +76,15 @@ export default function DownloadModal({
     { id: 'academic-research', label: 'Academic Research' },
     { id: 'entry-student', label: 'Entry Student' },
     { id: 'executive-leadership', label: 'Executive Leadership' },
+    { id: 'healthcare-medical', label: 'Healthcare & Medical' },
+    { id: 'finance-banking', label: 'Finance & Banking' },
+    { id: 'legal-law', label: 'Legal & Law' },
+    { id: 'sales-marketing', label: 'Sales & Marketing' },
+    { id: 'education-teaching', label: 'Education & Teaching' },
+    { id: 'engineering', label: 'Engineering' },
+    { id: 'hospitality-service', label: 'Hospitality & Service' },
+    { id: 'construction-trades', label: 'Construction & Trades' },
+    { id: 'retail-ecommerce', label: 'Retail & E-commerce' },
   ];
 
   // ATS Compatibility levels
