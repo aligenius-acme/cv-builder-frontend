@@ -729,20 +729,7 @@ export default function ResumeDetailPage() {
                             <div key={i}>
                               <p className="font-semibold text-slate-700">{edu.degree}</p>
                               {edu.institution && <p className="text-sm text-indigo-600">{edu.institution}</p>}
-                              <div className="flex items-center gap-3 mt-0.5">
-                                {edu.graduationDate && <p className="text-xs text-slate-500">{edu.graduationDate}</p>}
-                                {edu.gpa && <p className="text-xs text-slate-500">GPA: {edu.gpa}</p>}
-                              </div>
-                              {edu.achievements && edu.achievements.length > 0 && (
-                                <ul className="mt-1 space-y-0.5">
-                                  {edu.achievements.map((a: string, j: number) => (
-                                    <li key={j} className="text-xs text-slate-500 flex items-start gap-1">
-                                      <span className="text-indigo-400 mt-0.5">·</span>
-                                      <span>{a}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
+                              {edu.graduationDate && <p className="text-xs text-slate-500">{edu.graduationDate}</p>}
                             </div>
                           ))}
                         </div>
@@ -802,22 +789,11 @@ export default function ResumeDetailPage() {
                         <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
                           Certifications
                         </h3>
-                        <ul className="space-y-2 text-sm">
-                          {resume.parsedData.certifications.map((cert: any, i: number) => (
+                        <ul className="space-y-1 text-sm text-slate-600">
+                          {resume.parsedData.certifications.map((cert: string, i: number) => (
                             <li key={i} className="flex items-start gap-2">
-                              <span className="text-indigo-600 mt-0.5">•</span>
-                              {typeof cert === 'string' ? (
-                                <span className="text-slate-600">{cert}</span>
-                              ) : (
-                                <div>
-                                  <span className="font-medium text-slate-700">{cert.name}</span>
-                                  {(cert.issuer || cert.date) && (
-                                    <span className="text-slate-500 text-xs ml-2">
-                                      {cert.issuer}{cert.issuer && cert.date ? ' · ' : ''}{cert.date}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
+                              <span className="text-indigo-600 mt-1">•</span>
+                              <span>{cert}</span>
                             </li>
                           ))}
                         </ul>
