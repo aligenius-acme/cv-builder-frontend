@@ -219,6 +219,16 @@ export default function ResumeDetailPage() {
     setShowSavedJobsDropdown(false);
   };
 
+  // Section header helper used in the resume content renderer
+  const SectionHeader = ({ icon, title, color }: { icon: React.ReactNode; title: string; color: string }) => (
+    <div className="flex items-center gap-2.5 mb-1">
+      <div className={`w-7 h-7 bg-gradient-to-br ${color} rounded-lg flex items-center justify-center shadow-sm flex-shrink-0`}>
+        {icon}
+      </div>
+      <h3 className="font-bold text-slate-800 text-xs uppercase tracking-widest">{title}</h3>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-mesh flex items-center justify-center">
@@ -565,91 +575,345 @@ export default function ResumeDetailPage() {
           </Card>
         )}
 
-        {/* Original Resume Content */}
-        {resume.rawText && resume.rawText.length > 50 && (
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-indigo-600" />
-                Resume Content
-              </CardTitle>
-              <CardDescription>Original content from your resume</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-slate-600">
-                {(() => {
-                  let underSubHeader = false;
-
-                  return resume.rawText.split('\n').map((line, index) => {
-                    const trimmedLine = line.trim();
-
-                    if (!trimmedLine) {
-                      return <div key={index} className="h-2" />;
-                    }
-
-                    // Section header
-                    const isHeader = (
-                      trimmedLine.length < 50 &&
-                      (trimmedLine === trimmedLine.toUpperCase() ||
-                       /^(Summary|Experience|Education|Skills|Projects|Certifications|Languages|Awards|Profile|Objective|Work History|Employment|Technical Skills|Professional Experience|Core Competencies|Achievements|Publications|References)/i.test(trimmedLine))
-                    );
-
-                    // Sub-header
-                    const hasDate = /\b(19|20)\d{2}\b/.test(trimmedLine) || /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i.test(trimmedLine);
-                    const isSubHeader = (
-                      !isHeader &&
-                      trimmedLine.length < 100 &&
-                      !/\.$/.test(trimmedLine) &&
-                      (hasDate ||
-                       /\b(Engineer|Developer|Manager|Director|Lead|Senior|Junior|Intern|Associate|Analyst|Designer|Consultant|Specialist|Coordinator|Administrator|Architect|Scientist|University|College|Institute|School|Inc|LLC|Ltd|Corp|Company|Bachelor|Master|PhD|MBA|B\.S\.|M\.S\.|B\.A\.|M\.A\.)\b/i.test(trimmedLine))
-                    );
-
-                    // Remove existing bullet characters for clean display
-                    const cleanLine = trimmedLine.replace(/^[•\-\*▪◦›●○]\s*/, '');
-
-                    if (isHeader) {
-                      underSubHeader = false;
-                      return (
-                        <h3 key={index} className="font-bold text-slate-800 uppercase tracking-wide text-xs mt-5 mb-2 border-b border-slate-200 pb-1">
-                          {trimmedLine}
-                        </h3>
-                      );
-                    }
-
-                    if (isSubHeader) {
-                      underSubHeader = true;
-                      return (
-                        <p key={index} className="font-semibold text-slate-700 mt-3 mb-0.5">
-                          {trimmedLine}
-                        </p>
-                      );
-                    }
-
-                    return (
-                      <p key={index} className={`leading-relaxed text-slate-600 ${underSubHeader ? 'pl-4' : 'pl-1'}`}>
-                        {cleanLine}
-                      </p>
-                    );
-                  });
-                })()}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {(!resume.rawText || resume.rawText.length < 50) && resume.fileName === 'Created with Resume Builder' && (() => {
-          // Check if parsedData has any actual content
-          const hasContent = resume.parsedData && (
-            resume.parsedData.contact?.name ||
-            resume.parsedData.contact?.email ||
-            resume.parsedData.summary ||
-            (resume.parsedData.experience && resume.parsedData.experience.length > 0) ||
-            (resume.parsedData.education && resume.parsedData.education.length > 0) ||
-            (resume.parsedData.skills && resume.parsedData.skills.length > 0)
+        {/* Resume Content — always prefers structured parsedData, falls back to rawText */}
+        {(() => {
+          const pd = resume.parsedData;
+          const hasStructuredContent = pd && (
+            pd.contact?.name || pd.contact?.email || pd.summary ||
+            (pd.experience?.length > 0) || (pd.education?.length > 0) || (pd.skills?.length > 0)
           );
 
-          if (hasContent) {
-            // Show structured content from parsedData
+          if (hasStructuredContent) {
+            const skillColors = [
+              'bg-indigo-100 text-indigo-700 border-indigo-200',
+              'bg-purple-100 text-purple-700 border-purple-200',
+              'bg-emerald-100 text-emerald-700 border-emerald-200',
+              'bg-blue-100 text-blue-700 border-blue-200',
+              'bg-amber-100 text-amber-700 border-amber-200',
+              'bg-rose-100 text-rose-700 border-rose-200',
+              'bg-cyan-100 text-cyan-700 border-cyan-200',
+              'bg-teal-100 text-teal-700 border-teal-200',
+            ];
+
+            return (
+              <Card variant="elevated">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-indigo-600" />
+                        Resume Content
+                      </CardTitle>
+                      <CardDescription>Structured content from your resume</CardDescription>
+                    </div>
+                    <Link href={`/resume-builder?id=${resumeId}`}>
+                      <Button size="sm" variant="outline" leftIcon={<Edit2 className="h-4 w-4" />}>
+                        Edit
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-8">
+
+                    {/* ── CONTACT HEADER ── */}
+                    {pd.contact && (pd.contact.name || pd.contact.email) && (
+                      <div className="flex flex-col sm:flex-row items-start gap-5 p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-2xl border border-indigo-100">
+                        {(resume.photoUrl || pd.contact.photoUrl) && (
+                          <img
+                            src={resume.photoUrl || pd.contact.photoUrl}
+                            alt={pd.contact.name || 'Profile photo'}
+                            className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          {pd.contact.name && (
+                            <h2 className="text-2xl font-bold text-slate-900">{pd.contact.name}</h2>
+                          )}
+                          <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 text-sm text-slate-600">
+                            {pd.contact.email && (
+                              <span className="flex items-center gap-1.5">
+                                <Mail className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                {pd.contact.email}
+                              </span>
+                            )}
+                            {pd.contact.phone && (
+                              <span className="flex items-center gap-1.5">
+                                <Phone className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                {pd.contact.phone}
+                              </span>
+                            )}
+                            {pd.contact.location && (
+                              <span className="flex items-center gap-1.5">
+                                <MapPin className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                {pd.contact.location}
+                              </span>
+                            )}
+                            {pd.contact.linkedin && (
+                              <a href={`https://${pd.contact.linkedin.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                                <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                                LinkedIn
+                              </a>
+                            )}
+                            {pd.contact.github && (
+                              <a href={`https://${pd.contact.github.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                                <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                                GitHub
+                              </a>
+                            )}
+                            {pd.contact.website && (
+                              <a href={`https://${pd.contact.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                                <Globe className="h-3.5 w-3.5 flex-shrink-0" />
+                                {pd.contact.website}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── SUMMARY ── */}
+                    {pd.summary && (
+                      <div>
+                        <SectionHeader icon={<User className="h-4 w-4 text-white" />} title="Professional Summary" color="from-blue-500 to-indigo-600" />
+                        <p className="mt-3 text-sm text-slate-600 leading-relaxed bg-blue-50/50 border border-blue-100 rounded-xl p-4 italic">
+                          {pd.summary}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* ── EXPERIENCE ── */}
+                    {pd.experience && pd.experience.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Briefcase className="h-4 w-4 text-white" />} title="Experience" color="from-indigo-500 to-purple-600" />
+                        <div className="mt-3 space-y-5">
+                          {pd.experience.map((exp: any, i: number) => (
+                            <div key={i} className="relative pl-5 border-l-2 border-indigo-200 hover:border-indigo-400 transition-colors group">
+                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-400 group-hover:bg-indigo-600 transition-colors ring-2 ring-white" />
+                              <div className="flex flex-wrap items-start justify-between gap-2">
+                                <div>
+                                  <p className="font-semibold text-slate-900 text-sm">{exp.title}</p>
+                                  <p className="text-sm font-medium text-indigo-600">
+                                    {exp.company}
+                                    {exp.location && <span className="text-slate-400 font-normal"> · {exp.location}</span>}
+                                  </p>
+                                </div>
+                                {exp.startDate && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 flex-shrink-0">
+                                    <Clock className="h-3 w-3" />
+                                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                                  </span>
+                                )}
+                              </div>
+                              {exp.description && exp.description.length > 0 && (
+                                <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
+                                  {exp.description.map((desc: string, j: number) => (
+                                    <li key={j} className="flex items-start gap-2">
+                                      <ChevronRight className="h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0" />
+                                      <span className="leading-relaxed">{desc}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── EDUCATION ── */}
+                    {pd.education && pd.education.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<GraduationCap className="h-4 w-4 text-white" />} title="Education" color="from-violet-500 to-purple-600" />
+                        <div className="mt-3 space-y-3">
+                          {pd.education.map((edu: any, i: number) => (
+                            <div key={i} className="flex gap-3 p-4 rounded-xl bg-violet-50 border border-violet-100 hover:border-violet-300 transition-colors">
+                              <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <GraduationCap className="h-4 w-4 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                  <p className="font-semibold text-slate-900 text-sm">{edu.degree}</p>
+                                  {edu.gpa && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                      GPA {edu.gpa}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm font-medium text-violet-600">{edu.institution}</p>
+                                <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-400">
+                                  {edu.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{edu.location}</span>}
+                                  {edu.graduationDate && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{edu.graduationDate}</span>}
+                                </div>
+                                {edu.achievements && edu.achievements.length > 0 && (
+                                  <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                                    {edu.achievements.map((ach: string, j: number) => (
+                                      <li key={j} className="flex items-start gap-1.5">
+                                        <span className="text-violet-400 mt-0.5 font-bold">◦</span>
+                                        <span>{ach}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── SKILLS ── */}
+                    {pd.skills && pd.skills.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Sparkles className="h-4 w-4 text-white" />} title="Skills" color="from-emerald-500 to-teal-600" />
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {pd.skills.map((skill: string, i: number) => (
+                            <span
+                              key={i}
+                              className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium border ${skillColors[i % skillColors.length]}`}
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── CERTIFICATIONS ── */}
+                    {pd.certifications && pd.certifications.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Award className="h-4 w-4 text-white" />} title="Certifications" color="from-amber-500 to-orange-500" />
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {pd.certifications.map((cert: string, i: number) => (
+                            <div key={i} className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
+                              <div className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <Award className="h-3.5 w-3.5 text-white" />
+                              </div>
+                              <span className="text-xs text-slate-700 font-medium leading-tight">{cert}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── PROJECTS ── */}
+                    {pd.projects && pd.projects.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<FolderKanban className="h-4 w-4 text-white" />} title="Projects" color="from-purple-500 to-pink-600" />
+                        <div className="mt-3 space-y-3">
+                          {pd.projects.map((project: any, i: number) => (
+                            <div key={i} className="p-4 rounded-xl border border-purple-100 bg-purple-50 hover:border-purple-300 transition-colors">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="font-semibold text-slate-900 text-sm">{project.name}</p>
+                                {project.url && (
+                                  <a
+                                    href={`https://${project.url.replace(/^https?:\/\//, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 font-medium flex-shrink-0 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    View
+                                  </a>
+                                )}
+                              </div>
+                              {project.description && (
+                                <p className="text-sm text-slate-600 mt-1.5 leading-relaxed">{project.description}</p>
+                              )}
+                              {project.technologies && project.technologies.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2.5">
+                                  {project.technologies.map((tech: string, j: number) => (
+                                    <span key={j} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white text-purple-700 border border-purple-200">
+                                      {tech}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── VOLUNTEER WORK ── */}
+                    {pd.volunteerWork && pd.volunteerWork.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Heart className="h-4 w-4 text-white" />} title="Volunteer Work" color="from-rose-500 to-pink-600" />
+                        <div className="mt-3 space-y-5">
+                          {pd.volunteerWork.map((vol: any, i: number) => (
+                            <div key={i} className="relative pl-5 border-l-2 border-rose-200 hover:border-rose-400 transition-colors group">
+                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-rose-400 group-hover:bg-rose-600 transition-colors ring-2 ring-white" />
+                              <div className="flex flex-wrap items-start justify-between gap-2">
+                                <div>
+                                  <p className="font-semibold text-slate-900 text-sm">{vol.role}</p>
+                                  <p className="text-sm font-medium text-rose-600">
+                                    {vol.organization}
+                                    {vol.location && <span className="text-slate-400 font-normal"> · {vol.location}</span>}
+                                  </p>
+                                </div>
+                                {vol.startDate && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100 flex-shrink-0">
+                                    <Clock className="h-3 w-3" />
+                                    {vol.startDate} – {vol.current ? 'Present' : vol.endDate}
+                                  </span>
+                                )}
+                              </div>
+                              {vol.description && vol.description.length > 0 && (
+                                <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
+                                  {vol.description.map((desc: string, j: number) => (
+                                    <li key={j} className="flex items-start gap-2">
+                                      <Heart className="h-3 w-3 text-rose-400 mt-1 flex-shrink-0" />
+                                      <span className="leading-relaxed">{desc}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── AWARDS ── */}
+                    {pd.awards && pd.awards.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Trophy className="h-4 w-4 text-white" />} title="Awards & Honors" color="from-yellow-500 to-amber-500" />
+                        <div className="mt-3 space-y-2">
+                          {pd.awards.map((award: string, i: number) => (
+                            <div key={i} className="flex items-start gap-3 p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
+                              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <Trophy className="h-4 w-4 text-white" />
+                              </div>
+                              <span className="text-sm text-slate-700 leading-relaxed">{award}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── LANGUAGES ── */}
+                    {pd.languages && pd.languages.length > 0 && (
+                      <div>
+                        <SectionHeader icon={<Globe className="h-4 w-4 text-white" />} title="Languages" color="from-cyan-500 to-blue-600" />
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {pd.languages.map((lang: string, i: number) => (
+                            <div key={i} className="flex items-center gap-2 px-3.5 py-2 bg-cyan-50 border border-cyan-200 rounded-full text-sm text-cyan-800 font-medium hover:border-cyan-400 transition-colors">
+                              <Globe className="h-3.5 w-3.5 text-cyan-500" />
+                              {lang}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          // Fallback: rawText plain-text renderer
+          if (resume.rawText && resume.rawText.length > 50) {
             return (
               <Card variant="elevated">
                 <CardHeader>
@@ -657,247 +921,27 @@ export default function ResumeDetailPage() {
                     <FileText className="h-5 w-5 text-indigo-600" />
                     Resume Content
                   </CardTitle>
-                  <CardDescription>Content from Resume Builder</CardDescription>
+                  <CardDescription>Extracted from your uploaded file</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-6">
-                    {/* Contact */}
-                    {resume.parsedData.contact && (resume.parsedData.contact.name || resume.parsedData.contact.email) && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Contact
-                        </h3>
-                        <div className="text-sm text-slate-600 space-y-1">
-                          {resume.parsedData.contact.name && <p className="font-medium">{resume.parsedData.contact.name}</p>}
-                          {resume.parsedData.contact.email && <p>{resume.parsedData.contact.email}</p>}
-                          {resume.parsedData.contact.phone && <p>{resume.parsedData.contact.phone}</p>}
-                          {resume.parsedData.contact.location && <p>{resume.parsedData.contact.location}</p>}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Summary */}
-                    {resume.parsedData.summary && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Summary
-                        </h3>
-                        <p className="text-sm text-slate-600 leading-relaxed">{resume.parsedData.summary}</p>
-                      </div>
-                    )}
-
-                    {/* Experience */}
-                    {resume.parsedData.experience && resume.parsedData.experience.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Experience
-                        </h3>
-                        <div className="space-y-4">
-                          {resume.parsedData.experience.map((exp: any, i: number) => (
-                            <div key={i}>
-                              <p className="font-semibold text-slate-700">{exp.title}</p>
-                              {exp.company && <p className="text-sm text-indigo-600">{exp.company}</p>}
-                              {exp.startDate && (
-                                <p className="text-xs text-slate-500">
-                                  {exp.startDate} - {exp.current ? 'Present' : exp.endDate || 'Present'}
-                                </p>
-                              )}
-                              {exp.description && exp.description.length > 0 && (
-                                <ul className="mt-2 space-y-1 text-sm text-slate-600">
-                                  {exp.description.map((desc: string, j: number) => (
-                                    <li key={j} className="flex items-start gap-2">
-                                      <span className="text-slate-400 mt-1">•</span>
-                                      <span>{desc}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Education */}
-                    {resume.parsedData.education && resume.parsedData.education.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Education
-                        </h3>
-                        <div className="space-y-3">
-                          {resume.parsedData.education.map((edu: any, i: number) => (
-                            <div key={i}>
-                              <p className="font-semibold text-slate-700">{edu.degree}</p>
-                              {edu.institution && <p className="text-sm text-indigo-600">{edu.institution}</p>}
-                              {edu.graduationDate && <p className="text-xs text-slate-500">{edu.graduationDate}</p>}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Skills */}
-                    {resume.parsedData.skills && resume.parsedData.skills.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {resume.parsedData.skills.map((skill: string, i: number) => (
-                            <Badge key={i} variant="default" className="text-xs text-slate-800">
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Projects */}
-                    {resume.parsedData.projects && resume.parsedData.projects.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Projects
-                        </h3>
-                        <div className="space-y-3">
-                          {resume.parsedData.projects.map((project: any, i: number) => (
-                            <div key={i}>
-                              <p className="font-semibold text-slate-700">{project.name}</p>
-                              {project.description && <p className="text-sm text-slate-600 mt-1">{project.description}</p>}
-                              {project.technologies && project.technologies.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {project.technologies.map((tech: string, j: number) => (
-                                    <Badge key={j} variant="default" className="text-xs text-slate-800">
-                                      {tech}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              {project.url && (
-                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline mt-1 inline-block">
-                                  {project.url}
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Certifications */}
-                    {resume.parsedData.certifications && resume.parsedData.certifications.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Certifications
-                        </h3>
-                        <ul className="space-y-1 text-sm text-slate-600">
-                          {resume.parsedData.certifications.map((cert: string, i: number) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="text-indigo-600 mt-1">•</span>
-                              <span>{cert}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Languages */}
-                    {resume.parsedData.languages && resume.parsedData.languages.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Languages
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {resume.parsedData.languages.map((lang: string, i: number) => (
-                            <Badge key={i} variant="info" className="text-xs">
-                              {lang}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Awards */}
-                    {resume.parsedData.awards && resume.parsedData.awards.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Awards & Honors
-                        </h3>
-                        <ul className="space-y-1 text-sm text-slate-600">
-                          {resume.parsedData.awards.map((award: string, i: number) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <Trophy className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <span>{award}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Volunteer Work */}
-                    {resume.parsedData.volunteerWork && resume.parsedData.volunteerWork.length > 0 && (
-                      <div>
-                        <h3 className="font-bold text-slate-800 uppercase tracking-wide text-xs mb-3 border-b border-slate-200 pb-1">
-                          Volunteer Work
-                        </h3>
-                        <div className="space-y-3">
-                          {resume.parsedData.volunteerWork.map((vol: any, i: number) => (
-                            <div key={i}>
-                              <p className="font-semibold text-slate-700">{vol.role}</p>
-                              {vol.organization && <p className="text-sm text-indigo-600">{vol.organization}</p>}
-                              {vol.startDate && (
-                                <p className="text-xs text-slate-500">
-                                  {vol.startDate} - {vol.current ? 'Present' : vol.endDate}
-                                </p>
-                              )}
-                              {vol.description && vol.description.length > 0 && (
-                                <ul className="mt-2 space-y-1 text-sm text-slate-600">
-                                  {vol.description.map((desc: string, j: number) => (
-                                    <li key={j} className="flex items-start gap-2">
-                                      <span className="text-indigo-600 mt-1">•</span>
-                                      <span>{desc}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="pt-4 border-t border-slate-200">
-                      <Link href={`/resume-builder?id=${resumeId}`}>
-                        <Button size="sm" variant="outline">
-                          <Edit2 className="h-4 w-4 mr-2" />
-                          Edit in Resume Builder
-                        </Button>
-                      </Link>
-                    </div>
+                  <div className="text-sm text-slate-600 whitespace-pre-wrap font-mono leading-relaxed">
+                    {resume.rawText}
                   </div>
                 </CardContent>
               </Card>
             );
           }
 
-          // No content yet - show add content message
+          // Nothing to show
           return (
             <Card variant="elevated">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-indigo-600" />
-                  Resume Content
-                </CardTitle>
-              </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-indigo-300 mx-auto mb-4" />
-                  <p className="text-slate-600 font-medium mb-2">Your resume is ready to be filled in</p>
-                  <p className="text-sm text-slate-500 mb-4">
-                    Go to the Resume Builder to add your experience, education, skills, and other details.
-                  </p>
+                <div className="text-center py-10">
+                  <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500 font-medium">No resume content yet</p>
+                  <p className="text-sm text-slate-400 mt-1 mb-4">Use the Resume Builder to add your details.</p>
                   <Link href={`/resume-builder?id=${resumeId}`}>
-                    <Button size="sm" variant="primary">
-                      <Plus className="h-4 w-4 mr-2" />
+                    <Button size="sm" variant="primary" leftIcon={<Plus className="h-4 w-4" />}>
                       Add Content
                     </Button>
                   </Link>
@@ -906,243 +950,6 @@ export default function ResumeDetailPage() {
             </Card>
           );
         })()}
-
-        {!resume.rawText && resume.fileName !== 'Created with Resume Builder' && (
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-indigo-600" />
-                Resume Content
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500">No content could be extracted from this resume.</p>
-                <p className="text-sm text-slate-400 mt-2">
-                  Try re-uploading the resume or check if the file format is supported (PDF or DOCX).
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Hidden section - keeping parsedData structure for customization features */}
-        {false && resume.parsedData && (
-          <div className="hidden">
-
-                {/* Experience */}
-                {resume.parsedData.experience && resume.parsedData.experience.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                      <Briefcase className="h-4 w-4 text-slate-400" />
-                      Experience
-                    </h4>
-                    <div className="space-y-4">
-                      {resume.parsedData.experience.map((exp, i) => (
-                        <div key={i} className="border-l-2 border-indigo-200 pl-4">
-                          <h5 className="font-medium text-slate-900">{exp.title}</h5>
-                          <p className="text-sm text-indigo-600 font-medium">
-                            {exp.company}
-                            {exp.startDate && (
-                              <span className="text-slate-500 font-normal">
-                                {' '}• {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
-                              </span>
-                            )}
-                          </p>
-                          {exp.description && exp.description.length > 0 && (
-                            <ul className="mt-2 text-sm text-slate-600 space-y-1">
-                              {exp.description.map((desc, j) => {
-                                const hasBullet = desc.startsWith('•');
-                                const text = hasBullet ? desc.substring(1).trim() : desc;
-                                return (
-                                  <li key={j} className="flex items-start gap-2">
-                                    <span className="text-indigo-400 mt-1.5">•</span>
-                                    <span className="whitespace-pre-wrap">{text}</span>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Education */}
-                {resume.parsedData.education && resume.parsedData.education.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                      <GraduationCap className="h-4 w-4 text-slate-400" />
-                      Education
-                    </h4>
-                    <ul className="space-y-3 text-sm text-slate-600">
-                      {resume.parsedData.education.map((edu, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-violet-500 mt-0.5">•</span>
-                          <div>
-                            <p className="font-medium text-slate-900">{edu.degree}</p>
-                            <p className="text-slate-600">
-                              {edu.institution}
-                              {edu.graduationDate && (
-                                <span className="text-slate-400"> • {edu.graduationDate}</span>
-                              )}
-                            </p>
-                            {edu.gpa && (
-                              <p className="text-slate-500">GPA: {edu.gpa}</p>
-                            )}
-                            {edu.achievements && edu.achievements.length > 0 && (
-                              <ul className="mt-1 ml-4 space-y-0.5">
-                                {edu.achievements.map((achievement, j) => (
-                                  <li key={j} className="flex items-start gap-2">
-                                    <span className="text-violet-300 mt-0.5">◦</span>
-                                    <span>{achievement}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Projects */}
-                {resume.parsedData.projects && resume.parsedData.projects.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                      <FolderKanban className="h-4 w-4 text-slate-400" />
-                      Projects
-                    </h4>
-                    <div className="space-y-4">
-                      {resume.parsedData.projects.map((project, i) => (
-                        <div key={i} className="border-l-2 border-purple-200 pl-4">
-                          <h5 className="font-medium text-slate-900">{project.name}</h5>
-                          {project.company && (
-                            <p className="text-sm text-purple-600 font-medium">
-                              {project.company}
-                              {project.dates && (
-                                <span className="text-slate-500 font-normal"> • {project.dates}</span>
-                              )}
-                            </p>
-                          )}
-                          {project.description && (
-                            <div className="mt-1 text-sm text-slate-600">
-                              {project.description.split('\n').map((line, k) => {
-                                const trimmedLine = line.trim();
-                                if (!trimmedLine) return null;
-                                const hasBullet = trimmedLine.startsWith('•');
-                                const text = hasBullet ? trimmedLine.substring(1).trim() : trimmedLine;
-                                return hasBullet ? (
-                                  <div key={k} className="flex items-start gap-2 mb-1">
-                                    <span className="text-purple-400 mt-0.5">•</span>
-                                    <span>{text}</span>
-                                  </div>
-                                ) : (
-                                  <p key={k} className={k > 0 ? 'mt-1' : ''}>{text}</p>
-                                );
-                              })}
-                            </div>
-                          )}
-                          {project.technologies && project.technologies.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {project.technologies.map((tech, j) => (
-                                <Badge key={j} variant="default" size="sm" className="text-slate-800">
-                                  {tech}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                          {(project.url || project.link) && (
-                            <a
-                              href={project.url || project.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 mt-2 text-sm text-indigo-600 hover:text-indigo-700"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              View Project
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Certifications */}
-                {resume.parsedData.certifications && resume.parsedData.certifications.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                      <Award className="h-4 w-4 text-slate-400" />
-                      Certifications
-                    </h4>
-                    <ul className="space-y-2 text-sm text-slate-600">
-                      {resume.parsedData.certifications.map((cert, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-emerald-500 mt-0.5">•</span>
-                          <span>
-                            <span className="font-medium text-slate-900">{cert.name}</span>
-                            {(cert.issuer || cert.date) && (
-                              <span className="text-slate-500">
-                                {cert.issuer && ` — ${cert.issuer}`}
-                                {cert.date && ` (${cert.date})`}
-                              </span>
-                            )}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Languages */}
-                {resume.parsedData.languages && resume.parsedData.languages.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-slate-400" />
-                      Languages
-                    </h4>
-                    <ul className="space-y-1 text-sm text-slate-600">
-                      {resume.parsedData.languages.map((language, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-blue-500 mt-0.5">•</span>
-                          <span>{language}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Awards */}
-                {resume.parsedData.awards && resume.parsedData.awards.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-slate-400" />
-                      Awards & Achievements
-                    </h4>
-                    <ul className="space-y-2 text-sm text-slate-600">
-                      {resume.parsedData.awards.map((award, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-amber-500 mt-0.5">•</span>
-                          <span>
-                            <span className="font-medium text-slate-900">{award.name}</span>
-                            {(award.issuer || award.date) && (
-                              <span className="text-slate-500">
-                                {award.issuer && ` — ${award.issuer}`}
-                                {award.date && ` (${award.date})`}
-                              </span>
-                            )}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-          </div>
-        )}
 
         {/* ATS Simulator CTA */}
         {!isPro && (
