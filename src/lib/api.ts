@@ -232,6 +232,19 @@ class ApiClient {
     return response.data;
   }
 
+  // Photo upload endpoint
+  async uploadPhoto(file: File) {
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    const response = await this.client.post<ApiResponse<{ photoUrl: string }>>('/upload/photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
   // Resume endpoints
   async uploadResume(file: File) {
     const formData = new FormData();

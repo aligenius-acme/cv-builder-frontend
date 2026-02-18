@@ -32,16 +32,9 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoUrl, onPhotoChang
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('photo', file);
+      const response = await api.uploadPhoto(file);
 
-      const response = await api.post<{ photoUrl: string }>('/upload/photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      onPhotoChange(response.data.photoUrl);
+      onPhotoChange(response.data?.photoUrl || (response as any).photoUrl);
     } catch (err: any) {
       console.error('Photo upload error:', err);
       setError(err.response?.data?.error || 'Failed to upload photo');
