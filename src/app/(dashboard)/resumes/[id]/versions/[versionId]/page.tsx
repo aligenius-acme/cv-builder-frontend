@@ -276,15 +276,29 @@ export default function VersionDetailPage() {
           versionId={versionId}
           initialScore={version.atsScore}
           initialAnalysis={version.atsDetails ? {
+            // Spread ALL stored fields first so nothing is dropped
+            ...version.atsDetails,
+            // Then override with authoritative values from the version record
             score: version.atsScore,
-            keywordMatchPercentage: version.atsDetails.keywordMatchPercentage || Math.round((version.matchedKeywords?.length || 0) / ((version.matchedKeywords?.length || 0) + (version.missingKeywords?.length || 1)) * 100),
-            matchedKeywords: version.matchedKeywords || [],
-            missingKeywords: version.missingKeywords || [],
-            sectionScores: version.atsDetails.sectionScores || { summary: 75, experience: 80, skills: 70, education: 85, formatting: 90 },
+            keywordMatchPercentage: version.atsDetails.keywordMatchPercentage
+              || Math.round((version.matchedKeywords?.length || 0) / Math.max((version.matchedKeywords?.length || 0) + (version.missingKeywords?.length || 0), 1) * 100),
+            matchedKeywords: version.matchedKeywords?.length
+              ? version.matchedKeywords
+              : (version.atsDetails.matchedKeywords || []),
+            missingKeywords: version.missingKeywords?.length
+              ? version.missingKeywords
+              : (version.atsDetails.missingKeywords || []),
+            sectionScores: version.atsDetails.sectionScores || { summary: 0, experience: 0, skills: 0, education: 0, formatting: 0 },
             formattingIssues: version.atsDetails.formattingIssues || [],
             recommendations: version.atsDetails.recommendations || [],
             atsExtractedView: version.atsDetails.atsExtractedView || '',
             riskyElements: version.atsDetails.riskyElements || [],
+            // These were previously dropped — now explicitly passed through
+            quickWins: version.atsDetails.quickWins || [],
+            actionPlan: version.atsDetails.actionPlan,
+            honestAssessment: version.atsDetails.honestAssessment,
+            competitorComparison: version.atsDetails.competitorComparison,
+            detailedRecommendations: version.atsDetails.detailedRecommendations,
           } : undefined}
         />
 
