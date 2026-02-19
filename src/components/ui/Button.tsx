@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'gradient';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'dark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
@@ -24,39 +24,37 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary: `
-        bg-indigo-600 text-white
-        hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/25
-        focus-visible:ring-indigo-500
+        bg-blue-600 text-white shadow-sm
+        hover:bg-blue-700 hover:shadow-md
+        focus-visible:ring-blue-500
       `,
       secondary: `
         bg-slate-100 text-slate-900
-        hover:bg-slate-200 hover:shadow-md
+        hover:bg-slate-200
         focus-visible:ring-slate-500
+        dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700
       `,
       outline: `
-        border-2 border-slate-200 text-slate-700 bg-white
-        hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50
-        focus-visible:ring-indigo-500
+        border border-slate-200 text-slate-700 bg-white
+        hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50
+        focus-visible:ring-blue-500
+        dark:border-zinc-700 dark:text-zinc-300 dark:bg-transparent dark:hover:border-blue-500 dark:hover:text-blue-400 dark:hover:bg-blue-950/30
       `,
       ghost: `
         text-slate-600
         hover:bg-slate-100 hover:text-slate-900
         focus-visible:ring-slate-500
+        dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100
       `,
       danger: `
-        bg-red-600 text-white
-        hover:bg-red-700 hover:shadow-lg hover:shadow-red-500/25
+        bg-red-600 text-white shadow-sm
+        hover:bg-red-700 hover:shadow-md
         focus-visible:ring-red-500
       `,
-      gradient: `
-        bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white
-        hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02]
-        focus-visible:ring-purple-500
-        relative overflow-hidden
-        before:absolute before:inset-0
-        before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
-        before:translate-x-[-200%] hover:before:translate-x-[200%]
-        before:transition-transform before:duration-700
+      dark: `
+        bg-slate-900 text-white shadow-sm
+        hover:bg-slate-800 hover:shadow-md
+        focus-visible:ring-slate-700
       `,
     };
 

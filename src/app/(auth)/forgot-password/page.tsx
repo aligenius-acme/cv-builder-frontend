@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -41,15 +41,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
+            <div className="bg-blue-600 p-2.5 rounded-xl">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold text-slate-900">
               JobTools AI
             </span>
           </Link>
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                         required
                       />
                     </div>
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
 
                   <Button
                     type="submit"
-                    variant="gradient"
+                    variant="primary"
                     size="lg"
                     className="w-full"
                     isLoading={isLoading}
@@ -129,7 +129,7 @@ export default function ForgotPasswordPage() {
                   <div className="text-center">
                     <Link
                       href="/login"
-                      className="text-sm text-indigo-600 hover:text-indigo-700 font-medium inline-flex items-center gap-1"
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       Back to Sign In

@@ -122,7 +122,7 @@ export default function AdminTemplatesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -140,7 +140,7 @@ export default function AdminTemplatesPage() {
             </div>
           </div>
           <Button
-            variant="gradient"
+            variant="primary"
             leftIcon={<Plus className="h-4 w-4" />}
             onClick={() => setShowCreateForm(true)}
           >
@@ -173,7 +173,7 @@ export default function AdminTemplatesPage() {
                     value={newTemplate.name}
                     onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
                     placeholder="e.g., Modern Professional"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                     required
                   />
                 </div>
@@ -187,7 +187,7 @@ export default function AdminTemplatesPage() {
                     onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
                     placeholder="Describe the template style and features..."
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none"
                   />
                 </div>
 
@@ -197,7 +197,7 @@ export default function AdminTemplatesPage() {
                       type="checkbox"
                       checked={newTemplate.isDefault}
                       onChange={(e) => setNewTemplate({ ...newTemplate, isDefault: e.target.checked })}
-                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-slate-700">Set as default</span>
                   </label>
@@ -207,7 +207,7 @@ export default function AdminTemplatesPage() {
                       type="checkbox"
                       checked={newTemplate.isPremium}
                       onChange={(e) => setNewTemplate({ ...newTemplate, isPremium: e.target.checked })}
-                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-slate-700">Premium only</span>
                   </label>
@@ -217,7 +217,7 @@ export default function AdminTemplatesPage() {
                       type="checkbox"
                       checked={newTemplate.isAtsSafe}
                       onChange={(e) => setNewTemplate({ ...newTemplate, isAtsSafe: e.target.checked })}
-                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-slate-700">ATS-safe formatting</span>
                   </label>
@@ -247,7 +247,7 @@ export default function AdminTemplatesPage() {
         {/* Templates List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         ) : templates.length === 0 ? (
           <Card variant="elevated">
@@ -262,12 +262,12 @@ export default function AdminTemplatesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {templates.map((template) => (
-              <Card key={template.id} variant="elevated" className="hover:border-indigo-200 transition-colors">
+              <Card key={template.id} variant="elevated" className="hover:border-blue-200 transition-colors">
                 <CardContent className="py-5">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-indigo-600" />
+                      <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 rounded-xl flex items-center justify-center">
+                        <FileText className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-slate-900">{template.name}</h3>

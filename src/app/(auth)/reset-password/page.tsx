@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -86,7 +86,7 @@ function ResetPasswordForm() {
               Please request a new reset link.
             </p>
             <Link href="/forgot-password">
-              <Button variant="gradient" size="lg">
+              <Button variant="primary" size="lg">
                 Request New Link
               </Button>
             </Link>
@@ -110,7 +110,7 @@ function ResetPasswordForm() {
               You can now sign in with your new password.
             </p>
             <Link href="/login">
-              <Button variant="gradient" size="lg">
+              <Button variant="primary" size="lg">
                 Sign In
               </Button>
             </Link>
@@ -141,7 +141,7 @@ function ResetPasswordForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full pl-11 pr-12 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                className="w-full pl-11 pr-12 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 required
                 minLength={8}
               />
@@ -166,7 +166,7 @@ function ResetPasswordForm() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 required
                 minLength={8}
               />
@@ -179,7 +179,7 @@ function ResetPasswordForm() {
 
           <Button
             type="submit"
-            variant="gradient"
+            variant="primary"
             size="lg"
             className="w-full"
             isLoading={isLoading}
@@ -194,15 +194,15 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
+            <div className="bg-blue-600 p-2.5 rounded-xl">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold text-slate-900">
               JobTools AI
             </span>
           </Link>
@@ -212,7 +212,7 @@ export default function ResetPasswordPage() {
           <Card variant="elevated">
             <CardContent className="py-12">
               <div className="flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             </CardContent>
           </Card>

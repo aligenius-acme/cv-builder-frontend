@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -162,14 +162,13 @@ export default function SkillGapPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <PageHeader
           icon={<GraduationCap className="h-5 w-5" />}
           label="Career Development"
           title="Skill Gap Analyzer"
           description="Identify the skills you need to land your target role. Get personalized learning paths and resource recommendations to bridge the gap."
-          gradient="purple"
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -376,7 +375,7 @@ export default function SkillGapPage() {
                 )}
 
                 <Button
-                  variant="gradient"
+                  variant="primary"
                   className="w-full"
                   onClick={analyzeGaps}
                   disabled={isAnalyzing || !targetRole || currentSkills.length === 0}
@@ -402,7 +401,7 @@ export default function SkillGapPage() {
             {!analysis ? (
               <Card variant="elevated">
                 <CardContent className="py-16 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6">
                     <GraduationCap className="h-10 w-10 text-purple-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">
@@ -437,7 +436,7 @@ export default function SkillGapPage() {
                     </div>
                     <div className="mt-4 bg-slate-100 rounded-full h-3 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                        className="h-full bg-blue-600 rounded-full transition-all duration-500"
                         style={{ width: `${analysis.overallReadiness}%` }}
                       />
                     </div>
@@ -566,7 +565,7 @@ export default function SkillGapPage() {
                             <div className="absolute left-3 top-6 bottom-0 w-0.5 bg-purple-200" />
                           )}
                           {/* Timeline dot */}
-                          <div className="absolute left-0 top-1 w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          <div className="absolute left-0 top-1 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                             {idx + 1}
                           </div>
                           <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">

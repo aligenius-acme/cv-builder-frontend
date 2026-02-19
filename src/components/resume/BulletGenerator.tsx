@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -124,11 +124,11 @@ export default function BulletGenerator({
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -158,7 +158,7 @@ export default function BulletGenerator({
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
                   placeholder="e.g. Senior Software Engineer"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
@@ -171,7 +171,7 @@ export default function BulletGenerator({
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder="e.g. Google"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function BulletGenerator({
                 onChange={(e) => setResponsibilities(e.target.value)}
                 placeholder="Briefly describe your main responsibilities..."
                 rows={2}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
             </div>
 
@@ -200,7 +200,7 @@ export default function BulletGenerator({
                 onChange={(e) => setAchievements(e.target.value)}
                 placeholder="Any metrics, awards, or accomplishments..."
                 rows={2}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
             </div>
 
@@ -214,12 +214,12 @@ export default function BulletGenerator({
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 placeholder="Role you're applying for - bullets will be tailored"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <Button
-              variant="gradient"
+              variant="primary"
               onClick={handleGenerate}
               disabled={isLoading}
               leftIcon={isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
@@ -238,14 +238,14 @@ export default function BulletGenerator({
                   <div className="flex gap-2">
                     <button
                       onClick={selectAll}
-                      className="text-xs text-indigo-600 hover:underline"
+                      className="text-xs text-blue-600 hover:underline"
                     >
                       Select All
                     </button>
                     <span className="text-slate-300">|</span>
                     <button
                       onClick={selectNone}
-                      className="text-xs text-indigo-600 hover:underline"
+                      className="text-xs text-blue-600 hover:underline"
                     >
                       Clear
                     </button>
@@ -259,7 +259,7 @@ export default function BulletGenerator({
                       className={cn(
                         'p-3 rounded-xl border cursor-pointer transition-all group',
                         selectedBullets.has(index)
-                          ? 'border-indigo-500 bg-indigo-50'
+                          ? 'border-blue-500 bg-blue-50'
                           : 'border-slate-200 hover:border-slate-300 bg-white'
                       )}
                     >
@@ -268,7 +268,7 @@ export default function BulletGenerator({
                           className={cn(
                             'w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5',
                             selectedBullets.has(index)
-                              ? 'bg-indigo-600 border-indigo-600'
+                              ? 'bg-blue-600 border-blue-600'
                               : 'border-slate-300'
                           )}
                         >
@@ -306,7 +306,7 @@ export default function BulletGenerator({
                 Cancel
               </Button>
               <Button
-                variant="gradient"
+                variant="primary"
                 onClick={handleInsert}
                 disabled={selectedBullets.size === 0}
                 leftIcon={<Plus className="h-4 w-4" />}

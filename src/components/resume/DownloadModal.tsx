@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter, Sparkles, ArrowUpDown } from 'lucide-react';
@@ -373,14 +373,14 @@ export default function DownloadModal({
       <div className="flex min-h-screen items-center justify-center p-4">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-900/80 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity"
           onClick={onClose}
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[92vh] overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="relative bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[92vh] overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
           {/* Header with Gradient */}
-          <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 border-b border-white/20">
+          <div className="bg-slate-900 p-6 border-b border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -441,7 +441,7 @@ export default function DownloadModal({
                         className={cn(
                           'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
                           selectedCategory === cat.id
-                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                            ? 'bg-blue-600 text-white shadow-sm'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
                         )}
                       >
@@ -535,7 +535,7 @@ export default function DownloadModal({
                         className={cn(
                           'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
                           sortBy === opt.id
-                            ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-sm'
+                            ? 'bg-slate-700 text-white shadow-sm'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         )}
                       >
@@ -547,7 +547,7 @@ export default function DownloadModal({
 
                 {/* Results indicator */}
                 <div className="pt-2 border-t border-gray-100">
-                  <div className="flex items-center justify-between px-2 py-1.5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
+                  <div className="flex items-center justify-between px-2 py-1.5 bg-gray-50 rounded-lg">
                     <span className="text-[11px] text-gray-600 font-medium">Showing Results</span>
                     <span className="text-[11px] font-bold text-gray-900 bg-white px-2 py-0.5 rounded-full">
                       {filteredTemplates.length} / {templates.length}
@@ -562,18 +562,18 @@ export default function DownloadModal({
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* Loading skeleton */}
                     <div className="space-y-2">
-                      <div className="h-4 w-32 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded animate-pulse" />
+                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
                       <div className="grid grid-cols-4 gap-2">
                         {[...Array(4)].map((_, i) => (
-                          <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+                          <div key={i} className="aspect-square rounded-lg bg-gray-200 animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
                         ))}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-4 w-40 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded animate-pulse" />
+                      <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
                       <div className="grid grid-cols-4 gap-2">
                         {[...Array(4)].map((_, i) => (
-                          <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+                          <div key={i} className="aspect-square rounded-lg bg-gray-200 animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
                         ))}
                       </div>
                     </div>
@@ -585,17 +585,17 @@ export default function DownloadModal({
                       <div className="mb-6 animate-in slide-in-from-top-4 fade-in duration-500">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg shadow-sm">
+                            <div className="p-1.5 bg-blue-600 rounded-lg">
                               <Sparkles className="h-3.5 w-3.5 text-white" />
                             </div>
                             <h3 className="text-sm font-bold text-gray-900">Recommended for You</h3>
                           </div>
-                          <span className="text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-2 py-1 rounded-full font-semibold shadow-sm">
+                          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-semibold">
                             AI-Powered
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-3 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-3 rounded-xl border-2 border-indigo-200/50 shadow-sm relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl" />
+                        <div className="grid grid-cols-3 gap-3 bg-blue-50 p-3 rounded-xl border border-blue-200 shadow-sm relative overflow-hidden">
+                          <div className="" />
                           {recommendedTemplates.slice(0, 6).map((template, idx) => (
                             <div key={template.id} className="relative animate-in zoom-in duration-300" style={{ animationDelay: `${idx * 50}ms` }}>
                               <TemplateCard
@@ -614,8 +614,8 @@ export default function DownloadModal({
                     {filteredTemplates.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="relative mb-4">
-                          <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-xl opacity-20 animate-pulse" />
-                          <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-full">
+                          <div className="" />
+                          <div className="relative bg-amber-50 p-6 rounded-full">
                             <Search className="h-12 w-12 text-amber-500" />
                           </div>
                         </div>
@@ -659,9 +659,9 @@ export default function DownloadModal({
                               </span>
                             )}
                             {selectedExperience !== 'All' && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-medium">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
                                 Experience: {selectedExperience}
-                                <button onClick={() => setSelectedExperience('All')} className="hover:bg-indigo-200 rounded p-0.5">
+                                <button onClick={() => setSelectedExperience('All')} className="hover:bg-blue-200 rounded p-0.5">
                                   <X className="h-3 w-3" />
                                 </button>
                               </span>
@@ -679,7 +679,7 @@ export default function DownloadModal({
 
                         <button
                           onClick={clearAllFilters}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 shadow-sm transition-all duration-200"
                         >
                           <X className="h-4 w-4" />
                           Clear All Filters
@@ -690,7 +690,7 @@ export default function DownloadModal({
                         {/* Section header - shown when recommended exists or filters active */}
                         {(recommendedTemplates.length > 0 && showRecommended && !hasActiveFilters) || hasActiveFilters ? (
                           <div className="mb-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div className="flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
                               <div className="flex items-center gap-2">
                                 {hasActiveFilters ? (
                                   <>
@@ -737,7 +737,7 @@ export default function DownloadModal({
             </div>
 
             {/* Preview */}
-            <div className="lg:w-1/2 p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 flex flex-col">
+            <div className="lg:w-1/2 p-6 bg-slate-50 flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
@@ -757,7 +757,7 @@ export default function DownloadModal({
                   )}
                 </div>
                 {isPreviewLoading && (
-                  <span className="text-sm text-blue-600 flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200/50 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <span className="text-sm text-blue-600 flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-200 animate-in fade-in slide-in-from-right-4 duration-300">
                     <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
                     <span className="font-medium">Loading preview...</span>
                   </span>
@@ -773,7 +773,7 @@ export default function DownloadModal({
                       title="Resume Preview"
                     />
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="px-2.5 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-medium rounded-lg shadow-lg backdrop-blur-sm">
+                      <span className="px-2.5 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg shadow-sm">
                         Live Preview
                       </span>
                     </div>
@@ -781,8 +781,8 @@ export default function DownloadModal({
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400 animate-in fade-in duration-500">
                     <div className="relative mb-4">
-                      <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full blur-xl opacity-20 animate-pulse" />
-                      <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-2xl">
+                      <div className="" />
+                      <div className="relative bg-gray-50 p-8 rounded-xl">
                         <FileText className="h-16 w-16 text-gray-300" />
                       </div>
                     </div>
@@ -800,7 +800,7 @@ export default function DownloadModal({
               <div className="flex items-center gap-2.5">
                 <span className="text-sm text-gray-600 font-medium">Selected:</span>
                 {selectedTemplateData ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-2 border-blue-200 shadow-sm">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-50 text-blue-700 border-2 border-blue-200">
                     <Check className="h-3.5 w-3.5" />
                     {selectedTemplateData.name}
                   </span>
@@ -824,7 +824,7 @@ export default function DownloadModal({
                       />
                       <div className={cn(
                         'w-11 h-6 rounded-full transition-all duration-200 shadow-inner',
-                        anonymize ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gray-300'
+                        anonymize ? 'bg-blue-600' : 'bg-gray-300'
                       )}>
                         <div className={cn(
                           'absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200',
@@ -859,7 +859,7 @@ export default function DownloadModal({
                 variant="outline"
                 onClick={() => handleDownload('docx')}
                 disabled={isDownloading || !selectedTemplate}
-                className="flex-1 sm:flex-none bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100 text-green-700 hover:text-green-800 disabled:opacity-50"
+                className="flex-1 sm:flex-none bg-emerald-50 border-emerald-200 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 disabled:opacity-50"
               >
                 <Download className="h-4 w-4 mr-2" />
                 DOCX
@@ -867,7 +867,7 @@ export default function DownloadModal({
               <Button
                 onClick={() => handleDownload('pdf')}
                 disabled={isDownloading || !selectedTemplate}
-                className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/30 disabled:opacity-50"
+                className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 shadow-sm disabled:opacity-50"
               >
                 <Download className="h-4 w-4 mr-2" />
                 PDF

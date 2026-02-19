@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
@@ -70,9 +70,9 @@ export default function SubscriptionPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <p className="text-slate-500">Loading subscription data...</p>
         </div>
       </div>
@@ -82,11 +82,11 @@ export default function SubscriptionPage() {
   const currentPlan = user?.planType || 'FREE';
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 px-4 py-2 rounded-full text-indigo-700 text-sm mb-4">
+          <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full text-blue-700 border border-blue-200 text-sm mb-4">
             <Sparkles className="h-4 w-4" />
             Choose Your Plan
           </div>
@@ -105,12 +105,12 @@ export default function SubscriptionPage() {
             <CardContent>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-lg ${
                     currentPlan === 'BUSINESS'
-                      ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-purple-500/30'
+                      ? 'bg-purple-600'
                       : currentPlan === 'PRO'
-                      ? 'bg-gradient-to-br from-amber-400 to-amber-500 shadow-amber-500/30'
-                      : 'bg-gradient-to-br from-slate-400 to-slate-500 shadow-slate-500/30'
+                      ? 'bg-amber-400'
+                      : 'bg-slate-400'
                   }`}>
                     {currentPlan === 'BUSINESS' ? (
                       <Building className="h-7 w-7 text-white" />
@@ -178,12 +178,12 @@ export default function SubscriptionPage() {
                 key={plan.id}
                 variant="elevated"
                 className={`relative ${
-                  isPro ? 'border-2 border-indigo-500 shadow-xl shadow-indigo-500/10' : ''
+                  isPro ? 'border-2 border-blue-500 shadow-xl' : ''
                 }`}
               >
                 {isPro && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge variant="gradient" size="lg" className="shadow-lg">
+                    <Badge variant="primary" size="lg" className="shadow-lg">
                       <Star className="h-3 w-3 mr-1" />
                       Most Popular
                     </Badge>
@@ -192,12 +192,12 @@ export default function SubscriptionPage() {
 
                 <CardHeader className="text-center pb-2 pt-6">
                   <div className="flex justify-center mb-4">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${
+                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-lg ${
                       isBusiness
-                        ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-purple-500/30'
+                        ? 'bg-purple-600'
                         : isPro
-                        ? 'bg-gradient-to-br from-amber-400 to-amber-500 shadow-amber-500/30'
-                        : 'bg-gradient-to-br from-slate-400 to-slate-500 shadow-slate-500/30'
+                        ? 'bg-amber-400'
+                        : 'bg-slate-400'
                     }`}>
                       {isBusiness ? (
                         <Building className="h-8 w-8 text-white" />
@@ -248,7 +248,7 @@ export default function SubscriptionPage() {
                   ) : (
                     <Button
                       className="w-full"
-                      variant={isPro ? 'gradient' : 'outline'}
+                      variant={isPro ? 'dark' : 'outline'}
                       onClick={() => handleUpgrade(plan.id as 'pro' | 'business')}
                       isLoading={isProcessing}
                     >

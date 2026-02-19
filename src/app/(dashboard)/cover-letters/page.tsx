@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
+import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -204,7 +205,7 @@ export default function CoverLettersPage() {
 
   if (!hasAccess) {
     return (
-      <div className="min-h-screen bg-mesh">
+      <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Cover Letters</h1>
@@ -216,7 +217,7 @@ export default function CoverLettersPage() {
           <Card variant="elevated">
             <CardContent className="py-16">
               <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-6">
                   <Crown className="h-10 w-10 text-amber-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Pro Feature</h3>
@@ -224,7 +225,7 @@ export default function CoverLettersPage() {
                   Cover letter generation is available on Pro and Business plans. Upgrade to unlock AI-powered cover letters.
                 </p>
                 <Link href="/subscription">
-                  <Button variant="gradient" size="lg" leftIcon={<Crown className="h-5 w-5" />}>
+                  <Button variant="primary" size="lg" leftIcon={<Crown className="h-5 w-5" />}>
                     Upgrade to Pro
                   </Button>
                 </Link>
@@ -237,34 +238,24 @@ export default function CoverLettersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-5 w-5" />
-                <span className="text-white/80 text-sm font-medium">AI Writing Assistant</span>
-              </div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">Cover Letters</h1>
-              <p className="text-white/80 text-lg max-w-2xl">
-                Generate compelling, personalized cover letters that highlight your unique value
-                and match each job opportunity perfectly.
-              </p>
-            </div>
+        <PageHeader
+          icon={<FileText className="h-5 w-5" />}
+          label="AI Writing Assistant"
+          title="Cover Letters"
+          description="Generate compelling, personalized cover letters that highlight your unique value and match each job opportunity perfectly."
+          actions={
             <Button
-              variant="secondary"
-              size="lg"
-              leftIcon={<Plus className="h-5 w-5" />}
+              variant="primary"
+              size="md"
+              leftIcon={<Plus className="h-4 w-4" />}
               onClick={() => setShowGenerator(!showGenerator)}
-              className="mt-6 lg:mt-0"
             >
               Generate Cover Letter
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Generator Form */}
         {showGenerator && (
@@ -306,7 +297,7 @@ export default function CoverLettersPage() {
                       </p>
                       <div className="flex justify-center gap-3 mt-4">
                         <Link href="/job-tracker">
-                          <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                          <Button variant="primary" size="sm" leftIcon={<Search className="h-4 w-4" />}>
                             Job Tracker
                           </Button>
                         </Link>
@@ -324,7 +315,7 @@ export default function CoverLettersPage() {
                       <button
                         type="button"
                         onClick={() => setShowSavedJobsDropdown(!showSavedJobsDropdown)}
-                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                       >
                         {selectedJobId ? (
                           <span className="text-slate-900">
@@ -343,12 +334,12 @@ export default function CoverLettersPage() {
                               key={job.id}
                               type="button"
                               onClick={() => handleSelectSavedJob(job.id)}
-                              className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
-                                selectedJobId === job.id ? 'bg-indigo-50' : ''
+                              className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                                selectedJobId === job.id ? 'bg-blue-50' : ''
                               }`}
                             >
-                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Building className="h-5 w-5 text-indigo-600" />
+                              <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Building className="h-5 w-5 text-blue-600" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
@@ -377,7 +368,7 @@ export default function CoverLettersPage() {
                   {savedJobs.length > 0 && (
                     <p className="mt-2 text-xs text-slate-500">
                       {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} with descriptions •{' '}
-                      <Link href="/job-tracker" className="text-indigo-600 hover:text-indigo-700">Manage jobs</Link>
+                      <Link href="/job-tracker" className="text-blue-600 hover:text-blue-700">Manage jobs</Link>
                     </p>
                   )}
                 </div>
@@ -398,7 +389,7 @@ export default function CoverLettersPage() {
                           value={jobTitle}
                           onChange={(e) => setJobTitle(e.target.value)}
                           placeholder="e.g., Senior Software Engineer"
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                           readOnly={inputMode === 'saved' && !!selectedJobId}
                         />
                       </div>
@@ -414,7 +405,7 @@ export default function CoverLettersPage() {
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           placeholder="e.g., Google"
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                           readOnly={inputMode === 'saved' && !!selectedJobId}
                         />
                       </div>
@@ -433,7 +424,7 @@ export default function CoverLettersPage() {
                           onClick={() => setTone(t)}
                           className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                             tone === t
-                              ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300'
+                              ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
                               : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
                           }`}
                         >
@@ -452,7 +443,7 @@ export default function CoverLettersPage() {
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Paste the job description here..."
                       rows={6}
-                      className={`w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none ${
+                      className={`w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none ${
                         inputMode === 'saved' && selectedJobId ? 'bg-slate-50' : ''
                       }`}
                       readOnly={inputMode === 'saved' && !!selectedJobId}
@@ -461,7 +452,7 @@ export default function CoverLettersPage() {
 
                   <div className="flex gap-3 pt-2">
                     <Button
-                      variant="gradient"
+                      variant="primary"
                       size="lg"
                       onClick={handleGenerate}
                       disabled={isGenerating}
@@ -503,7 +494,7 @@ export default function CoverLettersPage() {
           <Card variant="elevated">
             <CardContent className="py-16">
               <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6">
                   <FileText className="h-10 w-10 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">No cover letters yet</h3>
@@ -511,7 +502,7 @@ export default function CoverLettersPage() {
                   Generate your first AI-powered cover letter for a job application
                 </p>
                 <Button
-                  variant="gradient"
+                  variant="primary"
                   size="lg"
                   leftIcon={<Sparkles className="h-5 w-5" />}
                   onClick={() => setShowGenerator(true)}
@@ -527,13 +518,13 @@ export default function CoverLettersPage() {
               <Card
                 key={coverLetter.id}
                 variant="elevated"
-                className="group hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300"
+                className="group hover:border-purple-300 hover:shadow-lg transition-all duration-300"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <CardContent className="py-5">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-pink-200 transition-colors">
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-pink-200 transition-colors">
                         <FileText className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
@@ -554,7 +545,7 @@ export default function CoverLettersPage() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleDownload(coverLetter.id, 'pdf')}
-                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                         title="Download PDF"
                       >
                         <Download className="h-5 w-5" />
@@ -615,7 +606,7 @@ export default function CoverLettersPage() {
                     <div className="border-t border-slate-200 pt-4">
                       <button
                         onClick={() => toggleEnhancements(coverLetter.id)}
-                        className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors mb-3"
+                        className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors mb-3"
                       >
                         <Wand2 className="h-4 w-4" />
                         {showEnhancements[coverLetter.id] ? 'Hide' : 'Show'} AI Alternatives & Enhancements
@@ -630,7 +621,7 @@ export default function CoverLettersPage() {
                         <div className="space-y-4 animate-slide-up">
                           {/* Subject Line Options */}
                           {coverLetter.subjectLineOptions && coverLetter.subjectLineOptions.length > 0 && (
-                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
                               <h4 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
                                 <Mail className="h-4 w-4" />
                                 Email Subject Lines
@@ -657,7 +648,7 @@ export default function CoverLettersPage() {
 
                           {/* Alternative Openings */}
                           {coverLetter.alternativeOpenings && coverLetter.alternativeOpenings.length > 0 && (
-                            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
                               <h4 className="text-sm font-semibold text-purple-800 mb-3 flex items-center gap-2">
                                 <Edit3 className="h-4 w-4" />
                                 Alternative Opening Paragraphs
@@ -689,7 +680,7 @@ export default function CoverLettersPage() {
 
                           {/* Call to Action Variations */}
                           {coverLetter.callToActionVariations && coverLetter.callToActionVariations.length > 0 && (
-                            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
                               <h4 className="text-sm font-semibold text-emerald-800 mb-3 flex items-center gap-2">
                                 <Target className="h-4 w-4" />
                                 Call-to-Action Closing Variations
@@ -716,7 +707,7 @@ export default function CoverLettersPage() {
 
                           {/* Key Phrases */}
                           {coverLetter.keyPhrases && coverLetter.keyPhrases.length > 0 && (
-                            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+                            <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                               <h4 className="text-sm font-semibold text-amber-800 mb-3 flex items-center gap-2">
                                 <Lightbulb className="h-4 w-4" />
                                 Key Phrases to Highlight
@@ -740,7 +731,7 @@ export default function CoverLettersPage() {
 
                           {/* Tone Analysis */}
                           {coverLetter.toneAnalysis && (
-                            <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-slate-200">
+                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                               <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
                                 <MessageSquare className="h-4 w-4" />
                                 Tone Analysis

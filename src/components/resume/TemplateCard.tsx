@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Check, FileText, Columns2, FileImage } from 'lucide-react';
 import { ResumeTemplate } from '@/types';
@@ -37,14 +37,14 @@ export default function TemplateCard({
       'creative-design': 'bg-purple-100 text-purple-700',
       'academic-research': 'bg-amber-100 text-amber-700',
       'entry-student': 'bg-pink-100 text-pink-700',
-      'executive-leadership': 'bg-indigo-100 text-indigo-700',
+      'executive-leadership': 'bg-blue-100 text-blue-700',
       // Legacy support for old format
       'ATS-Professional': 'bg-blue-100 text-blue-700',
       'Tech-Startup': 'bg-emerald-100 text-emerald-700',
       'Creative-Design': 'bg-purple-100 text-purple-700',
       'Academic-Research': 'bg-amber-100 text-amber-700',
       'Entry-Student': 'bg-pink-100 text-pink-700',
-      'Executive-Leadership': 'bg-indigo-100 text-indigo-700',
+      'Executive-Leadership': 'bg-blue-100 text-blue-700',
     };
     return colors[category || ''] || 'bg-gray-100 text-gray-700';
   };
@@ -111,7 +111,7 @@ export default function TemplateCard({
 
         {/* Selection check */}
         {selected && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-600/40 to-indigo-600/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="absolute inset-0 flex items-center justify-center bg-blue-600/40 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-full p-1.5 shadow-lg">
               <Check className="h-4 w-4 text-blue-600" />
             </div>
@@ -133,12 +133,12 @@ export default function TemplateCard({
             </span>
           )}
           {template.atsCompatibility === 'ATS-Safe' && (
-            <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-bold shadow-lg">
+            <span className="bg-emerald-600 text-[8px] px-1.5 py-0.5 rounded-full text-white font-bold">
               ATS
             </span>
           )}
           {template.isNew && (
-            <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-bold shadow-lg animate-pulse">
+            <span className="bg-rose-600 text-[8px] px-1.5 py-0.5 rounded-full text-white font-bold">
               NEW
             </span>
           )}
@@ -147,12 +147,12 @@ export default function TemplateCard({
         {/* Right badges - show on hover */}
         <div className="absolute top-1 right-1 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {template.isPopular && (
-            <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-semibold shadow-md">
+            <span className="bg-amber-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-semibold">
               ★
             </span>
           )}
           {template.supportsDocx && (
-            <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-semibold shadow-md">
+            <span className="bg-blue-600 text-[8px] px-1.5 py-0.5 rounded-full text-white font-semibold">
               DOCX
             </span>
           )}
@@ -167,7 +167,7 @@ export default function TemplateCard({
         </div>
 
         {/* Hover info overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white text-[9px] p-2 gap-1 z-20">
+        <div className="absolute inset-0 bg-black/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white text-[9px] p-2 gap-1 z-20">
           <div className="font-bold text-[11px] text-center leading-tight mb-1">{template.name}</div>
           {template.description && (
             <div className="text-center line-clamp-2 text-white/90 leading-tight">{template.description}</div>
@@ -192,7 +192,7 @@ export default function TemplateCard({
         className={cn(
           'group relative p-3 rounded-xl border-2 transition-all duration-300 text-left hover:shadow-xl hover:-translate-y-1 h-full flex flex-col',
           selected
-            ? 'border-blue-500 ring-2 ring-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg shadow-blue-200/50'
+            ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50 shadow-sm'
             : 'border-gray-200 hover:border-blue-300 bg-white'
         )}
       >
@@ -259,12 +259,12 @@ export default function TemplateCard({
           {/* Top badges */}
           <div className="absolute top-2 left-2 flex gap-1">
             {template.atsCompatibility === 'ATS-Safe' && (
-              <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-[9px] px-2 py-0.5 rounded-full text-white font-bold shadow-lg">
+              <span className="bg-emerald-600 text-[9px] px-2 py-0.5 rounded-full text-white font-bold">
                 ATS
               </span>
             )}
             {template.isNew && (
-              <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-[9px] px-2 py-0.5 rounded-full text-white font-bold shadow-lg">
+              <span className="bg-rose-600 text-[9px] px-2 py-0.5 rounded-full text-white font-bold">
                 NEW
               </span>
             )}
@@ -299,7 +299,7 @@ export default function TemplateCard({
             </span>
           )}
           {template.isPopular && (
-            <span className="text-[9px] px-2 py-0.5 rounded-full font-semibold bg-gradient-to-r from-amber-400 to-orange-500 text-white">
+            <span className="text-[9px] px-2 py-0.5 rounded-full font-semibold bg-amber-500 text-white">
               ⭐ Popular
             </span>
           )}
@@ -322,7 +322,7 @@ export default function TemplateCard({
       className={cn(
         'group w-full p-3 rounded-lg border-2 transition-all duration-300 text-left hover:shadow-lg hover:scale-[1.02]',
         selected
-          ? 'border-blue-500 ring-2 ring-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md shadow-blue-200/50'
+          ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50 shadow-sm'
           : 'border-gray-200 hover:border-blue-300 bg-white'
       )}
     >
@@ -376,17 +376,17 @@ export default function TemplateCard({
               </span>
             )}
             {template.isNew && (
-              <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold shadow-sm transition-all duration-300 hover:scale-105">
+              <span className="bg-rose-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold transition-all duration-300 hover:scale-105">
                 New
               </span>
             )}
             {template.isPopular && (
-              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold shadow-sm transition-all duration-300 hover:scale-105">
+              <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold transition-all duration-300 hover:scale-105">
                 Popular
               </span>
             )}
             {template.supportsDocx && (
-              <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold shadow-sm transition-all duration-300 hover:scale-105">
+              <span className="bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold transition-all duration-300 hover:scale-105">
                 DOCX
               </span>
             )}

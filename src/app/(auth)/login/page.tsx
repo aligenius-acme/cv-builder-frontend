@@ -83,14 +83,11 @@ export default function LoginPage() {
         <div className="max-w-md w-full space-y-8">
           {/* Logo */}
           <div>
-            <Link href="/" className="inline-flex items-center group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
-                <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
+            <Link href="/" className="inline-flex items-center gap-3">
+              <div className="bg-blue-600 p-2.5 rounded-xl">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">
                 JobTools AI
               </span>
             </Link>
@@ -165,14 +162,14 @@ export default function LoginPage() {
               <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="ml-2 text-sm text-slate-600">Remember me</span>
               </label>
 
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -180,7 +177,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              variant="gradient"
+              variant="primary"
               className="w-full"
               size="lg"
               isLoading={isLoading}
@@ -238,7 +235,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-slate-600">
               Don't have an account?{' '}
-              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+              <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
                 Create one for free
               </Link>
             </p>
@@ -247,7 +244,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Decorative */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      <div className="hidden lg:flex lg:flex-1 bg-slate-900 relative overflow-hidden">
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-50" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'%3E%3C/path%3E%3C/svg%3E\")"}} />
 

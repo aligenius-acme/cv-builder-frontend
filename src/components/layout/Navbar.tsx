@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
+import { useTheme } from '@/lib/theme';
 import {
   Menu,
   X,
@@ -27,6 +28,8 @@ import {
   BookOpen,
   Wand2,
   MoreHorizontal,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -37,6 +40,7 @@ export default function Navbar() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
 
   // Primary navigation - most used features
   const primaryNavigation = [
@@ -69,19 +73,16 @@ export default function Navbar() {
   const isMoreActive = moreNavigation.some(item => isActive(item.href));
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
+    <nav className="sticky top-0 z-50 bg-[var(--surface)] border-b border-[var(--border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo & Navigation */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
-                <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 p-2 rounded-xl">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <span className="ml-3 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-slate-900 dark:text-white">
                 JobTools AI
               </span>
             </Link>
@@ -94,15 +95,15 @@ export default function Navbar() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200',
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                       isActive(item.href)
-                        ? 'text-indigo-600 bg-indigo-50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800'
                     )}
                   >
                     <item.icon className={cn(
                       'h-4 w-4 mr-1.5',
-                      isActive(item.href) ? 'text-indigo-600' : 'text-slate-400'
+                      isActive(item.href) ? 'text-blue-600' : 'text-slate-400 dark:text-zinc-500'
                     )} />
                     {item.name}
                   </Link>
@@ -113,15 +114,15 @@ export default function Navbar() {
                   <button
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
                     className={cn(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200',
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                       isMoreActive
-                        ? 'text-indigo-600 bg-indigo-50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800'
                     )}
                   >
                     <MoreHorizontal className={cn(
                       'h-4 w-4 mr-1.5',
-                      isMoreActive ? 'text-indigo-600' : 'text-slate-400'
+                      isMoreActive ? 'text-blue-600' : 'text-slate-400 dark:text-zinc-500'
                     )} />
                     More
                     <ChevronDown className={cn(
@@ -136,7 +137,7 @@ export default function Navbar() {
                         className="fixed inset-0 z-10"
                         onClick={() => setShowMoreMenu(false)}
                       />
-                      <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/60 py-2 z-20 animate-slide-down">
+                      <div className="absolute left-0 mt-2 w-56 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-lg)] border border-[var(--border)] py-2 z-20 animate-slide-down">
                         {moreNavigation.map((item) => (
                           <Link
                             key={item.name}
@@ -145,13 +146,13 @@ export default function Navbar() {
                             className={cn(
                               'flex items-center px-4 py-2.5 text-sm transition-colors',
                               isActive(item.href)
-                                ? 'text-indigo-600 bg-indigo-50'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
+                                : 'text-[var(--text-secondary)] hover:bg-[var(--surface-raised)] hover:text-[var(--text)]'
                             )}
                           >
                             <item.icon className={cn(
                               'h-4 w-4 mr-3',
-                              isActive(item.href) ? 'text-indigo-600' : 'text-slate-400'
+                              isActive(item.href) ? 'text-blue-600' : 'text-[var(--text-muted)]'
                             )} />
                             {item.name}
                           </Link>
@@ -165,26 +166,35 @@ export default function Navbar() {
           </div>
 
           {/* Right side */}
-          <div className="hidden md:flex md:items-center md:space-x-3">
+          <div className="hidden md:flex md:items-center md:space-x-2">
             {isAuthenticated ? (
               <>
                 {user?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    className="flex items-center px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] rounded-lg transition-all duration-200"
                   >
                     <Shield className="h-4 w-4 mr-2 text-amber-500" />
                     Admin
                   </Link>
                 )}
 
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] transition-all duration-200"
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </button>
+
                 {/* User Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] rounded-lg transition-all duration-200"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-semibold">
                         {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                       </span>
@@ -202,29 +212,29 @@ export default function Navbar() {
                         className="fixed inset-0 z-10"
                         onClick={() => setShowUserMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/60 py-2 z-20 animate-slide-down">
-                        <div className="px-4 py-3 border-b border-slate-100">
-                          <p className="text-sm font-semibold text-slate-900">{user?.firstName} {user?.lastName}</p>
-                          <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                      <div className="absolute right-0 mt-2 w-56 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-lg)] border border-[var(--border)] py-2 z-20 animate-slide-down">
+                        <div className="px-4 py-3 border-b border-[var(--border)]">
+                          <p className="text-sm font-semibold text-[var(--text)]">{user?.firstName} {user?.lastName}</p>
+                          <p className="text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
                         </div>
                         {userNavigation.map((item) => (
                           <Link
                             key={item.name}
                             href={item.href}
                             onClick={() => setShowUserMenu(false)}
-                            className="flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                            className="flex items-center px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-raised)] hover:text-[var(--text)] transition-colors"
                           >
-                            <item.icon className="h-4 w-4 mr-3 text-slate-400" />
+                            <item.icon className="h-4 w-4 mr-3 text-[var(--text-muted)]" />
                             {item.name}
                           </Link>
                         ))}
-                        <div className="border-t border-slate-100 mt-2 pt-2">
+                        <div className="border-t border-[var(--border)] mt-2 pt-2">
                           <button
                             onClick={() => {
                               logout();
                               setShowUserMenu(false);
                             }}
-                            className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                           >
                             <LogOut className="h-4 w-4 mr-3" />
                             Sign out
@@ -237,11 +247,19 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {/* Theme Toggle (unauthenticated) */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] transition-all duration-200"
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </button>
                 <Link href="/login">
                   <Button variant="ghost">Sign in</Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="gradient">
+                  <Button variant="primary">
                     Get Started Free
                   </Button>
                 </Link>
@@ -250,10 +268,17 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] transition-all duration-200"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] transition-colors"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -263,20 +288,20 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 animate-slide-down">
+        <div className="md:hidden bg-[var(--surface)] border-t border-[var(--border)] animate-slide-down">
           <div className="px-4 py-4 space-y-1">
             {isAuthenticated ? (
               <>
                 {/* User info */}
-                <div className="flex items-center space-x-3 px-3 py-3 mb-3 bg-slate-50 rounded-xl">
-                  <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                <div className="flex items-center space-x-3 px-3 py-3 mb-3 bg-[var(--surface-raised)] rounded-xl">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold">
                       {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">{user?.firstName} {user?.lastName}</p>
-                    <p className="text-xs text-slate-500">{user?.email}</p>
+                    <p className="text-sm font-semibold text-[var(--text)]">{user?.firstName} {user?.lastName}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{user?.email}</p>
                   </div>
                 </div>
 
@@ -288,8 +313,8 @@ export default function Navbar() {
                     className={cn(
                       'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors',
                       isActive(item.href)
-                        ? 'text-indigo-600 bg-indigo-50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)]'
                     )}
                     onClick={() => setIsOpen(false)}
                   >
@@ -305,7 +330,7 @@ export default function Navbar() {
                       'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors',
                       isActive('/admin')
                         ? 'text-amber-600 bg-amber-50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)]'
                     )}
                     onClick={() => setIsOpen(false)}
                   >
@@ -314,13 +339,13 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                <div className="border-t border-slate-100 my-3" />
+                <div className="border-t border-[var(--border)] my-3" />
 
                 {userNavigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="flex items-center px-4 py-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                    className="flex items-center px-4 py-3 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)] rounded-xl transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
@@ -333,7 +358,7 @@ export default function Navbar() {
                     logout();
                     setIsOpen(false);
                   }}
-                  className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
                 >
                   <LogOut className="h-5 w-5 mr-3" />
                   Sign out
@@ -353,7 +378,7 @@ export default function Navbar() {
                   className="block"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Button variant="gradient" className="w-full">Get Started Free</Button>
+                  <Button variant="primary" className="w-full">Get Started Free</Button>
                 </Link>
               </div>
             )}

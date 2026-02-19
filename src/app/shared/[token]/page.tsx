@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -105,9 +105,9 @@ export default function SharedResumePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           <p className="text-slate-500">Loading resume...</p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function SharedResumePage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="text-center py-12">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -133,12 +133,12 @@ export default function SharedResumePage() {
   const { resume } = data;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-[var(--bg)]">
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -158,7 +158,7 @@ export default function SharedResumePage() {
               DOCX
             </Button>
             <Button
-              variant="gradient"
+              variant="primary"
               size="sm"
               onClick={() => handleDownload('pdf')}
               disabled={isDownloading}
@@ -205,7 +205,7 @@ export default function SharedResumePage() {
             {resume.summary && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Target className="h-5 w-5 text-indigo-600" />
+                  <Target className="h-5 w-5 text-blue-600" />
                   Professional Summary
                 </h3>
                 <p className="text-slate-700 leading-relaxed">{resume.summary}</p>
@@ -216,14 +216,14 @@ export default function SharedResumePage() {
             {resume.experience && resume.experience.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-indigo-600" />
+                  <Briefcase className="h-5 w-5 text-blue-600" />
                   Experience
                 </h3>
                 <div className="space-y-6">
                   {resume.experience.map((exp, index) => (
-                    <div key={index} className="border-l-2 border-indigo-200 pl-4">
+                    <div key={index} className="border-l-2 border-blue-200 pl-4">
                       <h4 className="font-semibold text-slate-900">{exp.title}</h4>
-                      <p className="text-indigo-600 text-sm">{exp.company}{exp.location ? ` | ${exp.location}` : ''}</p>
+                      <p className="text-blue-600 text-sm">{exp.company}{exp.location ? ` | ${exp.location}` : ''}</p>
                       <p className="text-slate-500 text-sm mb-2">
                         {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                       </p>
@@ -244,14 +244,14 @@ export default function SharedResumePage() {
             {resume.education && resume.education.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-indigo-600" />
+                  <GraduationCap className="h-5 w-5 text-blue-600" />
                   Education
                 </h3>
                 <div className="space-y-4">
                   {resume.education.map((edu, index) => (
                     <div key={index}>
                       <h4 className="font-semibold text-slate-900">{edu.degree}</h4>
-                      <p className="text-indigo-600 text-sm">{edu.institution}</p>
+                      <p className="text-blue-600 text-sm">{edu.institution}</p>
                       {edu.graduationDate && (
                         <p className="text-slate-500 text-sm">{edu.graduationDate}</p>
                       )}
@@ -265,7 +265,7 @@ export default function SharedResumePage() {
             {resume.skills && resume.skills.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Code className="h-5 w-5 text-indigo-600" />
+                  <Code className="h-5 w-5 text-blue-600" />
                   Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -282,7 +282,7 @@ export default function SharedResumePage() {
             {resume.certifications && resume.certifications.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Award className="h-5 w-5 text-indigo-600" />
+                  <Award className="h-5 w-5 text-blue-600" />
                   Certifications
                 </h3>
                 <ul className="list-disc list-inside text-slate-700 space-y-1">
@@ -297,7 +297,7 @@ export default function SharedResumePage() {
             {resume.projects && resume.projects.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Code className="h-5 w-5 text-indigo-600" />
+                  <Code className="h-5 w-5 text-blue-600" />
                   Projects
                 </h3>
                 <div className="space-y-4">

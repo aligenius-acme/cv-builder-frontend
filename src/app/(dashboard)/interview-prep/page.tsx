@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
+import PageHeader from '@/components/shared/PageHeader';
 import {
   MessageSquare,
   Sparkles,
@@ -335,7 +336,7 @@ export default function InterviewPrepPage() {
       case 'technical':
         return 'bg-purple-100 text-purple-700';
       case 'situational':
-        return 'bg-indigo-100 text-indigo-700';
+        return 'bg-blue-100 text-blue-700';
       case 'company-specific':
         return 'bg-pink-100 text-pink-700';
       default:
@@ -346,23 +347,14 @@ export default function InterviewPrepPage() {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-mesh">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="h-5 w-5" />
-              <span className="text-white/80 text-sm font-medium">AI Interview Coach</span>
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">Interview Prep</h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Practice with AI-generated questions tailored to your target role. Get instant feedback
-              and improve your answers before the real interview.
-            </p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[var(--bg)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <PageHeader
+          icon={<MessageSquare className="h-5 w-5" />}
+          label="AI Interview Coach"
+          title="Interview Prep"
+          description="Practice with AI-generated questions tailored to your target role. Get instant feedback and improve your answers before the real interview."
+        />
 
         {!practiceMode ? (
           <>
@@ -370,7 +362,7 @@ export default function InterviewPrepPage() {
             <Card variant="elevated">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-indigo-600" />
+                  <Target className="h-5 w-5 text-blue-600" />
                   Generate Custom Questions
                 </CardTitle>
                 <CardDescription>
@@ -399,7 +391,7 @@ export default function InterviewPrepPage() {
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Select a Job Application</label>
                     {isLoadingSavedJobs ? (
                       <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
-                        <Loader2 className="h-5 w-5 text-indigo-600 animate-spin" />
+                        <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
                         <span className="text-slate-500">Loading saved jobs...</span>
                       </div>
                     ) : savedJobs.length === 0 ? (
@@ -409,7 +401,7 @@ export default function InterviewPrepPage() {
                         <p className="text-xs text-slate-500 mt-1">Add applications in the Job Tracker</p>
                         <div className="flex justify-center gap-2 mt-3">
                           <Link href="/job-tracker">
-                            <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                            <Button variant="primary" size="sm" leftIcon={<Search className="h-4 w-4" />}>
                               Job Tracker
                             </Button>
                           </Link>
@@ -423,7 +415,7 @@ export default function InterviewPrepPage() {
                         <button
                           type="button"
                           onClick={() => setShowJobDropdown(!showJobDropdown)}
-                          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                         >
                           {selectedJob ? (
                             <span className="text-slate-900">{selectedJob.jobTitle} at {selectedJob.companyName}</span>
@@ -440,12 +432,12 @@ export default function InterviewPrepPage() {
                                 key={job.id}
                                 type="button"
                                 onClick={() => handleSelectSavedJob(job.id)}
-                                className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
-                                  selectedJobId === job.id ? 'bg-indigo-50' : ''
+                                className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
+                                  selectedJobId === job.id ? 'bg-blue-50' : ''
                                 }`}
                               >
-                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <Building className="h-5 w-5 text-indigo-600" />
+                                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <Building className="h-5 w-5 text-blue-600" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-slate-900 truncate">{job.jobTitle}</p>
@@ -468,7 +460,7 @@ export default function InterviewPrepPage() {
                     {savedJobs.length > 0 && (
                       <p className="mt-2 text-xs text-slate-500">
                         {savedJobs.length} job application{savedJobs.length !== 1 ? 's' : ''} available •{' '}
-                        <Link href="/job-tracker" className="text-indigo-600 hover:text-indigo-700">Manage jobs</Link>
+                        <Link href="/job-tracker" className="text-blue-600 hover:text-blue-700">Manage jobs</Link>
                       </p>
                     )}
                   </div>
@@ -489,7 +481,7 @@ export default function InterviewPrepPage() {
                             value={jobTitle}
                             onChange={(e) => setJobTitle(e.target.value)}
                             placeholder="e.g. Software Engineer"
-                            className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             readOnly={jobInputMode === 'saved' && !!selectedJobId}
                           />
                         </div>
@@ -505,7 +497,7 @@ export default function InterviewPrepPage() {
                             value={company}
                             onChange={(e) => setCompany(e.target.value)}
                             placeholder="e.g. Google"
-                            className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             readOnly={jobInputMode === 'saved' && !!selectedJobId}
                           />
                         </div>
@@ -523,7 +515,7 @@ export default function InterviewPrepPage() {
                           value={industry}
                           onChange={(e) => setIndustry(e.target.value)}
                           placeholder="e.g. Technology, Finance, Healthcare"
-                          className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                          className="w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                         />
                       </div>
                     </div>
@@ -537,7 +529,7 @@ export default function InterviewPrepPage() {
                         onChange={(e) => setJobDescription(e.target.value)}
                         placeholder="Paste the job description for more tailored questions..."
                         rows={3}
-                        className={`w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none ${
+                        className={`w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none ${
                           jobInputMode === 'saved' && selectedJobId ? 'bg-slate-50' : ''
                         }`}
                         readOnly={jobInputMode === 'saved' && !!selectedJobId}
@@ -556,7 +548,7 @@ export default function InterviewPrepPage() {
                             className={cn(
                               'px-4 py-2 rounded-full text-sm font-medium transition-all capitalize',
                               questionTypes.includes(type)
-                                ? 'bg-indigo-600 text-white'
+                                ? 'bg-blue-600 text-white'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             )}
                           >
@@ -567,7 +559,7 @@ export default function InterviewPrepPage() {
                     </div>
 
                     <Button
-                      variant="gradient"
+                      variant="primary"
                       size="lg"
                       onClick={handleGenerate}
                       disabled={isGenerating || !jobTitle.trim()}
@@ -585,7 +577,7 @@ export default function InterviewPrepPage() {
             <Card variant="elevated">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-indigo-600" />
+                  <BookOpen className="h-5 w-5 text-blue-600" />
                   Common Interview Questions
                 </CardTitle>
                 <CardDescription>
@@ -604,7 +596,7 @@ export default function InterviewPrepPage() {
                         className={cn(
                           'px-3 py-1.5 rounded-full text-sm font-medium transition-all capitalize',
                           selectedCategory === cat
-                            ? 'bg-indigo-600 text-white'
+                            ? 'bg-blue-600 text-white'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         )}
                       >
@@ -628,7 +620,7 @@ export default function InterviewPrepPage() {
                             ? diff === 'easy' ? 'bg-green-600 text-white'
                             : diff === 'medium' ? 'bg-amber-600 text-white'
                             : diff === 'hard' ? 'bg-red-600 text-white'
-                            : 'bg-indigo-600 text-white'
+                            : 'bg-blue-600 text-white'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         )}
                       >
@@ -641,7 +633,7 @@ export default function InterviewPrepPage() {
                 {/* Questions List */}
                 {isLoadingCommonQuestions ? (
                   <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
                     <span className="ml-3 text-slate-500">Loading questions...</span>
                   </div>
                 ) : filteredCommonQuestions.length === 0 ? (
@@ -707,7 +699,7 @@ export default function InterviewPrepPage() {
                       className={cn(
                         'w-2 h-2 rounded-full',
                         i === currentQuestionIndex
-                          ? 'bg-indigo-600'
+                          ? 'bg-blue-600'
                           : i < currentQuestionIndex
                           ? 'bg-green-500'
                           : 'bg-slate-300'
@@ -1029,12 +1021,12 @@ export default function InterviewPrepPage() {
                     onChange={(e) => setUserAnswer(e.target.value)}
                     placeholder="Type your answer here..."
                     rows={6}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
 
                   <div className="flex gap-3">
                     <Button
-                      variant="gradient"
+                      variant="primary"
                       onClick={handleEvaluate}
                       disabled={isEvaluating || !userAnswer.trim()}
                       leftIcon={isEvaluating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -1055,12 +1047,12 @@ export default function InterviewPrepPage() {
 
                 {/* Sample Answer */}
                 {showSampleAnswer && currentQuestion?.sampleAnswer && (
-                  <div className="mt-6 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                  <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-indigo-900">Sample Answer</h4>
+                      <h4 className="font-medium text-blue-900">Sample Answer</h4>
                       <button
                         onClick={() => copyToClipboard(currentQuestion.sampleAnswer!)}
-                        className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 transition-colors"
+                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 transition-colors"
                       >
                         {copiedText === currentQuestion.sampleAnswer ? (
                           <>
@@ -1075,7 +1067,7 @@ export default function InterviewPrepPage() {
                         )}
                       </button>
                     </div>
-                    <p className="text-sm text-indigo-800">{currentQuestion.sampleAnswer}</p>
+                    <p className="text-sm text-blue-800">{currentQuestion.sampleAnswer}</p>
                   </div>
                 )}
 
@@ -1098,7 +1090,7 @@ export default function InterviewPrepPage() {
                             />
                           ))}
                         </div>
-                        <span className="font-bold text-indigo-600">{evaluation.score}/10</span>
+                        <span className="font-bold text-blue-600">{evaluation.score}/10</span>
                       </div>
                     </div>
 
@@ -1140,12 +1132,12 @@ export default function InterviewPrepPage() {
                     </div>
 
                     {evaluation.improvedAnswer && (
-                      <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-indigo-900">Improved Version</h4>
+                          <h4 className="font-medium text-blue-900">Improved Version</h4>
                           <button
                             onClick={() => copyToClipboard(evaluation.improvedAnswer)}
-                            className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 transition-colors"
+                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 transition-colors"
                           >
                             {copiedText === evaluation.improvedAnswer ? (
                               <>
@@ -1160,7 +1152,7 @@ export default function InterviewPrepPage() {
                             )}
                           </button>
                         </div>
-                        <p className="text-sm text-indigo-800">{evaluation.improvedAnswer}</p>
+                        <p className="text-sm text-blue-800">{evaluation.improvedAnswer}</p>
                       </div>
                     )}
                   </div>
@@ -1176,7 +1168,7 @@ export default function InterviewPrepPage() {
                     Previous
                   </Button>
                   <Button
-                    variant="gradient"
+                    variant="primary"
                     onClick={nextQuestion}
                     disabled={currentQuestionIndex === questions.length - 1}
                   >

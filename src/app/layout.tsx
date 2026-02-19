@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { ThemeProvider, ThemeScript } from '@/lib/theme';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,32 +22,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
-        <GoogleAnalytics />
-        {children}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#fff',
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <ThemeProvider>
+          <GoogleAnalytics />
+          {children}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: 'var(--surface-overlay)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: { primary: '#22c55e', secondary: '#fff' },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: { primary: '#ef4444', secondary: '#fff' },
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

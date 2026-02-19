@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -205,9 +205,9 @@ export default function OrganizationPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <p className="text-slate-500">Loading organization...</p>
         </div>
       </div>
@@ -217,10 +217,10 @@ export default function OrganizationPage() {
   // No organization - show create form
   if (!organization) {
     return (
-      <div className="min-h-screen bg-mesh">
+      <div className="min-h-screen bg-[var(--bg)]">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/30">
+            <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Building className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Organization</h1>
@@ -235,7 +235,7 @@ export default function OrganizationPage() {
                 <p className="text-slate-500 mb-6">
                   You&apos;re not part of an organization yet. Create one to collaborate with your team.
                 </p>
-                <Button variant="gradient" onClick={() => setShowCreateForm(true)}>
+                <Button variant="primary" onClick={() => setShowCreateForm(true)}>
                   Create Organization
                 </Button>
               </CardContent>
@@ -257,7 +257,7 @@ export default function OrganizationPage() {
                       value={newOrgName}
                       onChange={(e) => setNewOrgName(e.target.value)}
                       placeholder="e.g., Acme Corporation"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                       required
                     />
                   </div>
@@ -275,7 +275,7 @@ export default function OrganizationPage() {
                         value={newOrgDomain}
                         onChange={(e) => setNewOrgDomain(e.target.value)}
                         placeholder="acme.com"
-                        className="flex-1 px-4 py-3 rounded-r-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                        className="flex-1 px-4 py-3 rounded-r-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                       />
                     </div>
                     <p className="text-sm text-slate-400 mt-1">
@@ -284,7 +284,7 @@ export default function OrganizationPage() {
                   </div>
 
                   <div className="flex items-center gap-3 pt-2">
-                    <Button type="submit" variant="gradient" isLoading={isSubmitting}>
+                    <Button type="submit" variant="primary" isLoading={isSubmitting}>
                       Create Organization
                     </Button>
                     <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
@@ -302,12 +302,12 @@ export default function OrganizationPage() {
 
   // Has organization - show management
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+            <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <Building className="h-7 w-7 text-white" />
             </div>
             <div>
@@ -319,7 +319,7 @@ export default function OrganizationPage() {
                     @{organization.domain}
                   </span>
                 )}
-                <Badge variant={organization.isAdmin ? 'gradient' : 'default'} size="sm">
+                <Badge variant={organization.isAdmin ? 'primary' : 'default'} size="sm">
                   {organization.isAdmin ? 'Admin' : 'Member'}
                 </Badge>
               </div>
@@ -337,7 +337,7 @@ export default function OrganizationPage() {
                 Settings
               </Button>
               <Button
-                variant="gradient"
+                variant="primary"
                 size="sm"
                 leftIcon={<UserPlus className="h-4 w-4" />}
                 onClick={() => setShowInviteForm(true)}
@@ -383,8 +383,8 @@ export default function OrganizationPage() {
           <Card variant="elevated" className="col-span-2 sm:col-span-1">
             <CardContent className="py-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-indigo-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">Anonymization</p>
@@ -422,7 +422,7 @@ export default function OrganizationPage() {
                       type="text"
                       value={settingsName}
                       onChange={(e) => setSettingsName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                     />
                   </div>
                   <div>
@@ -434,7 +434,7 @@ export default function OrganizationPage() {
                       value={settingsDomain}
                       onChange={(e) => setSettingsDomain(e.target.value)}
                       placeholder="acme.com"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export default function OrganizationPage() {
                     type="checkbox"
                     checked={settingsAnonymization}
                     onChange={(e) => setSettingsAnonymization(e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div>
                     <span className="font-medium text-slate-900">Enable Resume Anonymization</span>
@@ -482,11 +482,11 @@ export default function OrganizationPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="colleague@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                     required
                   />
                 </div>
-                <Button type="submit" variant="gradient" isLoading={isSubmitting}>
+                <Button type="submit" variant="primary" isLoading={isSubmitting}>
                   <Mail className="h-4 w-4 mr-2" />
                   Send Invite
                 </Button>
@@ -508,7 +508,7 @@ export default function OrganizationPage() {
               {organization.members.map((member) => (
                 <div key={member.id} className="py-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
                       {(member.firstName?.[0] || member.email[0]).toUpperCase()}
                     </div>
                     <div>

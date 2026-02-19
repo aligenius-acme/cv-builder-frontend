@@ -63,7 +63,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Decorative */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      <div className="hidden lg:flex lg:flex-1 bg-slate-900 relative overflow-hidden">
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-50" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'%3E%3C/path%3E%3C/svg%3E\")"}} />
 
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                 { value: '6', label: 'Template Styles' },
                 { value: '24/7', label: 'AI Support' },
               ].map((stat, i) => (
-                <div key={i} className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                <div key={i} className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
                   <p className="text-3xl font-bold">{stat.value}</p>
                   <p className="text-white/70 text-sm">{stat.label}</p>
                 </div>
@@ -93,7 +93,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Testimonial */}
-            <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
               <p className="text-white/90 italic mb-4">
                 "JobTools AI helped me tailor my resume for each application. I got 3x more interviews!"
               </p>
@@ -120,14 +120,11 @@ export default function RegisterPage() {
         <div className="max-w-md w-full space-y-8">
           {/* Logo */}
           <div>
-            <Link href="/" className="inline-flex items-center group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
-                <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
+            <Link href="/" className="inline-flex items-center gap-3">
+              <div className="bg-blue-600 p-2.5 rounded-xl">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">
                 JobTools AI
               </span>
             </Link>
@@ -285,15 +282,15 @@ export default function RegisterPage() {
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
                 required
-                className="w-4 h-4 mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                className="w-4 h-4 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-slate-600">
                 I agree to the{' '}
-                <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium">
+                <a href="#" className="text-blue-600 hover:text-blue-500 font-medium">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium">
+                <a href="#" className="text-blue-600 hover:text-blue-500 font-medium">
                   Privacy Policy
                 </a>
               </span>
@@ -301,7 +298,7 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              variant="gradient"
+              variant="primary"
               className="w-full"
               size="lg"
               isLoading={isLoading}
@@ -312,7 +309,7 @@ export default function RegisterPage() {
 
             <p className="text-center text-sm text-slate-600">
               Already have an account?{' '}
-              <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+              <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
                 Sign in
               </Link>
             </p>

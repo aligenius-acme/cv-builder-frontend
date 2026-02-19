@@ -79,7 +79,7 @@ export default function AdminOrganizationsPage() {
   const getPlanBadge = (planType: string | undefined) => {
     switch (planType) {
       case 'BUSINESS':
-        return <Badge variant="gradient" size="sm">Business</Badge>;
+        return <Badge variant="primary" size="sm">Business</Badge>;
       case 'PRO':
         return <Badge variant="warning" size="sm">Pro</Badge>;
       default:
@@ -101,7 +101,7 @@ export default function AdminOrganizationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -123,7 +123,7 @@ export default function AdminOrganizationsPage() {
         {/* Organizations List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         ) : organizations.length === 0 ? (
           <Card variant="elevated">
@@ -138,10 +138,10 @@ export default function AdminOrganizationsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {organizations.map((org) => (
-              <Card key={org.id} variant="elevated" className="hover:border-indigo-200 transition-colors">
+              <Card key={org.id} variant="elevated" className="hover:border-blue-200 transition-colors">
                 <CardContent className="py-5">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center">
+                    <div className="w-14 h-14 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center">
                       <Building className="h-7 w-7 text-purple-600" />
                     </div>
                     <div className="flex-1 min-w-0">

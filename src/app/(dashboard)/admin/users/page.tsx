@@ -134,7 +134,7 @@ export default function AdminUsersPage() {
   const getPlanBadge = (planType: string) => {
     switch (planType) {
       case 'BUSINESS':
-        return <Badge variant="gradient" size="sm">{planType}</Badge>;
+        return <Badge variant="primary" size="sm">{planType}</Badge>;
       case 'PRO':
         return <Badge variant="warning" size="sm">{planType}</Badge>;
       default:
@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -184,7 +184,7 @@ export default function AdminUsersPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by email or name..."
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 />
               </div>
               <select
@@ -193,7 +193,7 @@ export default function AdminUsersPage() {
                   setRoleFilter(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 <option value="" className="text-slate-500">All Roles</option>
                 <option value="USER">User</option>
@@ -213,7 +213,7 @@ export default function AdminUsersPage() {
           <CardContent className="p-0">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-12">
@@ -239,7 +239,7 @@ export default function AdminUsersPage() {
                       <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
                               {(u.firstName?.[0] || u.email[0]).toUpperCase()}
                             </div>
                             <div>
@@ -265,7 +265,7 @@ export default function AdminUsersPage() {
                                     key={role}
                                     onClick={() => handleUpdateRole(u.id, role)}
                                     className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${
-                                      u.role === role ? 'text-indigo-600 font-medium' : 'text-slate-700'
+                                      u.role === role ? 'text-blue-600 font-medium' : 'text-slate-700'
                                     }`}
                                   >
                                     {role}

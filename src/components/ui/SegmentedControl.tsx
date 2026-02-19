@@ -33,14 +33,14 @@ export default function SegmentedControl<T extends string>({
           disabled={option.disabled}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             value === option.value
-              ? 'bg-white text-indigo-600 shadow-sm'
+              ? 'bg-white text-blue-600 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
           } ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {option.icon}
           {option.label}
           {option.count !== undefined && option.count > 0 && (
-            <span className={`${value === option.value ? 'text-indigo-500' : 'text-slate-400'}`}>
+            <span className={`${value === option.value ? 'text-blue-500' : 'text-slate-400'}`}>
               ({option.count})
             </span>
           )}

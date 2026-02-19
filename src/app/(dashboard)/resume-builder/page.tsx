@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import PageHeader from '@/components/shared/PageHeader';
 import {
   User,
   Briefcase,
@@ -289,9 +290,9 @@ export default function ResumeBuilderPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
           <p className="text-slate-500">Loading resume builder...</p>
         </div>
       </div>
@@ -299,71 +300,58 @@ export default function ResumeBuilderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              value={resumeTitle}
-              onChange={(e) => {
-                setResumeTitle(e.target.value);
-                setHasUnsavedChanges(true);
-              }}
-              className="text-xl font-bold text-slate-900 bg-transparent border-none focus:outline-none focus:ring-0"
-              placeholder="Resume Title"
-            />
-            {hasUnsavedChanges && (
-              <Badge variant="warning" size="sm">Unsaved changes</Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleSave()}
-              disabled={isSaving}
-              leftIcon={isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            >
-              Save
-            </Button>
-            <Button
-              variant="gradient"
-              size="sm"
-              onClick={handleOpenDownloadModal}
-              leftIcon={<Download className="h-4 w-4" />}
-            >
-              Download
-            </Button>
-          </div>
+    <div className="min-h-screen bg-[var(--bg)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Page Header */}
+        <PageHeader
+          icon={<Sparkles className="h-5 w-5" />}
+          label="Resume Builder"
+          title="Build Your Resume"
+          description="Create a professional resume with AI-powered suggestions and real-time preview."
+          actions={
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSave()}
+                disabled={isSaving}
+                leftIcon={isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              >
+                Save
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleOpenDownloadModal}
+                leftIcon={<Download className="h-4 w-4" />}
+              >
+                Download
+              </Button>
+            </div>
+          }
+        />
+
+        {/* Resume Title Bar */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-[var(--surface)] rounded-xl border border-[var(--border)]">
+          <input
+            type="text"
+            value={resumeTitle}
+            onChange={(e) => {
+              setResumeTitle(e.target.value);
+              setHasUnsavedChanges(true);
+            }}
+            className="flex-1 text-lg font-semibold text-slate-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 placeholder:text-slate-400"
+            placeholder="Resume Title"
+          />
+          {hasUnsavedChanges && (
+            <Badge variant="warning" size="sm">Unsaved changes</Badge>
+          )}
         </div>
 
-      </div>
-
-      {/* Hero Banner */}
-      <div className="max-w-7xl mx-auto px-4 pt-6">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 p-6 text-white mb-6">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">Resume Builder</h2>
-              <p className="text-white/80 text-sm">
-                Create a professional resume with AI-powered suggestions and real-time preview
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 pb-6">
         <div className="flex gap-6">
           {/* Section Navigation */}
           <div className="w-48 shrink-0">
-            <div className="sticky top-32 space-y-1">
+            <div className="sticky top-24 space-y-1">
               {sections.map((section) => (
                 <button
                   key={section.id}
@@ -371,7 +359,7 @@ export default function ResumeBuilderPage() {
                   className={cn(
                     'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
                     activeSection === section.id
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-slate-600 hover:bg-slate-100'
                   )}
                 >
@@ -501,7 +489,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.name}
             onChange={(e) => onChange({ ...data, name: e.target.value })}
             placeholder="John Doe"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -514,7 +502,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.email}
             onChange={(e) => onChange({ ...data, email: e.target.value })}
             placeholder="john@example.com"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -527,7 +515,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.phone}
             onChange={(e) => onChange({ ...data, phone: e.target.value })}
             placeholder="+1 (555) 123-4567"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
@@ -540,7 +528,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.location}
             onChange={(e) => onChange({ ...data, location: e.target.value })}
             placeholder="San Francisco, CA"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -553,7 +541,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.linkedin}
             onChange={(e) => onChange({ ...data, linkedin: e.target.value })}
             placeholder="linkedin.com/in/johndoe"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -566,7 +554,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.github}
             onChange={(e) => onChange({ ...data, github: e.target.value })}
             placeholder="github.com/johndoe"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
@@ -579,7 +567,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             value={data.website}
             onChange={(e) => onChange({ ...data, website: e.target.value })}
             placeholder="johndoe.com"
-            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+            className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
       </div>
@@ -720,7 +708,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.title}
                     onChange={(e) => updateExperience(index, { title: e.target.value })}
                     placeholder="Software Engineer"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -733,7 +721,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.company}
                     onChange={(e) => updateExperience(index, { company: e.target.value })}
                     placeholder="Google"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -746,7 +734,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     value={exp.location}
                     onChange={(e) => updateExperience(index, { location: e.target.value })}
                     placeholder="San Francisco, CA"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -760,7 +748,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                       value={exp.startDate}
                       onChange={(e) => updateExperience(index, { startDate: e.target.value })}
                       placeholder="Jan 2020"
-                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                     />
                   </div>
                   <div className="flex-1">
@@ -773,7 +761,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                       value={exp.current ? 'Present' : exp.endDate}
                       onChange={(e) => updateExperience(index, { endDate: e.target.value, current: e.target.value === 'Present' })}
                       placeholder="Present"
-                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
@@ -887,7 +875,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.degree}
                     onChange={(e) => updateEducation(index, { degree: e.target.value })}
                     placeholder="Bachelor of Science in Computer Science"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -900,7 +888,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.institution}
                     onChange={(e) => updateEducation(index, { institution: e.target.value })}
                     placeholder="Stanford University"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -913,7 +901,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.graduationDate}
                     onChange={(e) => updateEducation(index, { graduationDate: e.target.value })}
                     placeholder="May 2020"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -926,7 +914,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.location}
                     onChange={(e) => updateEducation(index, { location: e.target.value })}
                     placeholder="Stanford, CA"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -939,7 +927,7 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
                     value={edu.gpa}
                     onChange={(e) => updateEducation(index, { gpa: e.target.value })}
                     placeholder="3.8/4.0"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -976,7 +964,7 @@ function SkillsEditor({ data, onChange }: { data: string[]; onChange: (data: str
           onChange={(e) => setNewSkill(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
           placeholder="Add a skill (e.g., JavaScript, Project Management)"
-          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addSkill}>Add</Button>
       </div>
@@ -1066,7 +1054,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.name}
                     onChange={(e) => updateProject(index, { name: e.target.value })}
                     placeholder="My Awesome Project"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -1079,7 +1067,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.url}
                     onChange={(e) => updateProject(index, { url: e.target.value })}
                     placeholder="github.com/user/project"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="col-span-2">
@@ -1106,7 +1094,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
                     value={project.technologies.join(', ')}
                     onChange={(e) => updateProject(index, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
                     placeholder="React, Node.js, PostgreSQL"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -1143,7 +1131,7 @@ function CertificationsEditor({ data, onChange }: { data: string[]; onChange: (d
           onChange={(e) => setNewCert(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCertification())}
           placeholder="Add a certification (e.g., AWS Solutions Architect)"
-          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addCertification}>Add</Button>
       </div>
@@ -1192,7 +1180,7 @@ function LanguagesEditor({ data, onChange }: { data: string[]; onChange: (data: 
           onChange={(e) => setNewLanguage(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addLanguage())}
           placeholder="e.g., English (Native), Spanish (Fluent)"
-          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addLanguage}>Add</Button>
       </div>
@@ -1241,7 +1229,7 @@ function AwardsEditor({ data, onChange }: { data: string[]; onChange: (data: str
           onChange={(e) => setNewAward(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addAward())}
           placeholder="e.g., Employee of the Year 2023, Dean's List"
-          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+          className="flex-1 px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
         />
         <Button variant="outline" onClick={addAward}>Add</Button>
       </div>
@@ -1382,7 +1370,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                     value={vol.role}
                     onChange={(e) => updateVolunteerWork(index, { role: e.target.value })}
                     placeholder="Volunteer Tutor"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -1395,7 +1383,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                     value={vol.organization}
                     onChange={(e) => updateVolunteerWork(index, { organization: e.target.value })}
                     placeholder="Local Community Center"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -1408,7 +1396,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                     value={vol.location}
                     onChange={(e) => updateVolunteerWork(index, { location: e.target.value })}
                     placeholder="San Francisco, CA"
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -1422,7 +1410,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                       value={vol.startDate}
                       onChange={(e) => updateVolunteerWork(index, { startDate: e.target.value })}
                       placeholder="Jan 2020"
-                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                     />
                   </div>
                   <div className="flex-1">
@@ -1435,7 +1423,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                       value={vol.current ? 'Present' : vol.endDate}
                       onChange={(e) => updateVolunteerWork(index, { endDate: e.target.value, current: e.target.value === 'Present' })}
                       placeholder="Present"
-                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                      className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                     />
                   </div>
                 </div>

@@ -1,6 +1,5 @@
 // Shared components barrel export
-export { default as PageHeader, gradients, iconGradients } from './PageHeader';
-export type { GradientType } from './PageHeader';
+export { default as PageHeader } from './PageHeader';
 
 export { default as EmptyState } from './EmptyState';
 

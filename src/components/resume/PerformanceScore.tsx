@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -35,7 +35,7 @@ const categoryConfig: Record<string, { icon: React.ReactNode; label: string; col
   formatting: {
     icon: <Type className="h-4 w-4" />,
     label: 'Formatting',
-    color: 'from-purple-500 to-purple-600',
+    color: 'bg-purple-600',
   },
   keywords: {
     icon: <Search className="h-4 w-4" />,
@@ -126,7 +126,7 @@ function CategoryScore({
         className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 bg-gradient-to-br ${config.color} rounded-lg flex items-center justify-center text-white`}>
+          <div className={`w-8 h-8 ${config.color} rounded-lg flex items-center justify-center text-white`}>
             {config.icon}
           </div>
           <span className="font-medium text-slate-900">{config.label}</span>
@@ -180,14 +180,14 @@ export default function PerformanceScore({ resumeId, versionId, compact = false 
     return (
       <Card variant="elevated" className={compact ? '' : 'max-w-md'}>
         <CardContent className="py-8 text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="h-8 w-8 text-indigo-600" />
+          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <BarChart3 className="h-8 w-8 text-blue-600" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Resume Performance Score</h3>
           <p className="text-sm text-slate-500 mb-4">
             Get a detailed analysis of your resume&apos;s effectiveness
           </p>
-          <Button variant="gradient" onClick={loadScore} disabled={isLoading}>
+          <Button variant="primary" onClick={loadScore} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -209,7 +209,7 @@ export default function PerformanceScore({ resumeId, versionId, compact = false 
     return (
       <Card variant="elevated" className={compact ? '' : 'max-w-md'}>
         <CardContent className="py-12 text-center">
-          <Loader2 className="h-12 w-12 text-indigo-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-500">Analyzing your resume...</p>
         </CardContent>
       </Card>
@@ -241,7 +241,7 @@ export default function PerformanceScore({ resumeId, versionId, compact = false 
     <Card variant="elevated">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5 text-indigo-600" />
+          <BarChart3 className="h-5 w-5 text-blue-600" />
           Resume Performance Score
         </CardTitle>
       </CardHeader>

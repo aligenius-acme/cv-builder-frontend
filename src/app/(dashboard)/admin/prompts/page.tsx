@@ -111,7 +111,7 @@ export default function AdminPromptsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -148,7 +148,7 @@ export default function AdminPromptsPage() {
         {/* Prompts List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
         ) : activePrompts.length === 0 ? (
           <Card variant="elevated">
@@ -167,7 +167,7 @@ export default function AdminPromptsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <MessageSquare className="h-5 w-5 text-indigo-600" />
+                        <MessageSquare className="h-5 w-5 text-blue-600" />
                         {name.replace(/_/g, ' ')}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-3 mt-1">
@@ -207,7 +207,7 @@ export default function AdminPromptsPage() {
                           value={editedText}
                           onChange={(e) => setEditedText(e.target.value)}
                           rows={12}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-y"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-y"
                         />
                         <div className="flex items-center gap-3">
                           <Button

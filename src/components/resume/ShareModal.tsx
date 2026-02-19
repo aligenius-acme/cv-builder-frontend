@@ -127,11 +127,11 @@ export default function ShareModal({
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+        <div className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                 <Share2 className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -151,7 +151,7 @@ export default function ShareModal({
           <div className="p-5 space-y-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
               </div>
             ) : (
               <>
@@ -214,7 +214,7 @@ export default function ShareModal({
                       href={shareStatus.shareUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700"
+                      className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
                     >
                       <ExternalLink className="h-4 w-4" />
                       Open in new tab

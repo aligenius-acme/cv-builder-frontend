@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -190,55 +191,43 @@ export default function JobTrackerPage() {
   }, {} as Record<string, JobApplication[]>);
 
   return (
-    <div className="min-h-screen bg-mesh">
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-8 text-white mb-6">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="h-5 w-5" />
-                <span className="text-white/80 text-sm font-medium">Application Management</span>
-              </div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                Job Tracker
-              </h1>
-              <p className="text-white/80 text-lg max-w-2xl">
-                Track your job applications from wishlist to offer. Drag and drop cards
-                between columns to update status instantly.
-              </p>
-            </div>
+    <div className="min-h-screen bg-[var(--bg)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <PageHeader
+          icon={<Target className="h-5 w-5" />}
+          label="Application Management"
+          title="Job Tracker"
+          description="Track your job applications from wishlist to offer. Drag and drop cards between columns to update status instantly."
+          actions={
             <Button
-              variant="secondary"
-              size="lg"
-              leftIcon={<Plus className="h-5 w-5" />}
+              variant="primary"
+              size="md"
+              leftIcon={<Plus className="h-4 w-4" />}
               onClick={() => {
                 setEditingApp({});
                 setShowAddModal(true);
               }}
-              className="mt-6 lg:mt-0"
             >
               Add Application
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Search Bar */}
-        <div className="relative max-w-md mb-6">
+        <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by job title or company..."
-            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-slate-400"
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
           />
         </div>
 
         {/* Stats Row */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <Card variant="elevated" className="text-center">
               <CardContent className="py-4">
                 <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
@@ -323,7 +312,7 @@ export default function JobTrackerPage() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, app)}
                       onClick={() => openDetails(app)}
-                      className={`bg-white rounded-lg p-4 shadow-sm border border-slate-200 cursor-pointer hover:shadow-md hover:border-indigo-300 transition-all group ${
+                      className={`bg-white rounded-lg p-4 shadow-sm border border-slate-200 cursor-pointer hover:shadow-md hover:border-blue-300 transition-all group ${
                         draggedItem?.id === app.id ? 'opacity-50' : ''
                       }`}
                     >
@@ -527,7 +516,7 @@ function ApplicationModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900">
             {application?.id ? 'Edit Application' : 'Add Application'}
@@ -549,8 +538,8 @@ function ApplicationModal({
                     onClick={() => setJobInputMode('saved')}
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                       jobInputMode === 'saved'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'
                     }`}
                   >
                     Saved Jobs
@@ -563,8 +552,8 @@ function ApplicationModal({
                     }}
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
                       jobInputMode === 'manual'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'
                     }`}
                   >
                     Manual Entry
@@ -586,7 +575,7 @@ function ApplicationModal({
                       <select
                         value={selectedJobId}
                         onChange={(e) => handleSelectSavedJob(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                       >
                         <option value="">Select a saved job...</option>
                         {savedJobs.map((job) => (
@@ -619,7 +608,7 @@ function ApplicationModal({
                 required
                 value={formData.jobTitle || ''}
                 onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="Software Engineer"
               />
             </div>
@@ -633,7 +622,7 @@ function ApplicationModal({
                 required
                 value={formData.companyName || ''}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="Google"
               />
             </div>
@@ -649,7 +638,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.location || ''}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -662,7 +651,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.salary || ''}
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="$150,000 - $180,000"
               />
             </div>
@@ -677,7 +666,7 @@ function ApplicationModal({
               type="url"
               value={formData.jobUrl || ''}
               onChange={(e) => setFormData({ ...formData, jobUrl: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               placeholder="https://..."
             />
           </div>
@@ -691,7 +680,7 @@ function ApplicationModal({
               <select
                 value={formData.status || 'WISHLIST'}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as ApplicationStatus })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900"
               >
                 {Object.entries(STATUS_CONFIG).map(([key, { label }]) => (
                   <option key={key} value={key}>{label}</option>
@@ -706,7 +695,7 @@ function ApplicationModal({
               <select
                 value={formData.priority || 0}
                 onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900"
               >
                 <option value={0}>Normal</option>
                 <option value={1}>High</option>
@@ -721,7 +710,7 @@ function ApplicationModal({
               <select
                 value={formData.source || ''}
                 onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-900"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900"
               >
                 <option value="" className="text-slate-500">Select source</option>
                 <option value="linkedin">LinkedIn</option>
@@ -744,7 +733,7 @@ function ApplicationModal({
                 type="date"
                 value={formData.deadline?.split('T')[0] || ''}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -756,7 +745,7 @@ function ApplicationModal({
                 type="text"
                 value={formData.contactName || ''}
                 onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="Hiring Manager"
               />
             </div>
@@ -771,7 +760,7 @@ function ApplicationModal({
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               placeholder="Any notes about this application..."
             />
           </div>
@@ -780,7 +769,7 @@ function ApplicationModal({
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" variant="gradient" className="flex-1">
+            <Button type="submit" variant="primary" className="flex-1">
               {application?.id ? 'Save Changes' : 'Add Application'}
             </Button>
           </div>
@@ -881,7 +870,7 @@ function DetailsPanel({
               href={application.jobUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 mt-3 text-sm"
+              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 mt-3 text-sm"
             >
               View Job Posting <ExternalLink className="h-3 w-3" />
             </a>
@@ -912,9 +901,9 @@ function DetailsPanel({
             </div>
           )}
           {application.nextFollowUp && (
-            <div className="bg-indigo-50 rounded-xl p-4">
-              <p className="text-xs text-indigo-600 font-medium">Follow Up</p>
-              <p className="text-sm text-indigo-900 mt-1">{formatDate(application.nextFollowUp)}</p>
+            <div className="bg-blue-50 rounded-xl p-4">
+              <p className="text-xs text-blue-600 font-medium">Follow Up</p>
+              <p className="text-sm text-blue-900 mt-1">{formatDate(application.nextFollowUp)}</p>
             </div>
           )}
         </div>
@@ -947,7 +936,7 @@ function DetailsPanel({
               {application.contactEmail && (
                 <a
                   href={`mailto:${application.contactEmail}`}
-                  className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1 mt-1"
+                  className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-1"
                 >
                   <Mail className="h-3 w-3" /> {application.contactEmail}
                 </a>
@@ -964,7 +953,7 @@ function DetailsPanel({
             </h4>
             <button
               onClick={() => setShowNoteInput(!showNoteInput)}
-              className="text-xs text-indigo-600 hover:text-indigo-700"
+              className="text-xs text-blue-600 hover:text-blue-700"
             >
               + Add Note
             </button>
@@ -976,14 +965,14 @@ function DetailsPanel({
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 rows={2}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 placeholder="Add a note..."
               />
               <div className="flex justify-end gap-2 mt-2">
                 <Button size="sm" variant="outline" onClick={() => setShowNoteInput(false)}>
                   Cancel
                 </Button>
-                <Button size="sm" variant="gradient" onClick={handleAddNote}>
+                <Button size="sm" variant="primary" onClick={handleAddNote}>
                   Save
                 </Button>
               </div>
@@ -1067,7 +1056,7 @@ function DetailsPanel({
               <>
                 <Button
                   size="sm"
-                  variant="gradient"
+                  variant="primary"
                   onClick={() => onUpdate({ status: 'ACCEPTED' })}
                   className="w-full"
                 >

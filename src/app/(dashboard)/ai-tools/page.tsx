@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
+import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -52,11 +53,11 @@ import toast from 'react-hot-toast';
 type TabType = 'job-match' | 'quantifier' | 'weakness' | 'follow-up' | 'networking';
 
 const tabs = [
-  { id: 'job-match' as TabType, label: 'Job Match', icon: Target, color: 'from-blue-500 to-cyan-500' },
-  { id: 'quantifier' as TabType, label: 'Achievement Quantifier', icon: TrendingUp, color: 'from-green-500 to-emerald-500' },
-  { id: 'weakness' as TabType, label: 'Weakness Detector', icon: Shield, color: 'from-amber-500 to-orange-500' },
-  { id: 'follow-up' as TabType, label: 'Follow-up Emails', icon: Mail, color: 'from-purple-500 to-pink-500' },
-  { id: 'networking' as TabType, label: 'Networking Messages', icon: Users, color: 'from-indigo-500 to-violet-500' },
+  { id: 'job-match' as TabType, label: 'Job Match', icon: Target },
+  { id: 'quantifier' as TabType, label: 'Achievement Quantifier', icon: TrendingUp },
+  { id: 'weakness' as TabType, label: 'Weakness Detector', icon: Shield },
+  { id: 'follow-up' as TabType, label: 'Follow-up Emails', icon: Mail },
+  { id: 'networking' as TabType, label: 'Networking Messages', icon: Users },
 ];
 
 export default function AIToolsPage() {
@@ -101,35 +102,24 @@ export default function AIToolsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 p-8 text-white">
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5" />
-              <span className="text-white/80 text-sm font-medium">AI-Powered Tools</span>
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-              AI Career Assistant
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Advanced AI tools to supercharge your job search. Match with jobs, improve your resume,
-              and craft perfect messages.
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          icon={<Sparkles className="h-5 w-5" />}
+          label="AI-Powered Tools"
+          title="AI Career Assistant"
+          description="Advanced AI tools to supercharge your job search. Match with jobs, improve your resume, and craft perfect messages."
+        />
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 bg-white rounded-2xl p-2 shadow-lg border border-slate-100">
+        <div className="flex flex-wrap gap-2 bg-white rounded-xl p-2 shadow-lg border border-slate-100">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
                 activeTab === tab.id
-                  ? `bg-gradient-to-r ${tab.color} text-white shadow-md`
+                  ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -252,7 +242,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                 <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
                 <p className="text-xs text-slate-500 mt-1">Upload a resume to get started</p>
                 <Link href="/resumes">
-                  <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                  <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
                     Upload Resume
                   </Button>
                 </Link>
@@ -266,7 +256,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                 >
                   {selectedResume ? (
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                         <FileText className="h-4 w-4 text-blue-600" />
                       </div>
                       <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
@@ -288,7 +278,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                           selectedResumeId === resume.id ? 'bg-blue-50' : ''
                         }`}
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                           <FileText className="h-4 w-4 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -334,7 +324,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                   <p className="text-xs text-slate-500 mt-1">Save jobs from the Job Tracker to use here</p>
                   <div className="flex justify-center gap-2 mt-3">
                     <Link href="/job-tracker">
-                      <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                      <Button variant="primary" size="sm" leftIcon={<Search className="h-4 w-4" />}>
                         Job Tracker
                       </Button>
                     </Link>
@@ -369,7 +359,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                             selectedJobId === job.id ? 'bg-blue-50' : ''
                           }`}
                         >
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <Building className="h-5 w-5 text-blue-600" />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -438,7 +428,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
               </div>
 
               <Button
-                variant="gradient"
+                variant="primary"
                 className="w-full"
                 onClick={handleAnalyze}
                 disabled={isLoading || !selectedResumeId}
@@ -465,7 +455,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
         {!result ? (
           <Card variant="elevated">
             <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <Target className="h-10 w-10 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Know Before You Apply</h3>
@@ -496,7 +486,7 @@ function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs 
                 </div>
                 <div className="bg-slate-100 rounded-full h-3 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-500"
+                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
                     style={{ width: `${result.overallScore}%` }}
                   />
                 </div>
@@ -747,7 +737,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                     <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                     <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
                     <Link href="/resumes">
-                      <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                      <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
                         Upload Resume
                       </Button>
                     </Link>
@@ -761,7 +751,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                     >
                       {selectedResume ? (
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                             <FileText className="h-4 w-4 text-green-600" />
                           </div>
                           <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
@@ -783,7 +773,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                               selectedResumeId === resume.id ? 'bg-green-50' : ''
                             }`}
                           >
-                            <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                               <FileText className="h-4 w-4 text-green-600" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -838,8 +828,8 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
                     ))}
                   </div>
                   <Button
-                    variant="gradient"
-                    className="w-full mt-3 bg-gradient-to-r from-green-500 to-emerald-500"
+                    variant="primary"
+                    className="w-full"
                     onClick={importSelectedBullets}
                     disabled={selectedBulletIndices.size === 0}
                   >
@@ -899,8 +889,8 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
               </div>
 
               <Button
-                variant="gradient"
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-500"
+                variant="primary"
+                className="w-full"
                 onClick={handleQuantify}
                 disabled={isLoading}
               >
@@ -926,7 +916,7 @@ function AchievementQuantifierTab({ resumes, isLoadingResumes }: { resumes: any[
         {!result ? (
           <Card variant="elevated">
             <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <TrendingUp className="h-10 w-10 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Transform Vague to Valuable</h3>
@@ -1103,7 +1093,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                 <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                 <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
                 <Link href="/resumes">
-                  <Button variant="gradient" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
+                  <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
                     Upload Resume
                   </Button>
                 </Link>
@@ -1117,7 +1107,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                 >
                   {selectedResume ? (
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
                         <FileText className="h-4 w-4 text-amber-600" />
                       </div>
                       <span className="font-medium truncate">{selectedResume.title || selectedResume.fileName}</span>
@@ -1139,7 +1129,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                           selectedResumeId === resume.id ? 'bg-amber-50' : ''
                         }`}
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
                           <FileText className="h-4 w-4 text-amber-600" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1242,8 +1232,8 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
           </div>
 
           <Button
-            variant="gradient"
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-500"
+            variant="primary"
+            className="w-full"
             onClick={handleDetect}
             disabled={isLoading || !selectedResumeId}
           >
@@ -1267,7 +1257,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
         {!result ? (
           <Card variant="elevated">
             <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="h-10 w-10 text-amber-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Find Hidden Red Flags</h3>
@@ -1306,7 +1296,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
 
             {/* Quick Fixes Section - NEW */}
             {result.quickFixes && result.quickFixes.length > 0 && (
-              <Card variant="elevated" className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
+              <Card variant="elevated" className="border-emerald-200">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-emerald-800 flex items-center gap-2 text-base">
@@ -1438,7 +1428,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                       <div className="mt-4 border-t pt-4">
                         <button
                           onClick={() => setExpandedWeakness(expandedWeakness === idx ? null : idx)}
-                          className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                          className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                         >
                           <RefreshCw className="h-4 w-4" />
                           {expandedWeakness === idx ? 'Hide' : 'Show'} Rewritten Version
@@ -1494,25 +1484,25 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
 
             {/* Industry Insights - NEW */}
             {result.industryInsights && (
-              <Card variant="elevated" className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
+              <Card variant="elevated" className="border-blue-200">
                 <CardHeader>
-                  <CardTitle className="text-indigo-800 flex items-center gap-2 text-base">
+                  <CardTitle className="text-blue-800 flex items-center gap-2 text-base">
                     <Briefcase className="h-5 w-5" />
                     Industry Insights
-                    {targetRole && <Badge className="bg-indigo-200 text-indigo-800 ml-2">{targetRole}</Badge>}
+                    {targetRole && <Badge className="bg-indigo-200 text-blue-800 ml-2">{targetRole}</Badge>}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Common Mistakes */}
                   {result.industryInsights.commonMistakes && result.industryInsights.commonMistakes.length > 0 && (
                     <div>
-                      <h5 className="text-sm font-medium text-indigo-700 mb-2 flex items-center gap-2">
+                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         Common Mistakes to Avoid
                       </h5>
                       <ul className="space-y-1">
                         {result.industryInsights.commonMistakes.map((mistake: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-indigo-800">
+                          <li key={idx} className="flex items-start gap-2 text-sm text-blue-800">
                             <XCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
                             {mistake}
                           </li>
@@ -1524,13 +1514,13 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                   {/* Industry Keywords */}
                   {result.industryInsights.industryKeywords && result.industryInsights.industryKeywords.length > 0 && (
                     <div>
-                      <h5 className="text-sm font-medium text-indigo-700 mb-2 flex items-center gap-2">
+                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
                         <Target className="h-4 w-4" />
                         Keywords to Include
                       </h5>
                       <div className="flex flex-wrap gap-2">
                         {result.industryInsights.industryKeywords.map((keyword: string, idx: number) => (
-                          <Badge key={idx} className="bg-indigo-100 text-indigo-700 cursor-pointer hover:bg-indigo-200" onClick={() => copyToClipboard(keyword, idx + 2000)}>
+                          <Badge key={idx} className="bg-blue-100 text-blue-700 cursor-pointer hover:bg-blue-200" onClick={() => copyToClipboard(keyword, idx + 2000)}>
                             {keyword}
                           </Badge>
                         ))}
@@ -1541,13 +1531,13 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
                   {/* Competitor Advantages */}
                   {result.industryInsights.competitorAdvantages && result.industryInsights.competitorAdvantages.length > 0 && (
                     <div>
-                      <h5 className="text-sm font-medium text-indigo-700 mb-2 flex items-center gap-2">
+                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
                         <TrendingUp className="h-4 w-4" />
                         What Top Candidates Do Differently
                       </h5>
                       <ul className="space-y-1">
                         {result.industryInsights.competitorAdvantages.map((advantage: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-indigo-800">
+                          <li key={idx} className="flex items-start gap-2 text-sm text-blue-800">
                             <CheckCircle className="h-4 w-4 mt-0.5 shrink-0 text-emerald-500" />
                             {advantage}
                           </li>
@@ -1769,7 +1759,7 @@ function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes, isLoadingSaved
                     <p className="text-xs text-slate-500 mt-1">Add applications in the Job Tracker</p>
                     <div className="flex justify-center gap-2 mt-3">
                       <Link href="/job-tracker">
-                        <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                        <Button variant="primary" size="sm" leftIcon={<Search className="h-4 w-4" />}>
                           Job Tracker
                         </Button>
                       </Link>
@@ -1804,7 +1794,7 @@ function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes, isLoadingSaved
                               selectedJobId === job.id ? 'bg-purple-50' : ''
                             }`}
                           >
-                            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 bg-slate-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Building className="h-5 w-5 text-purple-600" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -1898,8 +1888,8 @@ function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes, isLoadingSaved
                 </div>
 
                 <Button
-                  variant="gradient"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  variant="primary"
+                  className="w-full"
                   onClick={handleGenerate}
                   disabled={isLoading}
                 >
@@ -1926,7 +1916,7 @@ function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes, isLoadingSaved
         {!result ? (
           <Card variant="elevated">
             <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <Mail className="h-10 w-10 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Perfect Follow-up Emails</h3>
@@ -2091,7 +2081,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
         <Card variant="elevated">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-indigo-600" />
+              <Users className="h-5 w-5 text-blue-600" />
               Message Settings
             </CardTitle>
           </CardHeader>
@@ -2105,8 +2095,8 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                     onClick={() => setPlatform(p.value)}
                     className={`flex-1 py-2 px-4 rounded-xl border font-medium transition-all ${
                       platform === p.value
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                        : 'border-slate-200 bg-white text-slate-900 hover:border-indigo-200 hover:text-indigo-700'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-slate-200 bg-white text-slate-900 hover:border-blue-200 hover:text-blue-700'
                     }`}
                   >
                     {p.label}
@@ -2120,7 +2110,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value as NetworkingPurpose)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
               >
                 {purposes.map((p) => (
                   <option key={p.value} value={p.value}>{p.label}</option>
@@ -2138,7 +2128,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
             {/* Resume selector — auto-fills name + background */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-indigo-500" />Load from Resume (auto-fills your info)</span>
+                <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-blue-500" />Load from Resume (auto-fills your info)</span>
               </label>
               {isLoadingResumes ? (
                 <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl text-slate-500 text-sm"><Loader2 className="h-4 w-4 animate-spin" />Loading...</div>
@@ -2148,7 +2138,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 <select
                   value={selectedResumeId}
                   onChange={(e) => handleSelectResume(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
                 >
                   <option value="">— Select a resume to auto-fill —</option>
                   {resumes.map((r) => (
@@ -2163,7 +2153,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 type="text"
                 value={formData.senderName}
                 onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -2173,7 +2163,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 onChange={(e) => setFormData({ ...formData, senderBackground: e.target.value })}
                 placeholder="e.g., Software engineer with 5 years experience in fintech"
                 rows={2}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
             </div>
             <div>
@@ -2183,7 +2173,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 value={formData.targetRole}
                 onChange={(e) => setFormData({ ...formData, targetRole: e.target.value })}
                 placeholder="e.g., Senior Product Manager"
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>
           </CardContent>
@@ -2201,7 +2191,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                   type="text"
                   value={formData.recipientName}
                   onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
               <div>
@@ -2210,7 +2200,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                   type="text"
                   value={formData.recipientTitle}
                   onChange={(e) => setFormData({ ...formData, recipientTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -2220,7 +2210,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 type="text"
                 value={formData.recipientCompany}
                 onChange={(e) => setFormData({ ...formData, recipientCompany: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>
             <div>
@@ -2230,13 +2220,13 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
                 value={formData.commonGround}
                 onChange={(e) => setFormData({ ...formData, commonGround: e.target.value })}
                 placeholder="Same university, mutual connection, etc. (comma-separated)"
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>
 
             <Button
-              variant="gradient"
-              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500"
+              variant="primary"
+              className="w-full"
               onClick={handleGenerate}
               disabled={isLoading}
             >
@@ -2261,8 +2251,8 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
         {!result ? (
           <Card variant="elevated">
             <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Users className="h-10 w-10 text-indigo-600" />
+              <div className="w-20 h-20 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-6">
+                <Users className="h-10 w-10 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Open Doors with Cold Outreach</h3>
               <p className="text-slate-500 max-w-sm mx-auto">
@@ -2277,7 +2267,7 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Badge className="bg-indigo-100 text-indigo-700">{result.platform}</Badge>
+                    <Badge className="bg-blue-100 text-blue-700">{result.platform}</Badge>
                     Message
                   </CardTitle>
                   <Button variant="outline" size="sm" onClick={copyMessage}>
@@ -2309,12 +2299,12 @@ function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; i
               </Card>
             )}
 
-            <Card variant="elevated" className="bg-indigo-50 border-indigo-200">
+            <Card variant="elevated" className="bg-blue-50 border-blue-200">
               <CardContent className="py-4">
-                <h4 className="font-medium text-indigo-800 mb-2">Outreach Tips</h4>
+                <h4 className="font-medium text-blue-800 mb-2">Outreach Tips</h4>
                 <ul className="space-y-1">
                   {result.tips.map((tip, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-indigo-700">
+                    <li key={idx} className="flex items-start gap-2 text-sm text-blue-700">
                       <ChevronRight className="h-4 w-4 mt-0.5 shrink-0" />
                       {tip}
                     </li>

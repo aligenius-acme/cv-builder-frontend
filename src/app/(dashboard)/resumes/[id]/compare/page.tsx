@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -99,9 +99,9 @@ export default function CompareVersionsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <p className="text-slate-500">Loading resume...</p>
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function CompareVersionsPage() {
   const versions = resume.versions || [];
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -127,7 +127,7 @@ export default function CompareVersionsPage() {
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <GitCompare className="h-6 w-6 text-indigo-600" />
+                <GitCompare className="h-6 w-6 text-blue-600" />
                 Compare Versions
               </h1>
               <p className="text-slate-500">{resume.title}</p>
@@ -144,7 +144,7 @@ export default function CompareVersionsPage() {
                 <select
                   value={selectedV1}
                   onChange={(e) => setSelectedV1(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   <option value="">Select version...</option>
                   {versions.map((v) => (
@@ -155,8 +155,8 @@ export default function CompareVersionsPage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-full">
-                <ArrowRight className="h-5 w-5 text-indigo-600" />
+              <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full">
+                <ArrowRight className="h-5 w-5 text-blue-600" />
               </div>
 
               <div className="flex-1 w-full">
@@ -164,7 +164,7 @@ export default function CompareVersionsPage() {
                 <select
                   value={selectedV2}
                   onChange={(e) => setSelectedV2(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   <option value="">Select version...</option>
                   {versions.map((v) => (
@@ -182,7 +182,7 @@ export default function CompareVersionsPage() {
         {isComparing ? (
           <div className="flex items-center justify-center py-12">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <p className="text-slate-500">Comparing versions...</p>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function CompareVersionsPage() {
           <div className="space-y-6">
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card variant="elevated" className="border-indigo-200">
+              <Card variant="elevated" className="border-blue-200">
                 <CardHeader>
                   <Badge variant="info" size="sm" className="w-fit mb-2">Version A</Badge>
                   <CardTitle className="text-lg">
@@ -215,7 +215,7 @@ export default function CompareVersionsPage() {
 
               <Card variant="elevated" className="border-purple-200">
                 <CardHeader>
-                  <Badge variant="gradient" size="sm" className="w-fit mb-2">Version B</Badge>
+                  <Badge variant="primary" size="sm" className="w-fit mb-2">Version B</Badge>
                   <CardTitle className="text-lg">
                     v{version2.versionNumber} - {version2.jobTitle}
                   </CardTitle>
@@ -245,7 +245,7 @@ export default function CompareVersionsPage() {
               <CardContent>
                 <div className="flex items-center justify-center gap-8">
                   <div className="text-center">
-                    <p className="text-4xl font-bold text-indigo-600">{version1.atsScore}%</p>
+                    <p className="text-4xl font-bold text-blue-600">{version1.atsScore}%</p>
                     <p className="text-sm text-slate-500">Version A</p>
                   </div>
                   <div className="flex flex-col items-center">
@@ -291,14 +291,14 @@ export default function CompareVersionsPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <Badge variant="info" size="sm" className="mb-3">Version A</Badge>
                     <p className="text-sm text-slate-700">
                       {version1.tailoredData?.summary || 'No summary'}
                     </p>
                   </div>
                   <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                    <Badge variant="gradient" size="sm" className="mb-3">Version B</Badge>
+                    <Badge variant="primary" size="sm" className="mb-3">Version B</Badge>
                     <p className="text-sm text-slate-700">
                       {version2.tailoredData?.summary || 'No summary'}
                     </p>
@@ -445,7 +445,7 @@ export default function CompareVersionsPage() {
           <Card variant="elevated">
             <CardContent className="py-12">
               <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6">
                   <GitCompare className="h-10 w-10 text-slate-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Not Enough Versions</h3>
@@ -453,7 +453,7 @@ export default function CompareVersionsPage() {
                   You need at least 2 versions to compare. Customize your resume for different jobs to create more versions.
                 </p>
                 <Link href={`/resumes/${resumeId}`}>
-                  <Button variant="gradient">
+                  <Button variant="primary">
                     Customize Resume
                   </Button>
                 </Link>
@@ -464,8 +464,8 @@ export default function CompareVersionsPage() {
           <Card variant="elevated">
             <CardContent className="py-12">
               <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <GitCompare className="h-10 w-10 text-indigo-600" />
+                <div className="w-20 h-20 bg-blue-50 dark:bg-blue-950/30 rounded-xl flex items-center justify-center mx-auto mb-6">
+                  <GitCompare className="h-10 w-10 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Select Versions to Compare</h3>
                 <p className="text-slate-500 max-w-sm mx-auto">

@@ -22,7 +22,7 @@ export default function LoadingSpinner({
 }: LoadingSpinnerProps) {
   const content = (
     <>
-      <Loader2 className={cn(sizes[size], 'animate-spin text-indigo-600', className)} />
+      <Loader2 className={cn(sizes[size], 'animate-spin text-blue-600', className)} />
       {text && <p className="text-sm text-slate-500 mt-2">{text}</p>}
     </>
   );

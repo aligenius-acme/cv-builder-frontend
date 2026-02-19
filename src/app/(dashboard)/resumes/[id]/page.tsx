@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -222,7 +222,7 @@ export default function ResumeDetailPage() {
   // Section header helper used in the resume content renderer
   const SectionHeader = ({ icon, title, color }: { icon: React.ReactNode; title: string; color: string }) => (
     <div className="flex items-center gap-2.5 mb-1">
-      <div className={`w-7 h-7 bg-gradient-to-br ${color} rounded-lg flex items-center justify-center shadow-sm flex-shrink-0`}>
+      <div className={`w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0`}>
         {icon}
       </div>
       <h3 className="font-bold text-slate-800 text-xs uppercase tracking-widest">{title}</h3>
@@ -231,9 +231,9 @@ export default function ResumeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           <p className="text-slate-500">Loading resume...</p>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function ResumeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -271,7 +271,7 @@ export default function ResumeDetailPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Target className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -284,7 +284,7 @@ export default function ResumeDetailPage() {
                   </div>
                 </div>
                 <Button
-                  variant={showCustomizeForm ? 'outline' : 'gradient'}
+                  variant={showCustomizeForm ? 'outline' : 'primary'}
                   onClick={() => setShowCustomizeForm(!showCustomizeForm)}
                   leftIcon={showCustomizeForm ? undefined : <Plus className="h-4 w-4" />}
                 >
@@ -315,7 +315,7 @@ export default function ResumeDetailPage() {
                       </label>
                       {isLoadingSavedJobs ? (
                         <div className="flex items-center gap-2 p-4 border border-slate-200 rounded-xl">
-                          <Loader2 className="h-5 w-5 text-indigo-600 animate-spin" />
+                          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
                           <span className="text-slate-500">Loading saved jobs...</span>
                         </div>
                       ) : savedJobs.length === 0 ? (
@@ -327,7 +327,7 @@ export default function ResumeDetailPage() {
                           </p>
                           <div className="flex justify-center gap-3 mt-4">
                             <a href="/jobs">
-                              <Button variant="gradient" size="sm" leftIcon={<Search className="h-4 w-4" />}>
+                              <Button variant="primary" size="sm" leftIcon={<Search className="h-4 w-4" />}>
                                 Browse Jobs
                               </Button>
                             </a>
@@ -345,7 +345,7 @@ export default function ResumeDetailPage() {
                           <button
                             type="button"
                             onClick={() => setShowSavedJobsDropdown(!showSavedJobsDropdown)}
-                            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                           >
                             <span className="text-slate-500">Select a job to customize for...</span>
                             <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showSavedJobsDropdown ? 'rotate-180' : ''}`} />
@@ -358,10 +358,10 @@ export default function ResumeDetailPage() {
                                   key={job.id}
                                   type="button"
                                   onClick={() => handleSelectSavedJob(job.id)}
-                                  className="w-full flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left border-b border-slate-100 last:border-0"
+                                  className="w-full flex items-start gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-100 last:border-0"
                                 >
-                                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Building className="h-5 w-5 text-indigo-600" />
+                                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Building className="h-5 w-5 text-blue-600" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium text-slate-900 truncate">{job.title}</p>
@@ -390,7 +390,7 @@ export default function ResumeDetailPage() {
                       {savedJobs.length > 0 && (
                         <p className="mt-2 text-xs text-slate-500">
                           {savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''} with descriptions •{' '}
-                          <a href="/jobs" className="text-indigo-600 hover:text-indigo-700">Manage jobs</a>
+                          <a href="/jobs" className="text-blue-600 hover:text-blue-700">Manage jobs</a>
                         </p>
                       )}
                     </div>
@@ -402,22 +402,22 @@ export default function ResumeDetailPage() {
                   <form onSubmit={handleCustomize} className="space-y-5">
                     {/* Selected Job Info Banner */}
                     {selectedJobInfo && (selectedJobInfo.location || selectedJobInfo.salary || selectedJobInfo.type || selectedJobInfo.url) && (
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
                         <div className="flex flex-wrap items-center gap-3">
                           {selectedJobInfo.location && (
-                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
                               <MapPin className="h-4 w-4" />
                               {selectedJobInfo.location}
                             </span>
                           )}
                           {selectedJobInfo.salary && (
-                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
                               <DollarSign className="h-4 w-4" />
                               {selectedJobInfo.salary}
                             </span>
                           )}
                           {selectedJobInfo.type && (
-                            <span className="flex items-center gap-1.5 text-sm text-indigo-700">
+                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
                               <Clock className="h-4 w-4" />
                               {selectedJobInfo.type}
                             </span>
@@ -428,7 +428,7 @@ export default function ResumeDetailPage() {
                             href={selectedJobInfo.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700"
+                            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
                           >
                             <ExternalLink className="h-4 w-4" />
                             View Original
@@ -450,7 +450,7 @@ export default function ResumeDetailPage() {
                             value={jobTitle}
                             onChange={(e) => setJobTitle(e.target.value)}
                             required
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -466,7 +466,7 @@ export default function ResumeDetailPage() {
                             value={companyName}
                             onChange={(e) => setCompanyName(e.target.value)}
                             required
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -481,7 +481,7 @@ export default function ResumeDetailPage() {
                         value={jobDescription}
                         onChange={(e) => setJobDescription(e.target.value)}
                         required
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 resize-none"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none"
                       />
                     </div>
                     <div className="flex justify-end gap-3">
@@ -494,7 +494,7 @@ export default function ResumeDetailPage() {
                       </Button>
                       <Button
                         type="submit"
-                        variant="gradient"
+                        variant="primary"
                         isLoading={isCustomizing}
                         leftIcon={<Sparkles className="h-4 w-4" />}
                       >
@@ -536,13 +536,13 @@ export default function ResumeDetailPage() {
                 {resume.versions.map((version, index) => (
                   <div
                     key={version.id}
-                    className="group flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300"
+                    className="group flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-lg transition-all duration-300"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-4">
                       <ATSScoreCircle score={version.atsScore} size="sm" showLabel={false} />
                       <div>
-                        <h4 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                           {version.jobTitle} at {version.companyName}
                         </h4>
                         <p className="text-sm text-slate-500">
@@ -585,7 +585,7 @@ export default function ResumeDetailPage() {
 
           if (hasStructuredContent) {
             const skillColors = [
-              'bg-indigo-100 text-indigo-700 border-indigo-200',
+              'bg-blue-100 text-blue-700 border-blue-200',
               'bg-purple-100 text-purple-700 border-purple-200',
               'bg-emerald-100 text-emerald-700 border-emerald-200',
               'bg-blue-100 text-blue-700 border-blue-200',
@@ -601,7 +601,7 @@ export default function ResumeDetailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-indigo-600" />
+                        <FileText className="h-5 w-5 text-blue-600" />
                         Resume Content
                       </CardTitle>
                       <CardDescription>Structured content from your resume</CardDescription>
@@ -618,12 +618,12 @@ export default function ResumeDetailPage() {
 
                     {/* ── CONTACT HEADER ── */}
                     {pd.contact && (pd.contact.name || pd.contact.email) && (
-                      <div className="flex flex-col sm:flex-row items-start gap-5 p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-2xl border border-indigo-100">
+                      <div className="flex flex-col sm:flex-row items-start gap-5 p-5 bg-blue-50 rounded-xl border border-blue-100">
                         {(resume.photoUrl || pd.contact.photoUrl) && (
                           <img
                             src={resume.photoUrl || pd.contact.photoUrl}
                             alt={pd.contact.name || 'Profile photo'}
-                            className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white flex-shrink-0"
+                            className="w-20 h-20 rounded-xl object-cover shadow-md border-2 border-white flex-shrink-0"
                           />
                         )}
                         <div className="flex-1 min-w-0">
@@ -633,36 +633,36 @@ export default function ResumeDetailPage() {
                           <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 text-sm text-slate-600">
                             {pd.contact.email && (
                               <span className="flex items-center gap-1.5">
-                                <Mail className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                <Mail className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
                                 {pd.contact.email}
                               </span>
                             )}
                             {pd.contact.phone && (
                               <span className="flex items-center gap-1.5">
-                                <Phone className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                <Phone className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
                                 {pd.contact.phone}
                               </span>
                             )}
                             {pd.contact.location && (
                               <span className="flex items-center gap-1.5">
-                                <MapPin className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                                <MapPin className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
                                 {pd.contact.location}
                               </span>
                             )}
                             {pd.contact.linkedin && (
-                              <a href={`https://${pd.contact.linkedin.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                              <a href={`https://${pd.contact.linkedin.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium">
                                 <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                                 LinkedIn
                               </a>
                             )}
                             {pd.contact.github && (
-                              <a href={`https://${pd.contact.github.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                              <a href={`https://${pd.contact.github.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium">
                                 <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                                 GitHub
                               </a>
                             )}
                             {pd.contact.website && (
-                              <a href={`https://${pd.contact.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
+                              <a href={`https://${pd.contact.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium">
                                 <Globe className="h-3.5 w-3.5 flex-shrink-0" />
                                 {pd.contact.website}
                               </a>
@@ -685,21 +685,21 @@ export default function ResumeDetailPage() {
                     {/* ── EXPERIENCE ── */}
                     {pd.experience && pd.experience.length > 0 && (
                       <div>
-                        <SectionHeader icon={<Briefcase className="h-4 w-4 text-white" />} title="Experience" color="from-indigo-500 to-purple-600" />
+                        <SectionHeader icon={<Briefcase className="h-4 w-4 text-white" />} title="Experience" color="bg-blue-600" />
                         <div className="mt-3 space-y-5">
                           {pd.experience.map((exp: any, i: number) => (
-                            <div key={i} className="relative pl-5 border-l-2 border-indigo-200 hover:border-indigo-400 transition-colors group">
-                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-400 group-hover:bg-indigo-600 transition-colors ring-2 ring-white" />
+                            <div key={i} className="relative pl-5 border-l-2 border-blue-200 hover:border-blue-400 transition-colors group">
+                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-400 group-hover:bg-blue-600 transition-colors ring-2 ring-white" />
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
                                   <p className="font-semibold text-slate-900 text-sm">{exp.title}</p>
-                                  <p className="text-sm font-medium text-indigo-600">
+                                  <p className="text-sm font-medium text-blue-600">
                                     {exp.company}
                                     {exp.location && <span className="text-slate-400 font-normal"> · {exp.location}</span>}
                                   </p>
                                 </div>
                                 {exp.startDate && (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 flex-shrink-0">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 flex-shrink-0">
                                     <Clock className="h-3 w-3" />
                                     {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
                                   </span>
@@ -709,7 +709,7 @@ export default function ResumeDetailPage() {
                                 <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
                                   {exp.description.map((desc: string, j: number) => (
                                     <li key={j} className="flex items-start gap-2">
-                                      <ChevronRight className="h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0" />
+                                      <ChevronRight className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
                                       <span className="leading-relaxed">{desc}</span>
                                     </li>
                                   ))}
@@ -724,11 +724,11 @@ export default function ResumeDetailPage() {
                     {/* ── EDUCATION ── */}
                     {pd.education && pd.education.length > 0 && (
                       <div>
-                        <SectionHeader icon={<GraduationCap className="h-4 w-4 text-white" />} title="Education" color="from-violet-500 to-purple-600" />
+                        <SectionHeader icon={<GraduationCap className="h-4 w-4 text-white" />} title="Education" color="bg-blue-600" />
                         <div className="mt-3 space-y-3">
                           {pd.education.map((edu: any, i: number) => (
                             <div key={i} className="flex gap-3 p-4 rounded-xl bg-violet-50 border border-violet-100 hover:border-violet-300 transition-colors">
-                              <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                              <div className="w-9 h-9 bg-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <GraduationCap className="h-4 w-4 text-white" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -765,7 +765,7 @@ export default function ResumeDetailPage() {
                     {/* ── SKILLS ── */}
                     {pd.skills && pd.skills.length > 0 && (
                       <div>
-                        <SectionHeader icon={<Sparkles className="h-4 w-4 text-white" />} title="Skills" color="from-emerald-500 to-teal-600" />
+                        <SectionHeader icon={<Sparkles className="h-4 w-4 text-white" />} title="Skills" color="bg-blue-600" />
                         <div className="flex flex-wrap gap-2 mt-3">
                           {pd.skills.map((skill: string, i: number) => (
                             <span
@@ -786,7 +786,7 @@ export default function ResumeDetailPage() {
                         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {pd.certifications.map((cert: string, i: number) => (
                             <div key={i} className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
-                              <div className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                              <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Award className="h-3.5 w-3.5 text-white" />
                               </div>
                               <span className="text-xs text-slate-700 font-medium leading-tight">{cert}</span>
@@ -799,7 +799,7 @@ export default function ResumeDetailPage() {
                     {/* ── PROJECTS ── */}
                     {pd.projects && pd.projects.length > 0 && (
                       <div>
-                        <SectionHeader icon={<FolderKanban className="h-4 w-4 text-white" />} title="Projects" color="from-purple-500 to-pink-600" />
+                        <SectionHeader icon={<FolderKanban className="h-4 w-4 text-white" />} title="Projects" color="bg-blue-600" />
                         <div className="mt-3 space-y-3">
                           {pd.projects.map((project: any, i: number) => (
                             <div key={i} className="p-4 rounded-xl border border-purple-100 bg-purple-50 hover:border-purple-300 transition-colors">
@@ -880,8 +880,8 @@ export default function ResumeDetailPage() {
                         <SectionHeader icon={<Trophy className="h-4 w-4 text-white" />} title="Awards & Honors" color="from-yellow-500 to-amber-500" />
                         <div className="mt-3 space-y-2">
                           {pd.awards.map((award: string, i: number) => (
-                            <div key={i} className="flex items-start gap-3 p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
-                              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <div key={i} className="flex items-start gap-3 p-3.5 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
+                              <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Trophy className="h-4 w-4 text-white" />
                               </div>
                               <span className="text-sm text-slate-700 leading-relaxed">{award}</span>
@@ -918,7 +918,7 @@ export default function ResumeDetailPage() {
               <Card variant="elevated">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-indigo-600" />
+                    <FileText className="h-5 w-5 text-blue-600" />
                     Resume Content
                   </CardTitle>
                   <CardDescription>Extracted from your uploaded file</CardDescription>
@@ -953,7 +953,7 @@ export default function ResumeDetailPage() {
 
         {/* ATS Simulator CTA */}
         {!isPro && (
-          <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 border-0 text-white overflow-hidden relative">
+          <Card className="bg-slate-900 border-0 text-white overflow-hidden relative">
             <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'%3E%3C/path%3E%3C/svg%3E\")"}} />
             <CardContent className="py-6 relative">
               <div className="flex items-center justify-between">

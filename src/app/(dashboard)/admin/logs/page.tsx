@@ -144,7 +144,7 @@ export default function AdminLogsPage() {
   const setCurrentPage = activeTab === 'errors' ? setErrorPage : setAuditPage;
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -169,7 +169,7 @@ export default function AdminLogsPage() {
             onClick={() => setActiveTab('errors')}
             className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               activeTab === 'errors'
-                ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300'
+                ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
             }`}
           >
@@ -182,7 +182,7 @@ export default function AdminLogsPage() {
             onClick={() => setActiveTab('audit')}
             className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               activeTab === 'audit'
-                ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300'
+                ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
             }`}
           >
@@ -198,7 +198,7 @@ export default function AdminLogsPage() {
           <CardContent className="p-0">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               </div>
             ) : activeTab === 'errors' ? (
               parsingErrors.length === 0 ? (

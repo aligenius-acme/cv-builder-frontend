@@ -189,7 +189,7 @@ export default function AIWritingAssistant({
           placeholder={placeholder}
           className={cn(
             'w-full px-4 py-3 pr-12 bg-white text-slate-900 border border-slate-200 rounded-xl',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
             'resize-none placeholder:text-slate-400',
             'transition-all duration-200'
           )}
@@ -200,8 +200,8 @@ export default function AIWritingAssistant({
           className={cn(
             'absolute right-3 top-3 p-1.5 rounded-lg transition-all',
             showSuggestions
-              ? 'bg-indigo-100 text-indigo-600'
-              : 'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600'
+              ? 'bg-blue-100 text-blue-600'
+              : 'bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600'
           )}
           title="AI Writing Assistant"
         >
@@ -218,7 +218,7 @@ export default function AIWritingAssistant({
           {/* Action Buttons */}
           <div className="p-3 border-b border-slate-100 bg-slate-50">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-indigo-600" />
+              <Sparkles className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium text-slate-700">AI Writing Assistant</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -244,7 +244,7 @@ export default function AIWritingAssistant({
           {/* Loading State */}
           {isLoading && (
             <div className="p-8 flex flex-col items-center justify-center gap-2">
-              <Loader2 className="h-6 w-6 text-indigo-600 animate-spin" />
+              <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
               <p className="text-sm text-slate-500">Generating suggestions...</p>
             </div>
           )}
@@ -297,7 +297,7 @@ export default function AIWritingAssistant({
                   className="w-full p-3 border-b border-slate-100 hover:bg-slate-50 text-left"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-indigo-600">{verb.verb}</span>
+                    <span className="font-semibold text-blue-600">{verb.verb}</span>
                   </div>
                   <p className="text-xs text-slate-500">Example: {verb.example}</p>
                 </button>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -61,13 +61,13 @@ export default function GoogleCallbackPage() {
   }, [searchParams, router, setUser]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+        <div className="bg-white rounded-xl shadow-xl p-8 text-center">
           {status === 'loading' && (
             <>
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
               </div>
               <h2 className="text-xl font-semibold text-slate-900 mb-2">
                 Signing you in with Google...
@@ -105,7 +105,7 @@ export default function GoogleCallbackPage() {
               </p>
               <button
                 onClick={() => router.push('/login')}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
               >
                 Back to Login
               </button>

@@ -35,7 +35,7 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
           className={cn(
             'w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white',
             'transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
             error && 'border-red-300 focus:ring-red-500/20 focus:border-red-500',
             props.disabled && 'bg-slate-50 cursor-not-allowed',
             isPlaceholderSelected ? 'text-slate-500' : 'text-slate-900',

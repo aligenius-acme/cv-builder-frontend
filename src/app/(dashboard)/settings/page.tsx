@@ -93,7 +93,7 @@ export default function SettingsPage() {
       case 'ADMIN':
         return <Badge variant="error">Admin</Badge>;
       case 'ORG_ADMIN':
-        return <Badge variant="gradient">Org Admin</Badge>;
+        return <Badge variant="primary">Org Admin</Badge>;
       case 'ORG_USER':
         return <Badge variant="info">Org User</Badge>;
       default:
@@ -104,7 +104,7 @@ export default function SettingsPage() {
   const getPlanBadge = (planType: string | undefined) => {
     switch (planType) {
       case 'BUSINESS':
-        return <Badge variant="gradient">Business</Badge>;
+        return <Badge variant="primary">Business</Badge>;
       case 'PRO':
         return <Badge variant="warning">Pro</Badge>;
       default:
@@ -113,7 +113,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div>
@@ -125,13 +125,13 @@ export default function SettingsPage() {
         <Card variant="elevated">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-indigo-600" />
+              <Shield className="h-5 w-5 text-blue-600" />
               Account Overview
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-20 h-20 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-3xl font-bold text-white">
                   {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                 </span>
@@ -192,7 +192,7 @@ export default function SettingsPage() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="John"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Doe"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function SettingsPage() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
-                    className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password"
-                      className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                      className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                     />
                     <button
                       type="button"
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default function SettingsPage() {
                     className="sr-only"
                   />
                   <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${
-                    emailNotifications ? 'bg-indigo-600' : 'bg-slate-300'
+                    emailNotifications ? 'bg-blue-600' : 'bg-slate-300'
                   }`}>
                     <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${
                       emailNotifications ? 'translate-x-5' : 'translate-x-0.5'
@@ -377,7 +377,7 @@ export default function SettingsPage() {
                     className="sr-only"
                   />
                   <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${
-                    marketingEmails ? 'bg-indigo-600' : 'bg-slate-300'
+                    marketingEmails ? 'bg-blue-600' : 'bg-slate-300'
                   }`}>
                     <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${
                       marketingEmails ? 'translate-x-5' : 'translate-x-0.5'

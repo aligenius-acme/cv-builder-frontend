@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -125,9 +125,9 @@ export default function VersionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           <p className="text-slate-500">Loading version...</p>
         </div>
       </div>
@@ -211,7 +211,7 @@ export default function VersionDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Download Modal */}
         <DownloadModal
@@ -260,7 +260,7 @@ export default function VersionDetailPage() {
               Share
             </Button>
             <Button
-              variant="gradient"
+              variant="primary"
               size="lg"
               onClick={() => setShowDownloadModal(true)}
               leftIcon={<Download className="h-5 w-5" />}
@@ -304,9 +304,9 @@ export default function VersionDetailPage() {
 
         {/* Before/After Comparison Section */}
         {originalData && tailoredData && (
-          <div className="relative overflow-hidden rounded-2xl border border-cyan-200/50 bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/20 shadow-lg">
+          <div className="rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]">
             {/* Header with gradient */}
-            <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 p-6">
+            <div className="bg-blue-600 p-6">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
               <div className="relative flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -349,10 +349,10 @@ export default function VersionDetailPage() {
                   <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <button
                       onClick={() => toggleSection('summary')}
-                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition-colors"
+                      className="w-full flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600 shadow-lg">
                           <User className="h-5 w-5 text-white" />
                         </div>
                         <span className="font-semibold text-slate-900">Professional Summary</span>
@@ -378,7 +378,7 @@ export default function VersionDetailPage() {
                         </div>
                         {/* Arrow */}
                         <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
                             <ArrowRight className="h-5 w-5 text-white" />
                           </div>
                         </div>
@@ -403,10 +403,10 @@ export default function VersionDetailPage() {
                   <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <button
                       onClick={() => toggleSection('skills')}
-                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-purple-50 hover:from-violet-100 hover:to-purple-100 transition-colors"
+                      className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-600">
                           <Zap className="h-5 w-5 text-white" />
                         </div>
                         <span className="font-semibold text-slate-900">Key Skills</span>
@@ -482,10 +482,10 @@ export default function VersionDetailPage() {
                   <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <button
                       onClick={() => toggleSection('experience')}
-                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 transition-colors"
+                      className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-500/25">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-lg">
                           <Briefcase className="h-5 w-5 text-white" />
                         </div>
                         <span className="font-semibold text-slate-900">Professional Experience</span>
@@ -503,10 +503,10 @@ export default function VersionDetailPage() {
                             (o) => o.company === exp.company && o.title === exp.title
                           ) || originalData.experience?.[expIndex];
                           return (
-                            <div key={expIndex} className="rounded-lg border border-indigo-100 overflow-hidden">
-                              <div className="p-3 bg-gradient-to-r from-indigo-100 to-blue-100">
+                            <div key={expIndex} className="rounded-lg border border-blue-100 overflow-hidden">
+                              <div className="p-3 bg-blue-100">
                                 <h5 className="font-medium text-slate-900">{exp.title}</h5>
-                                <p className="text-sm text-indigo-600">{exp.company} {exp.dates && `• ${exp.dates}`}</p>
+                                <p className="text-sm text-blue-600">{exp.company} {exp.dates && `• ${exp.dates}`}</p>
                               </div>
                               <div className="grid md:grid-cols-2 gap-4 p-4">
                                 {/* Original Description */}
@@ -531,15 +531,15 @@ export default function VersionDetailPage() {
                                 </div>
                                 {/* Tailored Description */}
                                 <div className="relative">
-                                  <div className="absolute -top-2 left-4 px-2 py-0.5 bg-indigo-100 rounded text-xs font-medium text-indigo-700 uppercase tracking-wide">
+                                  <div className="absolute -top-2 left-4 px-2 py-0.5 bg-blue-100 rounded text-xs font-medium text-blue-700 uppercase tracking-wide">
                                     Optimized
                                   </div>
-                                  <div className="mt-2 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                                  <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                                     {exp.description && exp.description.length > 0 ? (
                                       <ul className="space-y-2">
                                         {exp.description.map((desc, j) => (
                                           <li key={j} className="flex items-start gap-2 text-xs text-slate-700">
-                                            <ChevronRight className="h-3 w-3 text-indigo-500 flex-shrink-0 mt-0.5" />
+                                            <ChevronRight className="h-3 w-3 text-blue-500 flex-shrink-0 mt-0.5" />
                                             <span>{desc}</span>
                                           </li>
                                         ))}
@@ -559,7 +559,7 @@ export default function VersionDetailPage() {
                 )}
 
                 {/* Info footer */}
-                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl border border-cyan-200/50">
+                <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-cyan-100 flex items-center justify-center">
                       <Lightbulb className="h-4 w-4 text-cyan-600" />
@@ -576,9 +576,9 @@ export default function VersionDetailPage() {
 
         {/* Changes Explanation */}
         {version.changesExplanation && (
-          <div className="relative overflow-hidden rounded-2xl border border-purple-200/50 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/20 shadow-lg">
+          <div className="rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]">
             {/* Header with gradient */}
-            <div className="relative bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 p-6">
+            <div className="bg-slate-900 p-6">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
               <div className="relative flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -617,7 +617,7 @@ export default function VersionDetailPage() {
                   </svg>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-fuchsia-50 rounded-xl p-6 border border-purple-200/50">
+                <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
                   <p className="text-slate-700 whitespace-pre-wrap leading-relaxed pl-8">
                     {version.changesExplanation}
                   </p>
@@ -625,7 +625,7 @@ export default function VersionDetailPage() {
               </div>
 
               {/* Info footer */}
-              <div className="mt-4 flex items-center gap-3 p-4 bg-gradient-to-r from-slate-50 to-purple-50/50 rounded-xl border border-slate-200/50">
+              <div className="mt-4 flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
                     <ListChecks className="h-4 w-4 text-purple-600" />
@@ -641,9 +641,9 @@ export default function VersionDetailPage() {
 
         {/* TruthGuard Warnings */}
         {version.truthGuardWarnings && version.truthGuardWarnings.length > 0 && (
-          <div className="relative overflow-hidden rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50 via-orange-50/50 to-yellow-50/30 shadow-lg">
+          <div className="rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]">
             {/* Header with gradient */}
-            <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 p-6">
+            <div className="bg-amber-600 p-6">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
               <div className="relative flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -700,7 +700,7 @@ export default function VersionDetailPage() {
                   switch (severity) {
                     case 'high':
                       return {
-                        bg: 'bg-gradient-to-r from-red-50 to-rose-50',
+                        bg: 'bg-red-50',
                         border: 'border-l-4 border-l-red-500 border border-red-200/50',
                         icon: AlertOctagon,
                         iconBg: 'bg-red-100',
@@ -710,7 +710,7 @@ export default function VersionDetailPage() {
                       };
                     case 'medium':
                       return {
-                        bg: 'bg-gradient-to-r from-amber-50 to-yellow-50',
+                        bg: 'bg-amber-50',
                         border: 'border-l-4 border-l-amber-500 border border-amber-200/50',
                         icon: AlertTriangle,
                         iconBg: 'bg-amber-100',
@@ -720,7 +720,7 @@ export default function VersionDetailPage() {
                       };
                     default:
                       return {
-                        bg: 'bg-gradient-to-r from-blue-50 to-sky-50',
+                        bg: 'bg-blue-50',
                         border: 'border-l-4 border-l-blue-500 border border-blue-200/50',
                         icon: Info,
                         iconBg: 'bg-blue-100',
@@ -772,7 +772,7 @@ export default function VersionDetailPage() {
 
             {/* Footer tip */}
             <div className="px-6 pb-6">
-              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl border border-slate-200/50">
+              <div className="flex items-center gap-3 p-4 bg-slate-100 rounded-xl border border-slate-200">
                 <Lightbulb className="h-5 w-5 text-amber-500 flex-shrink-0" />
                 <p className="text-sm text-slate-600">
                   <span className="font-medium text-slate-700">Pro tip:</span> Review each warning and verify the information before using this resume. Accuracy builds trust with employers.
@@ -784,9 +784,9 @@ export default function VersionDetailPage() {
 
         {/* Tailored Resume Content */}
         {version.tailoredData && (
-          <div className="relative overflow-hidden rounded-2xl border border-indigo-200/50 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 shadow-lg">
+          <div className="rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]">
             {/* Header with gradient */}
-            <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 p-6">
+            <div className="bg-blue-600 p-6">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
               <div className="relative flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -797,7 +797,7 @@ export default function VersionDetailPage() {
                     Tailored Resume Content
                     <Sparkles className="h-5 w-5 text-yellow-300" />
                   </h3>
-                  <p className="text-indigo-200 text-sm mt-1">
+                  <p className="text-blue-200 text-sm mt-1">
                     Your resume optimized for {version.jobTitle} at {version.companyName}
                   </p>
                 </div>
@@ -831,7 +831,7 @@ export default function VersionDetailPage() {
               {tailoredData?.summary && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600 shadow-lg">
                       <User className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -839,7 +839,7 @@ export default function VersionDetailPage() {
                       <p className="text-xs text-slate-500">Your tailored elevator pitch</p>
                     </div>
                   </div>
-                  <div className="relative bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-200/50">
+                  <div className="relative bg-emerald-50 rounded-xl p-5 border border-emerald-200">
                     <div className="absolute top-4 left-4 text-emerald-200">
                       <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
@@ -856,7 +856,7 @@ export default function VersionDetailPage() {
               {tailoredData?.skills && tailoredData.skills.length > 0 && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-600">
                       <Zap className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -864,7 +864,7 @@ export default function VersionDetailPage() {
                       <p className="text-xs text-slate-500">Highlighted competencies for this role</p>
                     </div>
                   </div>
-                  <div className="bg-gradient-to-r from-violet-50/50 to-purple-50/50 rounded-xl p-5 border border-violet-200/50">
+                  <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
                     <div className="flex flex-wrap gap-2">
                       {tailoredData.skills.map((skill: string, i: number) => (
                         <span
@@ -884,7 +884,7 @@ export default function VersionDetailPage() {
               {tailoredData?.experience && tailoredData.experience.length > 0 && (
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-500/25">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-lg">
                       <Briefcase className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -896,21 +896,21 @@ export default function VersionDetailPage() {
                     {tailoredData.experience.map((exp: any, i: number) => (
                       <div
                         key={i}
-                        className="relative bg-white rounded-xl p-5 border border-indigo-200/50 shadow-sm hover:shadow-md transition-shadow group"
+                        className="relative bg-white rounded-xl p-5 border border-blue-200/50 shadow-sm hover:shadow-md transition-shadow group"
                       >
                         {/* Position indicator */}
-                        <div className="absolute -left-px top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-violet-500 rounded-l-full" />
+                        <div className="absolute -left-px top-0 bottom-0 w-1 bg-blue-600 rounded-l-full" />
 
                         <div className="flex items-start gap-4">
-                          <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center group-hover:scale-105 transition-transform">
-                            <span className="text-lg font-bold bg-gradient-to-br from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                          <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <span className="text-lg font-bold text-blue-600">
                               {i + 1}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <h5 className="font-semibold text-slate-900 text-lg">{exp.title}</h5>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-indigo-600 font-medium">{exp.company}</span>
+                              <span className="text-blue-600 font-medium">{exp.company}</span>
                               {exp.dates && (
                                 <>
                                   <span className="text-slate-300">•</span>
@@ -922,7 +922,7 @@ export default function VersionDetailPage() {
                               <ul className="mt-4 space-y-2">
                                 {exp.description.map((desc: string, j: number) => (
                                   <li key={j} className="flex items-start gap-3 text-sm text-slate-600">
-                                    <ChevronRight className="h-4 w-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                                    <ChevronRight className="h-4 w-4 text-blue-400 flex-shrink-0 mt-0.5" />
                                     <span className="leading-relaxed">{desc}</span>
                                   </li>
                                 ))}
@@ -939,14 +939,14 @@ export default function VersionDetailPage() {
 
             {/* Footer */}
             <div className="px-6 pb-6">
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-100/50 to-purple-100/50 rounded-xl border border-indigo-200/50">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <div className="flex items-center gap-3">
-                  <Target className="h-5 w-5 text-indigo-600" />
+                  <Target className="h-5 w-5 text-blue-600" />
                   <p className="text-sm text-slate-600">
                     <span className="font-medium text-slate-700">Optimized for:</span> {version.jobTitle}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium">
+                <div className="flex items-center gap-2 text-sm text-blue-600 font-medium">
                   <TrendingUp className="h-4 w-4" />
                   ATS Score: {version.atsScore}%
                 </div>

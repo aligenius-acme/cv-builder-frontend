@@ -4,19 +4,19 @@ import { HTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'gradient';
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info';
   size?: 'sm' | 'md' | 'lg';
 }
 
 const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = 'default', size = 'md', ...props }, ref) => {
     const variants = {
-      default: 'bg-slate-100 text-slate-700 border-slate-200',
-      success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      warning: 'bg-amber-50 text-amber-700 border-amber-200',
-      error: 'bg-red-50 text-red-700 border-red-200',
-      info: 'bg-blue-50 text-blue-700 border-blue-200',
-      gradient: 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent',
+      default: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700',
+      primary: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800',
+      success: 'bg-[var(--success-bg)] text-[var(--success-text)] border-[var(--success-border)]',
+      warning: 'bg-[var(--warning-bg)] text-[var(--warning-text)] border-[var(--warning-border)]',
+      error: 'bg-[var(--error-bg)] text-[var(--error-text)] border-[var(--error-border)]',
+      info: 'bg-[var(--info-bg)] text-[var(--info-text)] border-[var(--info-border)]',
     };
 
     const sizes = {

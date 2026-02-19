@@ -42,11 +42,11 @@ function VerifyEmailContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Verifying Email</h1>
             <p className="text-slate-500">Please wait while we verify your email address...</p>
@@ -58,10 +58,10 @@ function VerifyEmailContent() {
 
   if (status === 'no-token') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-6">
               <Mail className="h-8 w-8 text-amber-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">No Verification Token</h1>
@@ -81,16 +81,16 @@ function VerifyEmailContent() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Email Verified!</h1>
             <p className="text-slate-500 mb-6">{message}</p>
             <Link href="/resumes">
-              <Button variant="gradient" className="w-full" rightIcon={<ArrowRight className="h-4 w-4" />}>
+              <Button variant="primary" className="w-full" rightIcon={<ArrowRight className="h-4 w-4" />}>
                 Continue to Dashboard
               </Button>
             </Link>
@@ -101,10 +101,10 @@ function VerifyEmailContent() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-6">
             <XCircle className="h-8 w-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Verification Failed</h1>
@@ -129,10 +129,10 @@ export default function VerifyEmailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
           <div className="w-full max-w-md">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mx-auto" />
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin mx-auto" />
             </div>
           </div>
         </div>

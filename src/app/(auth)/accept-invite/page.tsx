@@ -58,11 +58,11 @@ function AcceptInviteContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Loading...</h1>
             <p className="text-slate-500">Please wait...</p>
@@ -74,10 +74,10 @@ function AcceptInviteContent() {
 
   if (status === 'no-token') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-6">
               <Building className="h-8 w-8 text-amber-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Invalid Invitation</h1>
@@ -97,11 +97,11 @@ function AcceptInviteContent() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <LogIn className="h-8 w-8 text-indigo-600" />
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <LogIn className="h-8 w-8 text-blue-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Sign In Required</h1>
             <p className="text-slate-500 mb-6">
@@ -109,7 +109,7 @@ function AcceptInviteContent() {
             </p>
             <div className="space-y-3">
               <Link href={`/login?redirect=/accept-invite?token=${token}`}>
-                <Button variant="gradient" className="w-full">
+                <Button variant="primary" className="w-full">
                   Sign In
                 </Button>
               </Link>
@@ -127,10 +127,10 @@ function AcceptInviteContent() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-8 w-8 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome!</h1>
@@ -138,7 +138,7 @@ function AcceptInviteContent() {
               You&apos;ve successfully joined <strong>{orgName}</strong>.
             </p>
             <Link href="/organization">
-              <Button variant="gradient" className="w-full">
+              <Button variant="primary" className="w-full">
                 View Organization
               </Button>
             </Link>
@@ -150,10 +150,10 @@ function AcceptInviteContent() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-6">
               <XCircle className="h-8 w-8 text-red-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Invitation Failed</h1>
@@ -171,10 +171,10 @@ function AcceptInviteContent() {
 
   // Ready to accept
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/30">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+          <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Building className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Organization Invitation</h1>
@@ -182,7 +182,7 @@ function AcceptInviteContent() {
             You&apos;ve been invited to join an organization. Click below to accept.
           </p>
           <Button
-            variant="gradient"
+            variant="primary"
             className="w-full"
             onClick={handleAccept}
             isLoading={isSubmitting}
@@ -199,10 +199,10 @@ export default function AcceptInvitePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-mesh flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
           <div className="w-full max-w-md">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 text-center">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mx-auto" />
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20 p-8 text-center">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin mx-auto" />
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -177,14 +177,13 @@ export default function ABTestingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <PageHeader
           icon={<FlaskConical className="h-5 w-5" />}
           label="Resume Optimization"
           title="A/B Testing"
           description="Test different resume versions to see which performs better. Track views, downloads, and response rates to optimize your job applications."
-          gradient="cyan"
           actions={
             <Button
               variant="secondary"
@@ -204,13 +203,13 @@ export default function ABTestingPage() {
             {isLoading ? (
               <Card variant="elevated">
                 <CardContent className="py-8 text-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mx-auto" />
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
                 </CardContent>
               </Card>
             ) : tests.length === 0 ? (
               <Card variant="elevated">
                 <CardContent className="py-12 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <FlaskConical className="h-8 w-8 text-blue-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">No tests yet</h3>
@@ -229,7 +228,7 @@ export default function ABTestingPage() {
                     key={test.id}
                     variant={selectedTest?.id === test.id ? 'elevated' : 'default'}
                     hover
-                    className={`cursor-pointer ${selectedTest?.id === test.id ? 'ring-2 ring-indigo-500' : ''}`}
+                    className={`cursor-pointer ${selectedTest?.id === test.id ? 'ring-2 ring-blue-500' : ''}`}
                     onClick={() => setSelectedTest(test)}
                   >
                     <CardContent className="p-4">
@@ -264,7 +263,7 @@ export default function ABTestingPage() {
             {!selectedTest ? (
               <Card variant="elevated">
                 <CardContent className="py-16 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-6">
                     <BarChart3 className="h-10 w-10 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">
@@ -511,7 +510,7 @@ export default function ABTestingPage() {
         {/* Create Test Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl">
+            <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl">
               <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-slate-900">Create A/B Test</h2>

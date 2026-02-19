@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -185,7 +185,7 @@ export default function JobBoardPage() {
             <span className="font-medium">Added to Job Tracker!</span>
             <button
               onClick={() => router.push('/job-tracker')}
-              className="text-sm text-indigo-600 hover:text-indigo-700 text-left mt-1"
+              className="text-sm text-blue-600 hover:text-blue-700 text-left mt-1"
             >
               View in Tracker →
             </button>
@@ -321,7 +321,7 @@ export default function JobBoardPage() {
   const activeFiltersCount = [experienceLevel, jobType, remoteOnly].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Header */}
         <PageHeader
@@ -329,7 +329,6 @@ export default function JobBoardPage() {
           label="Job Discovery"
           title="Job Board"
           description="Find and apply to jobs tailored to your profile. Search thousands of opportunities and get AI-powered recommendations."
-          gradient="slate"
         />
 
         {/* Tabs */}
@@ -359,7 +358,7 @@ export default function JobBoardPage() {
                     onChange={(e) => setKeywords(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="Job title, skills, or keywords"
-                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex-1 relative">
@@ -370,7 +369,7 @@ export default function JobBoardPage() {
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="City, state, or 'remote'"
-                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -383,13 +382,13 @@ export default function JobBoardPage() {
                   >
                     Filters
                     {activeFiltersCount > 0 && (
-                      <Badge variant="gradient" size="sm" className="ml-2">
+                      <Badge variant="primary" size="sm" className="ml-2">
                         {activeFiltersCount}
                       </Badge>
                     )}
                   </Button>
                   <Button
-                    variant="gradient"
+                    variant="primary"
                     size="lg"
                     onClick={handleSearch}
                     disabled={isSearching}
@@ -411,7 +410,7 @@ export default function JobBoardPage() {
                       <select
                         value={experienceLevel}
                         onChange={(e) => setExperienceLevel(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                       >
                         <option value="" className="text-slate-500">Any level</option>
                         <option value="entry">Entry Level</option>
@@ -428,7 +427,7 @@ export default function JobBoardPage() {
                       <select
                         value={jobType}
                         onChange={(e) => setJobType(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                       >
                         <option value="" className="text-slate-500">Any type</option>
                         <option value="full-time">Full-time</option>
@@ -443,7 +442,7 @@ export default function JobBoardPage() {
                           type="checkbox"
                           checked={remoteOnly}
                           onChange={(e) => setRemoteOnly(e.target.checked)}
-                          className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                          className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                         />
                         <div>
                           <span className="text-sm font-medium text-slate-900">Remote Only</span>
@@ -477,8 +476,8 @@ export default function JobBoardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                    <div className="p-1.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg">
-                      <Sparkles className="h-4 w-4 text-indigo-600" />
+                    <div className="p-1.5 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                      <Sparkles className="h-4 w-4 text-blue-600" />
                     </div>
                     Recommended for You
                   </h2>
@@ -505,7 +504,6 @@ export default function JobBoardPage() {
                     icon={<Search className="h-10 w-10 text-slate-400" />}
                     title="Search for Jobs"
                     description="Enter keywords above to discover thousands of opportunities matching your skills."
-                    gradient="slate"
                   />
                 )}
               </div>
@@ -542,7 +540,6 @@ export default function JobBoardPage() {
                 icon={<Search className="h-10 w-10 text-slate-400" />}
                 title="No Jobs Found"
                 description="Try different keywords or adjust your filters to find more opportunities."
-                gradient="slate"
                 action={
                   <Button variant="outline" onClick={clearFilters}>
                     Clear Filters
@@ -568,7 +565,7 @@ export default function JobBoardPage() {
             ) : (
               <Card variant="elevated" className="h-full min-h-[500px]">
                 <CardContent className="h-full flex flex-col items-center justify-center text-center p-12">
-                  <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-gray-100 rounded-3xl flex items-center justify-center mb-6">
+                  <div className="w-24 h-24 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mb-6">
                     <Briefcase className="h-12 w-12 text-slate-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">Select a Job</h3>
@@ -599,12 +596,12 @@ export default function JobBoardPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                      <div className="p-1.5 bg-gradient-to-br from-pink-100 to-rose-100 rounded-lg">
+                      <div className="p-1.5 bg-rose-50 rounded-lg">
                         <Heart className="h-4 w-4 text-pink-600" />
                       </div>
                       Your Saved Jobs
                     </h2>
-                    <Badge variant="gradient" size="sm">{savedJobsCount} saved</Badge>
+                    <Badge variant="primary" size="sm">{savedJobsCount} saved</Badge>
                   </div>
                   <div className="space-y-3">
                     {savedJobsList.map((job, index) => (
@@ -626,9 +623,8 @@ export default function JobBoardPage() {
                   icon={<Heart className="h-10 w-10 text-slate-400" />}
                   title="No Saved Jobs"
                   description="Save jobs you're interested in to review and apply later. Click the bookmark icon on any job to save it."
-                  gradient="violet"
                   action={
-                    <Button variant="gradient" onClick={() => setActiveTab('search')}>
+                    <Button variant="primary" onClick={() => setActiveTab('search')}>
                       Browse Jobs
                     </Button>
                   }
@@ -652,7 +648,7 @@ export default function JobBoardPage() {
               ) : (
                 <Card variant="elevated" className="h-full min-h-[500px]">
                   <CardContent className="h-full flex flex-col items-center justify-center text-center p-12">
-                    <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-rose-100 rounded-3xl flex items-center justify-center mb-6">
+                    <div className="w-24 h-24 bg-rose-50 rounded-xl flex items-center justify-center mb-6">
                       <Heart className="h-12 w-12 text-pink-400" />
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Select a Saved Job</h3>
@@ -727,7 +723,7 @@ function SavedJobCard({
               <div className="flex items-center gap-1">
                 {isTracked ? (
                   <Link href="/job-tracker">
-                    <Badge variant="info" size="sm" className="cursor-pointer hover:bg-indigo-200">
+                    <Badge variant="info" size="sm" className="cursor-pointer hover:bg-blue-200">
                       <ListChecks className="h-3 w-3 mr-1" />
                       In Tracker
                     </Badge>
@@ -809,7 +805,7 @@ function CompanyLogo({ company, size = 48 }: { company: string; size?: number })
   if (imgError || !domain) {
     return (
       <div
-        className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0 shadow-sm"
+        className="rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold flex-shrink-0 shadow-sm"
         style={{ width: size, height: size, fontSize: size * 0.35 }}
       >
         {initials}
@@ -850,7 +846,7 @@ function JobCard({
       hover
       className={cn(
         'cursor-pointer transition-all duration-200 group',
-        isSelected && 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-500/10'
+        isSelected && 'ring-2 ring-blue-500 shadow-lg'
       )}
       onClick={onSelect}
       style={{ animationDelay: `${index * 50}ms` }}
@@ -861,7 +857,7 @@ function JobCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
                   {job.title}
                 </h3>
                 <p className="text-sm text-slate-600 flex items-center gap-1 mt-0.5">
@@ -874,7 +870,7 @@ function JobCard({
                 className={cn(
                   'p-2 rounded-lg transition-all flex-shrink-0',
                   isSaved
-                    ? 'bg-indigo-100 text-indigo-600'
+                    ? 'bg-blue-100 text-blue-600'
                     : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'
                 )}
               >
@@ -937,11 +933,11 @@ function JobDetailsPanel({
     <Card variant="elevated" className="sticky top-6">
       <CardContent className="p-0">
         {/* Header */}
-        <div className="p-6 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white">
+        <div className="p-6 border-b border-slate-100 bg-slate-50">
           {/* Mobile back button */}
           <button
             onClick={onBack}
-            className="lg:hidden flex items-center gap-1 text-sm text-indigo-600 mb-4 hover:text-indigo-700 transition-colors"
+            className="lg:hidden flex items-center gap-1 text-sm text-blue-600 mb-4 hover:text-blue-700 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
             Back to results
@@ -991,7 +987,7 @@ function JobDetailsPanel({
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 mt-6">
             <Button
-              variant="gradient"
+              variant="primary"
               size="lg"
               className="flex-1"
               leftIcon={<ExternalLink className="h-4 w-4" />}
@@ -1034,7 +1030,7 @@ function JobDetailsPanel({
         <div className="p-6 max-h-[600px] overflow-y-auto">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 text-indigo-600 animate-spin mb-3" />
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin mb-3" />
               <p className="text-sm text-slate-500">Loading job details...</p>
             </div>
           ) : (
@@ -1042,8 +1038,8 @@ function JobDetailsPanel({
               {/* Description */}
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <div className="p-1.5 bg-indigo-100 rounded-lg">
-                    <FileText className="h-4 w-4 text-indigo-600" />
+                  <div className="p-1.5 bg-blue-100 rounded-lg">
+                    <FileText className="h-4 w-4 text-blue-600" />
                   </div>
                   About this Role
                 </h3>
@@ -1064,7 +1060,7 @@ function JobDetailsPanel({
                   <ul className="space-y-2">
                     {details.responsibilities.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-3 text-slate-700">
-                        <ArrowRight className="h-4 w-4 text-indigo-500 mt-1 flex-shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -1142,7 +1138,7 @@ function JobDetailsPanel({
                     href={job.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+                    className="text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
                   >
                     View original posting
                     <ExternalLink className="h-3.5 w-3.5" />
