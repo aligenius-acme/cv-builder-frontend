@@ -1205,6 +1205,7 @@ class ApiClient {
     interviewDetails?: string;
     candidateName: string;
     keyPoints?: string[];
+    resumeId?: string;
   }) {
     const response = await this.client.post<ApiResponse<FollowUpEmailResult>>(
       '/ai-features/follow-up-email',
@@ -1225,6 +1226,7 @@ class ApiClient {
     commonGround?: string[];
     targetRole?: string;
     specificAsk?: string;
+    resumeId?: string;
   }) {
     const response = await this.client.post<ApiResponse<NetworkingMessageResult>>(
       '/ai-features/networking-message',

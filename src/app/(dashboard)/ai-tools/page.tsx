@@ -144,8 +144,8 @@ export default function AIToolsPage() {
           {activeTab === 'job-match' && <JobMatchTab resumes={resumes} savedJobs={savedJobs} isLoadingResumes={isLoadingResumes} isLoadingSavedJobs={isLoadingSavedJobs} />}
           {activeTab === 'quantifier' && <AchievementQuantifierTab resumes={resumes} isLoadingResumes={isLoadingResumes} />}
           {activeTab === 'weakness' && <WeaknessDetectorTab resumes={resumes} savedJobs={savedJobs} isLoadingResumes={isLoadingResumes} isLoadingSavedJobs={isLoadingSavedJobs} />}
-          {activeTab === 'follow-up' && <FollowUpEmailTab savedJobs={savedJobs} isLoadingSavedJobs={isLoadingSavedJobs} />}
-          {activeTab === 'networking' && <NetworkingMessageTab />}
+          {activeTab === 'follow-up' && <FollowUpEmailTab resumes={resumes} savedJobs={savedJobs} isLoadingResumes={isLoadingResumes} isLoadingSavedJobs={isLoadingSavedJobs} />}
+          {activeTab === 'networking' && <NetworkingMessageTab resumes={resumes} isLoadingResumes={isLoadingResumes} />}
         </div>
       </div>
     </div>
@@ -1585,7 +1585,7 @@ function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResumes, isLoadingSa
 }
 
 // Follow-up Email Tab
-function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApplication[]; isLoadingSavedJobs: boolean }) {
+function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes, isLoadingSavedJobs }: { resumes: any[]; savedJobs: JobApplication[]; isLoadingResumes: boolean; isLoadingSavedJobs: boolean }) {
   const [emailType, setEmailType] = useState<FollowUpType>('thank_you');
   const [formData, setFormData] = useState({
     candidateName: '',
@@ -1600,6 +1600,9 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<FollowUpEmailResult | null>(null);
 
+  // Resume selection
+  const [selectedResumeId, setSelectedResumeId] = useState('');
+
   // Job source state
   const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('saved');
   const [selectedJobId, setSelectedJobId] = useState('');
@@ -1612,6 +1615,14 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
     { value: 'after_rejection', label: 'After Rejection', description: 'Gracious response to rejection' },
     { value: 'networking', label: 'Networking', description: 'After informational interview' },
   ];
+
+  const handleSelectResume = (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    const resume = resumes.find((r) => r.id === resumeId);
+    if (resume?.parsedData?.contact?.name && !formData.candidateName) {
+      setFormData((prev) => ({ ...prev, candidateName: resume.parsedData.contact.name }));
+    }
+  };
 
   const handleSelectSavedJob = (jobId: string) => {
     const job = savedJobs.find((j) => j.id === jobId);
@@ -1646,6 +1657,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
         interviewDate: formData.interviewDate || undefined,
         interviewDetails: formData.interviewDetails || undefined,
         keyPoints: formData.keyPoints ? formData.keyPoints.split(',').map((k) => k.trim()) : undefined,
+        resumeId: selectedResumeId || undefined,
       });
       if (response.success && response.data) {
         setResult(response.data);
@@ -1703,6 +1715,29 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
             <CardTitle className="text-base">Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Resume Selector */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-purple-500" />Your Resume (optional — personalizes the email)</span>
+              </label>
+              {isLoadingResumes ? (
+                <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl text-slate-500 text-sm"><Loader2 className="h-4 w-4 animate-spin" />Loading...</div>
+              ) : resumes.length === 0 ? (
+                <p className="text-sm text-slate-500 italic">No resumes uploaded yet.</p>
+              ) : (
+                <select
+                  value={selectedResumeId}
+                  onChange={(e) => handleSelectResume(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-slate-900"
+                >
+                  <option value="">— Select a resume (optional) —</option>
+                  {resumes.map((r) => (
+                    <option key={r.id} value={r.id}>{r.title || r.originalFileName}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
             {/* Job Source Toggle */}
             <SegmentedControl
               options={[
@@ -1963,7 +1998,7 @@ function FollowUpEmailTab({ savedJobs, isLoadingSavedJobs }: { savedJobs: JobApp
 }
 
 // Networking Message Tab
-function NetworkingMessageTab() {
+function NetworkingMessageTab({ resumes, isLoadingResumes }: { resumes: any[]; isLoadingResumes: boolean }) {
   const [platform, setPlatform] = useState<NetworkingPlatform>('linkedin');
   const [purpose, setPurpose] = useState<NetworkingPurpose>('informational_interview');
   const [formData, setFormData] = useState({
@@ -1978,6 +2013,7 @@ function NetworkingMessageTab() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<NetworkingMessageResult | null>(null);
+  const [selectedResumeId, setSelectedResumeId] = useState('');
 
   const platforms: { value: NetworkingPlatform; label: string }[] = [
     { value: 'linkedin', label: 'LinkedIn' },
@@ -1992,6 +2028,22 @@ function NetworkingMessageTab() {
     { value: 'reconnection', label: 'Reconnection' },
     { value: 'cold_outreach', label: 'Cold Outreach' },
   ];
+
+  const handleSelectResume = (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    const resume = resumes.find((r) => r.id === resumeId);
+    if (resume?.parsedData) {
+      const pd = resume.parsedData;
+      const name = pd.contact?.name || '';
+      const summary = pd.summary || '';
+      const topRole = pd.experience?.[0];
+      const roleDesc = topRole ? `${topRole.title || topRole.position} at ${topRole.company}` : '';
+      const background = summary || roleDesc || '';
+      if (name && !formData.senderName) setFormData((prev) => ({ ...prev, senderName: name }));
+      if (background && !formData.senderBackground) setFormData((prev) => ({ ...prev, senderBackground: background.slice(0, 200) }));
+      toast.success('Resume loaded — name and background pre-filled');
+    }
+  };
 
   const handleGenerate = async () => {
     if (!formData.senderName || !formData.senderBackground || !formData.recipientName || !formData.recipientTitle || !formData.recipientCompany) {
@@ -2012,6 +2064,7 @@ function NetworkingMessageTab() {
         targetRole: formData.targetRole || undefined,
         commonGround: formData.commonGround ? formData.commonGround.split(',').map((g) => g.trim()) : undefined,
         specificAsk: formData.specificAsk || undefined,
+        resumeId: selectedResumeId || undefined,
       });
       if (response.success && response.data) {
         setResult(response.data);
@@ -2082,6 +2135,28 @@ function NetworkingMessageTab() {
             <CardTitle className="text-base">Your Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Resume selector — auto-fills name + background */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-indigo-500" />Load from Resume (auto-fills your info)</span>
+              </label>
+              {isLoadingResumes ? (
+                <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl text-slate-500 text-sm"><Loader2 className="h-4 w-4 animate-spin" />Loading...</div>
+              ) : resumes.length === 0 ? (
+                <p className="text-sm text-slate-500 italic">No resumes uploaded yet.</p>
+              ) : (
+                <select
+                  value={selectedResumeId}
+                  onChange={(e) => handleSelectResume(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900"
+                >
+                  <option value="">— Select a resume to auto-fill —</option>
+                  {resumes.map((r) => (
+                    <option key={r.id} value={r.id}>{r.title || r.originalFileName}</option>
+                  ))}
+                </select>
+              )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Your Name *</label>
               <input
