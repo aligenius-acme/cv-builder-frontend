@@ -72,7 +72,7 @@ export default function TemplateCard({
           <>
             {/* Fallback color preview with pattern */}
             <div
-              className="absolute inset-0 bg-gradient-to-br"
+              className="absolute inset-0 bg-blue-600"
               style={{
                 backgroundImage: `linear-gradient(135deg, ${template.colorHex || '#1e3a5f'} 0%, ${template.colorHex || '#1e3a5f'}dd 100%)`
               }}

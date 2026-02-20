@@ -852,7 +852,7 @@ export default function InterviewPrepPage() {
 
                 {/* Scoring Rubric Panel */}
                 {scoringRubricModal.isOpen && currentQuestion?.scoringRubric && (
-                  <div className="p-4 bg-gradient-to-r from-green-50 via-amber-50 to-red-50 rounded-xl border border-slate-200 mb-4">
+                  <div className="p-4 bg-slate-50 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-700 mb-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Award className="h-4 w-4 text-slate-600" />
                       <h4 className="font-medium text-slate-900">Self-Evaluation Guide</h4>

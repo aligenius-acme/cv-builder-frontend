@@ -85,9 +85,9 @@ export default function ATSSimulator({
   };
 
   const getPassStatus = (score: number) => {
-    if (score >= 75) return { status: 'LIKELY TO PASS', icon: Shield, color: 'emerald', bg: 'from-emerald-500 to-green-600' };
-    if (score >= 60) return { status: 'BORDERLINE', icon: AlertCircle, color: 'amber', bg: 'from-amber-500 to-orange-500' };
-    return { status: 'AT RISK', icon: XCircle, color: 'red', bg: 'from-red-500 to-rose-600' };
+    if (score >= 75) return { status: 'LIKELY TO PASS', icon: Shield, color: 'emerald', bg: 'bg-emerald-600' };
+    if (score >= 60) return { status: 'BORDERLINE', icon: AlertCircle, color: 'amber', bg: 'bg-amber-600' };
+    return { status: 'AT RISK', icon: XCircle, color: 'red', bg: 'bg-red-600' };
   };
 
   if (!analysis) {
@@ -157,10 +157,10 @@ export default function ATSSimulator({
       {/* Hero Score Section */}
       <Card variant="elevated" className="overflow-hidden">
         <div className={cn(
-          "relative bg-gradient-to-br p-8",
-          analysis.score >= 75 ? "from-emerald-600 via-teal-600 to-cyan-600" :
-          analysis.score >= 60 ? "from-amber-500 via-orange-500 to-yellow-500" :
-          "from-red-500 via-rose-500 to-pink-500"
+          "relative p-8",
+          analysis.score >= 75 ? "bg-emerald-600" :
+          analysis.score >= 60 ? "bg-amber-600" :
+          "bg-red-600"
         )}>
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
@@ -332,9 +332,9 @@ export default function ATSSimulator({
                   <div
                     className={cn(
                       "h-full rounded-full transition-all duration-700",
-                      score >= 80 ? "bg-gradient-to-r from-emerald-400 to-emerald-600" :
-                      score >= 60 ? "bg-gradient-to-r from-amber-400 to-amber-600" :
-                      "bg-gradient-to-r from-red-400 to-red-600"
+                      score >= 80 ? "bg-emerald-600" :
+                      score >= 60 ? "bg-amber-600" :
+                      "bg-red-600"
                     )}
                     style={{ width: `${score}%` }}
                   />
@@ -766,7 +766,7 @@ export default function ATSSimulator({
               const priorityConfig = [
                 { bg: 'bg-blue-600', ring: 'ring-blue-500/20', border: 'border-blue-200', icon: Star, label: 'High Impact' },
                 { bg: 'bg-purple-600', ring: 'ring-purple-500/20', border: 'border-purple-200', icon: Zap, label: 'Quick Win' },
-                { bg: 'from-pink-500 to-rose-500', ring: 'ring-pink-500/20', border: 'border-pink-200', icon: Target, label: 'Recommended' },
+                { bg: 'bg-pink-600', ring: 'ring-pink-500/20', border: 'border-pink-200', icon: Target, label: 'Recommended' },
               ];
               const config = priorityConfig[i % 3];
               const PriorityIcon = config.icon;

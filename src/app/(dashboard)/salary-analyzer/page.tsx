@@ -458,7 +458,7 @@ export default function SalaryAnalyzerPage() {
                 <Card variant="elevated">
                   <CardContent className="p-6">
                     <h3 className="text-lg font-semibold text-slate-900 mb-4">Salary Range</h3>
-                    <div className="relative h-8 bg-gradient-to-r from-red-200 via-amber-200 via-green-200 to-green-300 rounded-full mb-6">
+                    <div className="relative h-8 bg-slate-200 dark:bg-zinc-700 rounded-full mb-6">
                       <div className="absolute top-full mt-1 text-xs text-slate-500" style={{ left: '0%' }}>{formatCurrency(analysis.salaryRange.min)}</div>
                       <div className="absolute top-full mt-1 text-xs text-slate-500" style={{ left: '50%', transform: 'translateX(-50%)' }}>{formatCurrency(analysis.salaryRange.median)}</div>
                       <div className="absolute top-full mt-1 text-xs text-slate-500" style={{ right: '0%' }}>{formatCurrency(analysis.salaryRange.max)}</div>

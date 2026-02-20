@@ -31,7 +31,7 @@ const categoryConfig: Record<string, { icon: React.ReactNode; label: string; col
   content: {
     icon: <FileText className="h-4 w-4" />,
     label: 'Content Quality',
-    color: 'from-blue-500 to-blue-600',
+    color: 'bg-blue-600',
   },
   formatting: {
     icon: <Type className="h-4 w-4" />,
@@ -41,17 +41,17 @@ const categoryConfig: Record<string, { icon: React.ReactNode; label: string; col
   keywords: {
     icon: <Search className="h-4 w-4" />,
     label: 'Keywords',
-    color: 'from-amber-500 to-amber-600',
+    color: 'bg-amber-600',
   },
   impact: {
     icon: <TrendingUp className="h-4 w-4" />,
     label: 'Impact',
-    color: 'from-green-500 to-green-600',
+    color: 'bg-green-600',
   },
   completeness: {
     icon: <CheckCircle className="h-4 w-4" />,
     label: 'Completeness',
-    color: 'from-pink-500 to-pink-600',
+    color: 'bg-pink-600',
   },
 };
 
