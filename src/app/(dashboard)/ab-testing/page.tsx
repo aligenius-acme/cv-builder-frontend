@@ -1,6 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
+import { useModal } from '@/hooks/useModal';
+import { useFetchData } from '@/hooks/useFetchData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -33,11 +35,13 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { AB_TEST_STATUS_CONFIG } from '@/lib/colors';
 
 export default function ABTestingPage() {
-  const [tests, setTests] = useState<ABTest[]>([]);
+  const { data: tests, isLoading, setData: setTests, refetch: loadTests } = useFetchData<ABTest[]>({
+    fetchFn: () => api.getABTests(),
+    errorMessage: 'Failed to load A/B tests',
+  });
   const [selectedTest, setSelectedTest] = useState<ABTest | null>(null);
   const [analytics, setAnalytics] = useState<ABTestAnalytics | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const createModal = useModal();
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   // Create form state
@@ -51,28 +55,10 @@ export default function ABTestingPage() {
   });
 
   useEffect(() => {
-    loadTests();
-  }, []);
-
-  useEffect(() => {
     if (selectedTest) {
       loadAnalytics(selectedTest.id);
     }
   }, [selectedTest]);
-
-  const loadTests = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.getABTests();
-      if (response.success && response.data) {
-        setTests(response.data);
-      }
-    } catch (error) {
-      toast.error('Failed to load A/B tests');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const loadAnalytics = async (testId: string) => {
     try {
@@ -81,7 +67,6 @@ export default function ABTestingPage() {
         setAnalytics(response.data);
       }
     } catch (error) {
-      console.error('Failed to load analytics:', error);
     }
   };
 
@@ -102,8 +87,8 @@ export default function ABTestingPage() {
       });
 
       if (response.success && response.data) {
-        setTests([response.data, ...tests]);
-        setShowCreateModal(false);
+        setTests([response.data, ...(tests || [])]);
+        createModal.close();
         setNewTest({
           name: '',
           description: '',
@@ -124,7 +109,7 @@ export default function ABTestingPage() {
       const response = await api.updateABTestStatus(testId, status);
       if (response.success && response.data) {
         const updatedTest = response.data;
-        setTests(tests.map((t) => (t.id === testId ? updatedTest : t)));
+        setTests((tests || []).map((t) => (t.id === testId ? updatedTest : t)));
         if (selectedTest?.id === testId) {
           setSelectedTest(updatedTest);
         }
@@ -140,7 +125,7 @@ export default function ABTestingPage() {
 
     try {
       await api.deleteABTest(testId);
-      setTests(tests.filter((t) => t.id !== testId));
+      setTests((tests || []).filter((t) => t.id !== testId));
       if (selectedTest?.id === testId) {
         setSelectedTest(null);
         setAnalytics(null);
@@ -159,7 +144,7 @@ export default function ABTestingPage() {
         [field]: value,
       });
       await loadTests();
-      const updated = tests.find((t) => t.id === selectedTest.id);
+      const updated = tests?.find((t) => t.id === selectedTest.id);
       if (updated) setSelectedTest(updated);
       await loadAnalytics(selectedTest.id);
       toast.success('Metrics updated');
@@ -189,7 +174,7 @@ export default function ABTestingPage() {
               variant="secondary"
               size="lg"
               leftIcon={<Plus className="h-5 w-5" />}
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => createModal.open()}
             >
               Create Test
             </Button>
@@ -206,7 +191,7 @@ export default function ABTestingPage() {
                   <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
                 </CardContent>
               </Card>
-            ) : tests.length === 0 ? (
+            ) : !tests || tests.length === 0 ? (
               <Card variant="elevated">
                 <CardContent className="py-12 text-center">
                   <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -216,7 +201,7 @@ export default function ABTestingPage() {
                   <p className="text-slate-500 text-sm mb-4">
                     Create your first A/B test to start optimizing
                   </p>
-                  <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                  <Button variant="primary" onClick={() => createModal.open()}>
                     Create Test
                   </Button>
                 </CardContent>
@@ -508,13 +493,13 @@ export default function ABTestingPage() {
         </div>
 
         {/* Create Test Modal */}
-        {showCreateModal && (
+        {createModal.isOpen && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl">
               <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-slate-900">Create A/B Test</h2>
-                  <button onClick={() => setShowCreateModal(false)}>
+                  <button onClick={() => createModal.close()}>
                     <X className="h-6 w-6 text-slate-400 hover:text-slate-600" />
                   </button>
                 </div>
@@ -629,7 +614,7 @@ export default function ABTestingPage() {
                 </div>
               </div>
               <div className="p-6 border-t border-slate-200 flex justify-end gap-3">
-                <Button variant="ghost" onClick={() => setShowCreateModal(false)}>
+                <Button variant="ghost" onClick={() => createModal.close()}>
                   Cancel
                 </Button>
                 <Button variant="primary" onClick={createTest}>

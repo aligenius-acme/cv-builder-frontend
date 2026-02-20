@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
+import ScoreCircle from '@/components/ui/ScoreCircle';
 import {
   ArrowLeft,
   GitCompare,
@@ -203,7 +203,7 @@ export default function CompareVersionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
-                    <ATSScoreCircle score={version1.atsScore} size="sm" />
+                    <ScoreCircle score={version1.atsScore} size="sm" />
                     <div>
                       <p className="text-sm text-slate-500">ATS Score</p>
                       <p className="text-2xl font-bold text-slate-900">{version1.atsScore}%</p>
@@ -226,7 +226,7 @@ export default function CompareVersionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
-                    <ATSScoreCircle score={version2.atsScore} size="sm" />
+                    <ScoreCircle score={version2.atsScore} size="sm" />
                     <div>
                       <p className="text-sm text-slate-500">ATS Score</p>
                       <p className="text-2xl font-bold text-slate-900">{version2.atsScore}%</p>

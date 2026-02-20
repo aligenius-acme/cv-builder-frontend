@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -35,7 +35,9 @@ import {
 } from 'lucide-react';
 import api, { JobApplication, JobActivity } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { formatDate, getErrorMessage } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { useFetchData } from '@/hooks/useFetchData';
+import { useModal } from '@/hooks/useModal';
 
 type ApplicationStatus = JobApplication['status'];
 
@@ -53,36 +55,28 @@ const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: string; b
 const VISIBLE_COLUMNS: ApplicationStatus[] = ['WISHLIST', 'APPLIED', 'SCREENING', 'INTERVIEWING', 'OFFER'];
 
 export default function JobTrackerPage() {
-  const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [grouped, setGrouped] = useState<Record<string, JobApplication[]>>({});
-  const [stats, setStats] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showDetailsPanel, setShowDetailsPanel] = useState(false);
+  // Use useFetchData hook - replaces 20+ lines!
+  const { data: jobData, isLoading, refetch } = useFetchData<{
+    applications: JobApplication[];
+    grouped: Record<string, JobApplication[]>;
+    stats: any;
+  }>({
+    fetchFn: () => api.getJobApplications(),
+    errorMessage: 'Failed to load applications',
+  });
+
+  const applications = jobData?.applications || [];
+  const grouped = jobData?.grouped || {};
+  const stats = jobData?.stats || null;
+  const loadApplications = useCallback(() => refetch(), [refetch]);
+
+  const addModal = useModal();
+  const detailsPanel = useModal();
   const [selectedApp, setSelectedApp] = useState<JobApplication | null>(null);
   const [editingApp, setEditingApp] = useState<Partial<JobApplication> | null>(null);
   const [draggedItem, setDraggedItem] = useState<JobApplication | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const loadApplications = useCallback(async () => {
-    try {
-      const response = await api.getJobApplications();
-      if (response.success && response.data) {
-        setApplications(response.data.applications);
-        setGrouped(response.data.grouped);
-        setStats(response.data.stats);
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to load applications'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadApplications();
-  }, [loadApplications]);
 
   const handleDragStart = (e: React.DragEvent, app: JobApplication) => {
     setDraggedItem(app);
@@ -135,7 +129,7 @@ export default function JobTrackerPage() {
       if (response.success) {
         toast.success('Application added');
         loadApplications();
-        setShowAddModal(false);
+        addModal.close();
         setEditingApp(null);
       }
     } catch (error) {
@@ -168,7 +162,7 @@ export default function JobTrackerPage() {
       loadApplications();
       if (selectedApp?.id === id) {
         setSelectedApp(null);
-        setShowDetailsPanel(false);
+        detailsPanel.close();
       }
     } catch (error) {
       toast.error(getErrorMessage(error, 'Failed to delete application'));
@@ -177,7 +171,7 @@ export default function JobTrackerPage() {
 
   const openDetails = (app: JobApplication) => {
     setSelectedApp(app);
-    setShowDetailsPanel(true);
+    detailsPanel.open();
   };
 
   // Filter applications by search query
@@ -205,7 +199,7 @@ export default function JobTrackerPage() {
               leftIcon={<Plus className="h-4 w-4" />}
               onClick={() => {
                 setEditingApp({});
-                setShowAddModal(true);
+                addModal.open();
               }}
             >
               Add Application
@@ -397,7 +391,7 @@ export default function JobTrackerPage() {
       </div>
 
       {/* Add/Edit Modal */}
-      {showAddModal && (
+      {addModal.isOpen && (
         <ApplicationModal
           application={editingApp}
           onSave={(data) => {
@@ -408,23 +402,23 @@ export default function JobTrackerPage() {
             }
           }}
           onClose={() => {
-            setShowAddModal(false);
+            addModal.close();
             setEditingApp(null);
           }}
         />
       )}
 
       {/* Details Panel */}
-      {showDetailsPanel && selectedApp && (
+      {detailsPanel.isOpen && selectedApp && (
         <DetailsPanel
           application={selectedApp}
           onClose={() => {
-            setShowDetailsPanel(false);
+            detailsPanel.close();
             setSelectedApp(null);
           }}
           onEdit={() => {
             setEditingApp(selectedApp);
-            setShowAddModal(true);
+            addModal.open();
           }}
           onDelete={() => handleDeleteApplication(selectedApp.id)}
           onUpdate={(data) => handleUpdateApplication(selectedApp.id, data)}
@@ -793,7 +787,7 @@ function DetailsPanel({
   onDelete: () => void;
   onUpdate: (data: Partial<JobApplication>) => void;
 }) {
-  const [showNoteInput, setShowNoteInput] = useState(false);
+  const noteInputModal = useModal();
   const [newNote, setNewNote] = useState('');
 
   const handleAddNote = async () => {
@@ -803,7 +797,7 @@ function DetailsPanel({
       await api.addJobActivity(application.id, { description: newNote });
       toast.success('Note added');
       setNewNote('');
-      setShowNoteInput(false);
+      noteInputModal.close();
     } catch (error) {
       toast.error(getErrorMessage(error, 'Failed to add note'));
     }
@@ -952,14 +946,14 @@ function DetailsPanel({
               <FileText className="h-4 w-4" /> Notes
             </h4>
             <button
-              onClick={() => setShowNoteInput(!showNoteInput)}
+              onClick={() => noteInputModal.toggle()}
               className="text-xs text-blue-600 hover:text-blue-700"
             >
               + Add Note
             </button>
           </div>
 
-          {showNoteInput && (
+          {noteInputModal.isOpen && (
             <div className="mb-3">
               <textarea
                 value={newNote}
@@ -969,7 +963,7 @@ function DetailsPanel({
                 placeholder="Add a note..."
               />
               <div className="flex justify-end gap-2 mt-2">
-                <Button size="sm" variant="outline" onClick={() => setShowNoteInput(false)}>
+                <Button size="sm" variant="outline" onClick={() => noteInputModal.close()}>
                   Cancel
                 </Button>
                 <Button size="sm" variant="primary" onClick={handleAddNote}>
@@ -983,7 +977,7 @@ function DetailsPanel({
             <div className="bg-slate-50 rounded-xl p-4">
               <p className="text-sm text-slate-700 whitespace-pre-wrap">{application.notes}</p>
             </div>
-          ) : !showNoteInput && (
+          ) : !noteInputModal.isOpen && (
             <p className="text-sm text-slate-400 italic">No notes yet</p>
           )}
         </div>

@@ -278,6 +278,16 @@ class ApiClient {
     return response.data;
   }
 
+  async deleteVersion(resumeId: string, versionId: string) {
+    const response = await this.client.delete<ApiResponse>(`/resumes/${resumeId}/versions/${versionId}`);
+    return response.data;
+  }
+
+  async downloadOriginalResume(id: string) {
+    const response = await this.client.get<ApiResponse<{ downloadUrl: string }>>(`/resumes/${id}/download-original`);
+    return response.data;
+  }
+
   async customizeResume(id: string, data: { jobTitle: string; companyName: string; jobDescription: string }) {
     const response = await this.client.post<ApiResponse<ResumeVersion>>(`/resumes/${id}/customize`, data);
     return response.data;

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import api, { ResumePerformanceScore } from '@/lib/api';
 import toast from 'react-hot-toast';
+import ScoreCircle from '@/components/ui/ScoreCircle';
 
 interface PerformanceScoreProps {
   resumeId: string;
@@ -54,50 +55,7 @@ const categoryConfig: Record<string, { icon: React.ReactNode; label: string; col
   },
 };
 
-function ScoreCircle({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' }) {
-  const circumference = 2 * Math.PI * 45;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return { stroke: '#22c55e', text: 'text-green-500' };
-    if (score >= 60) return { stroke: '#f59e0b', text: 'text-amber-500' };
-    return { stroke: '#ef4444', text: 'text-red-500' };
-  };
-
-  const colors = getScoreColor(score);
-  const dimensions = size === 'lg' ? 'w-32 h-32' : 'w-20 h-20';
-  const textSize = size === 'lg' ? 'text-3xl' : 'text-xl';
-
-  return (
-    <div className={`relative ${dimensions}`}>
-      <svg className="w-full h-full transform -rotate-90">
-        <circle
-          cx="50%"
-          cy="50%"
-          r="45%"
-          stroke="#e2e8f0"
-          strokeWidth="8"
-          fill="none"
-        />
-        <circle
-          cx="50%"
-          cy="50%"
-          r="45%"
-          stroke={colors.stroke}
-          strokeWidth="8"
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-1000 ease-out"
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${textSize} font-bold ${colors.text}`}>{score}</span>
-      </div>
-    </div>
-  );
-}
+// ScoreCircle now imported from @/components/ui/ScoreCircle
 
 function CategoryScore({
   category,
@@ -221,7 +179,7 @@ export default function PerformanceScore({ resumeId, versionId, compact = false 
   if (compact) {
     return (
       <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
-        <ScoreCircle score={score.overall} size="sm" />
+        <ScoreCircle score={score.overall} size="sm" thresholds="strict" />
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <span className="font-medium text-slate-900">Performance Score</span>
@@ -248,7 +206,7 @@ export default function PerformanceScore({ resumeId, versionId, compact = false 
       <CardContent className="space-y-6">
         {/* Overall Score */}
         <div className="flex items-center gap-6">
-          <ScoreCircle score={score.overall} />
+          <ScoreCircle score={score.overall} size="lg" thresholds="strict" />
           <div className="flex-1">
             <h3 className="text-xl font-bold text-slate-900 mb-1">
               {score.overall >= 80 ? 'Excellent Resume!' : score.overall >= 60 ? 'Good Resume' : 'Needs Improvement'}

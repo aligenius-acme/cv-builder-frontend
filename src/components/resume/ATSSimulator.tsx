@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import ATSScoreCircle from './ATSScoreCircle';
+import ScoreCircle from '@/components/ui/ScoreCircle';
 import {
   Eye,
   AlertTriangle,

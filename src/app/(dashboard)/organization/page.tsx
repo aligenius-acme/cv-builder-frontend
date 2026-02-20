@@ -1,8 +1,10 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
+import { useFetchData } from '@/hooks/useFetchData';
+import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -54,11 +56,20 @@ interface Organization {
 export default function OrganizationPage() {
   const { user, fetchUser } = useAuthStore();
   const router = useRouter();
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showInviteForm, setShowInviteForm] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const { data: organization, isLoading, setData: setOrganization, refetch: loadOrganization } = useFetchData<Organization>({
+    fetchFn: () => api.getOrganization(),
+    errorMessage: 'Failed to load organization',
+    showErrorToast: false,
+    onSuccess: (data) => {
+      setSettingsName(data.name);
+      setSettingsDomain(data.domain || '');
+      setSettingsAnonymization(data.anonymizationEnabled);
+    },
+  });
+
+  const createFormModal = useModal();
+  const inviteFormModal = useModal();
+  const settingsModal = useModal();
 
   // Form states
   const [newOrgName, setNewOrgName] = useState('');
@@ -70,28 +81,6 @@ export default function OrganizationPage() {
   const [settingsName, setSettingsName] = useState('');
   const [settingsDomain, setSettingsDomain] = useState('');
   const [settingsAnonymization, setSettingsAnonymization] = useState(false);
-
-  useEffect(() => {
-    loadOrganization();
-  }, []);
-
-  const loadOrganization = async () => {
-    try {
-      const response = await api.getOrganization();
-      if (response.success && response.data) {
-        setOrganization(response.data);
-        setSettingsName(response.data.name);
-        setSettingsDomain(response.data.domain || '');
-        setSettingsAnonymization(response.data.anonymizationEnabled);
-      }
-    } catch (error: any) {
-      if (error.response?.status !== 404) {
-        toast.error('Failed to load organization');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleCreateOrg = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +97,7 @@ export default function OrganizationPage() {
       });
       if (response.success) {
         toast.success('Organization created!');
-        setShowCreateForm(false);
+        createFormModal.close();
         loadOrganization();
         fetchUser(); // Refresh user data to update role
       }
@@ -132,7 +121,7 @@ export default function OrganizationPage() {
       if (response.success) {
         toast.success(response.message || 'Invitation sent!');
         setInviteEmail('');
-        setShowInviteForm(false);
+        inviteFormModal.close();
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to send invitation');
@@ -152,7 +141,7 @@ export default function OrganizationPage() {
       });
       if (response.success) {
         toast.success('Settings updated!');
-        setShowSettings(false);
+        settingsModal.close();
         loadOrganization();
       }
     } catch (error: any) {
@@ -227,7 +216,7 @@ export default function OrganizationPage() {
             <p className="text-slate-500">Create or join an organization for team collaboration</p>
           </div>
 
-          {!showCreateForm ? (
+          {!createFormModal.isOpen ? (
             <Card variant="elevated" className="text-center">
               <CardContent className="py-12">
                 <Building className="h-16 w-16 text-slate-300 mx-auto mb-4" />
@@ -235,7 +224,7 @@ export default function OrganizationPage() {
                 <p className="text-slate-500 mb-6">
                   You&apos;re not part of an organization yet. Create one to collaborate with your team.
                 </p>
-                <Button variant="primary" onClick={() => setShowCreateForm(true)}>
+                <Button variant="primary" onClick={() => createFormModal.open()}>
                   Create Organization
                 </Button>
               </CardContent>
@@ -287,7 +276,7 @@ export default function OrganizationPage() {
                     <Button type="submit" variant="primary" isLoading={isSubmitting}>
                       Create Organization
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
+                    <Button type="button" variant="outline" onClick={() => createFormModal.close()}>
                       Cancel
                     </Button>
                   </div>
@@ -332,7 +321,7 @@ export default function OrganizationPage() {
                 variant="outline"
                 size="sm"
                 leftIcon={<Settings className="h-4 w-4" />}
-                onClick={() => setShowSettings(!showSettings)}
+                onClick={() => settingsModal.toggle()}
               >
                 Settings
               </Button>
@@ -340,7 +329,7 @@ export default function OrganizationPage() {
                 variant="primary"
                 size="sm"
                 leftIcon={<UserPlus className="h-4 w-4" />}
-                onClick={() => setShowInviteForm(true)}
+                onClick={() => inviteFormModal.open()}
               >
                 Invite Member
               </Button>
@@ -398,13 +387,13 @@ export default function OrganizationPage() {
         </div>
 
         {/* Settings Form */}
-        {showSettings && organization.isAdmin && (
+        {settingsModal.isOpen && organization.isAdmin && (
           <Card variant="elevated" className="animate-slide-up">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Organization Settings</CardTitle>
                 <button
-                  onClick={() => setShowSettings(false)}
+                  onClick={() => settingsModal.close()}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 >
                   <X className="h-5 w-5 text-slate-400" />
@@ -461,13 +450,13 @@ export default function OrganizationPage() {
         )}
 
         {/* Invite Form */}
-        {showInviteForm && (
+        {inviteFormModal.isOpen && (
           <Card variant="elevated" className="animate-slide-up">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Invite Team Member</CardTitle>
                 <button
-                  onClick={() => setShowInviteForm(false)}
+                  onClick={() => inviteFormModal.close()}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 >
                   <X className="h-5 w-5 text-slate-400" />

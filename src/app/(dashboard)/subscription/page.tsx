@@ -1,46 +1,26 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuthStore } from '@/store/auth';
+import { useFetchMultiple } from '@/hooks/useFetchData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { Check, Crown, Zap, Building, Loader2, Sparkles, Star } from 'lucide-react';
 import api from '@/lib/api';
 import { Plan } from '@/types';
-import { getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function SubscriptionPage() {
   const { user } = useAuthStore();
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [subscription, setSubscription] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading } = useFetchMultiple(
+    [() => api.getPlans(), () => api.getSubscription()],
+    { errorMessage: 'Failed to load subscription data' }
+  );
+
+  const plans: Plan[] = data?.[0]?.plans || [];
+  const subscription = data?.[1] || null;
   const [isProcessing, setIsProcessing] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [plansRes, subRes] = await Promise.all([
-        api.getPlans(),
-        api.getSubscription(),
-      ]);
-
-      if (plansRes.success && plansRes.data) {
-        setPlans(plansRes.data.plans);
-      }
-      if (subRes.success && subRes.data) {
-        setSubscription(subRes.data);
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to load subscription data'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleUpgrade = async (planType: 'pro' | 'business') => {
     setIsProcessing(true);

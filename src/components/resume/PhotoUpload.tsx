@@ -36,7 +36,6 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoUrl, onPhotoChang
 
       onPhotoChange(response.data?.photoUrl || (response as any).photoUrl);
     } catch (err: any) {
-      console.error('Photo upload error:', err);
       setError(err.response?.data?.error || 'Failed to upload photo');
     } finally {
       setIsUploading(false);

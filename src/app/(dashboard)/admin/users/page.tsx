@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
+import { useFetchData } from '@/hooks/useFetchData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -54,36 +55,27 @@ interface Pagination {
 export default function AdminUsersPage() {
   const { user } = useAuthStore();
   const router = useRouter();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [page, setPage] = useState(1);
   const [actionUserId, setActionUserId] = useState<string | null>(null);
+
+  const { data: usersData, isLoading, setData: setUsersData, refetch: loadUsers } = useFetchData<{ users: AdminUser[], pagination: Pagination }>({
+    fetchFn: () => api.getAdminUsers(page, 20, search || undefined, roleFilter || undefined),
+    errorMessage: 'Failed to load users',
+    immediate: user?.role === 'ADMIN',
+    deps: [page, roleFilter],
+  });
+
+  const users = usersData?.users || [];
+  const pagination = usersData?.pagination || null;
 
   useEffect(() => {
     if (user && user.role !== 'ADMIN') {
       router.push('/resumes');
       return;
     }
-    loadUsers();
-  }, [user, router, page, roleFilter]);
-
-  const loadUsers = async () => {
-    setIsLoading(true);
-    try {
-      const response = await api.getAdminUsers(page, 20, search || undefined, roleFilter || undefined);
-      if (response.success && response.data) {
-        setUsers(response.data.users);
-        setPagination(response.data.pagination);
-      }
-    } catch (error) {
-      toast.error('Failed to load users');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [user, router]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
+import ScoreCircle from '@/components/ui/ScoreCircle';
 import DownloadModal from '@/components/resume/DownloadModal';
 import ATSSimulator from '@/components/resume/ATSSimulator';
 import ShareModal from '@/components/resume/ShareModal';
@@ -202,8 +202,6 @@ export default function VersionDetailPage() {
     tailoredData.experience.forEach((exp, i) => {
       const keys = Object.keys(exp);
       if (keys.includes('id') || keys.includes('current') || keys.includes('startDate') || keys.includes('endDate')) {
-        console.error(`CRITICAL: Experience ${i} still has database fields:`, keys);
-        console.error('Raw object:', exp);
         // Force clean it again
         tailoredData.experience[i] = cleanExperience(exp);
       }
@@ -213,28 +211,8 @@ export default function VersionDetailPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Download Modal */}
-        <DownloadModal
-          isOpen={showDownloadModal}
-          onClose={() => setShowDownloadModal(false)}
-          resumeId={resumeId}
-          versionId={versionId}
-          versionNumber={version.versionNumber}
-          companyName={version.companyName}
-        />
-
-        {/* Share Modal */}
-        <ShareModal
-          isOpen={showShareModal}
-          onClose={() => setShowShareModal(false)}
-          resumeId={resumeId}
-          versionId={versionId}
-          jobTitle={version.jobTitle}
-          companyName={version.companyName}
-        />
-
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative z-10">
           <div className="flex items-center gap-4">
             <Link href={`/resumes/${resumeId}`}>
               <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />}>
@@ -250,7 +228,7 @@ export default function VersionDetailPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative z-20">
             <Button
               variant="outline"
               size="lg"
@@ -955,6 +933,25 @@ export default function VersionDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Modals - Rendered at root level */}
+      <DownloadModal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+        resumeId={resumeId}
+        versionId={versionId}
+        versionNumber={version.versionNumber}
+        companyName={version.companyName}
+      />
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        resumeId={resumeId}
+        versionId={versionId}
+        jobTitle={version.jobTitle}
+        companyName={version.companyName}
+      />
     </div>
   );
 }

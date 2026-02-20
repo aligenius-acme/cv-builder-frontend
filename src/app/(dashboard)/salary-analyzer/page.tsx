@@ -1,6 +1,7 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useFetchData } from '@/hooks/useFetchData';
 import {
   DollarSign,
   TrendingUp,
@@ -69,27 +70,12 @@ export default function SalaryAnalyzerPage() {
   const [activeTab, setActiveTab] = useState<TabType>('analyze');
 
   // Saved Jobs State
-  const [savedJobs, setSavedJobs] = useState<any[]>([]);
-  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(false);
-
-  // Load saved jobs on mount
-  useEffect(() => {
-    loadSavedJobs();
-  }, []);
-
-  const loadSavedJobs = async () => {
-    setIsLoadingSavedJobs(true);
-    try {
-      const response = await api.getSavedJobs();
-      if (response.success && response.data) {
-        setSavedJobs(response.data.jobs);
-      }
-    } catch (error) {
-      // Silent fail
-    } finally {
-      setIsLoadingSavedJobs(false);
-    }
-  };
+  const { data: savedJobsData, isLoading: isLoadingSavedJobs } = useFetchData({
+    fetchFn: () => api.getSavedJobs(),
+    errorMessage: 'Failed to load saved jobs',
+    showErrorToast: false,
+  });
+  const savedJobs = savedJobsData?.jobs || [];
 
   // Analyze State
   const [analyzeJobInputMode, setAnalyzeJobInputMode] = useState<'saved' | 'manual'>('manual');

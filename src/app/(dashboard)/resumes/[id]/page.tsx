@@ -8,7 +8,8 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
+import ScoreCircle from '@/components/ui/ScoreCircle';
+import DownloadModal from '@/components/resume/DownloadModal';
 import { useAuthStore } from '@/store/auth';
 import {
   FileText,
@@ -42,6 +43,7 @@ import {
   ChevronDown,
   ExternalLink,
   Edit2,
+  Trash2,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
@@ -58,6 +60,12 @@ export default function ResumeDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showCustomizeForm, setShowCustomizeForm] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [selectedVersionForDownload, setSelectedVersionForDownload] = useState<{
+    id: string;
+    versionNumber: number;
+    companyName: string;
+  } | null>(null);
 
   // Customize form state
   const [jobTitle, setJobTitle] = useState('');
@@ -166,15 +174,44 @@ export default function ResumeDetailPage() {
     }
   };
 
-  const handleDownload = async (versionId: string, format: 'pdf' | 'docx') => {
+  const handleDownload = (versionId: string) => {
+    const version = resume?.versions?.find((v) => v.id === versionId);
+    if (!version) return;
+
+    setSelectedVersionForDownload({
+      id: version.id,
+      versionNumber: version.versionNumber,
+      companyName: version.companyName,
+    });
+    setShowDownloadModal(true);
+  };
+
+  const handleDeleteVersion = async (versionId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm('Are you sure you want to delete this tailored version?')) {
+      return;
+    }
+
     try {
-      const blob = await api.downloadVersion(resumeId, versionId, format);
-      const version = resume?.versions?.find((v) => v.id === versionId);
-      const filename = `resume-${version?.companyName || 'tailored'}.${format}`;
-      downloadBlob(blob, filename);
-      toast.success('Download started');
+      await api.deleteVersion(resumeId, versionId);
+      toast.success('Version deleted');
+      loadResume();
     } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to download resume'));
+      toast.error(getErrorMessage(error, 'Failed to delete version'));
+    }
+  };
+
+  const handleDownloadOriginal = async () => {
+    try {
+      const response = await api.downloadOriginalResume(resumeId);
+      if (response.success && response.data?.downloadUrl) {
+        window.open(response.data.downloadUrl, '_blank');
+        toast.success('Download started');
+      }
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Failed to download original resume'));
     }
   };
 
@@ -260,9 +297,19 @@ export default function ResumeDetailPage() {
               <p className="text-slate-500">{resume.fileName}</p>
             </div>
           </div>
-          <Badge variant={resume.parseStatus === 'completed' ? 'success' : 'warning'} size="lg">
-            {resume.parseStatus}
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadOriginal}
+              leftIcon={<Download className="h-4 w-4" />}
+            >
+              Download Original
+            </Button>
+            <Badge variant={resume.parseStatus === 'completed' ? 'success' : 'warning'} size="lg">
+              {resume.parseStatus}
+            </Badge>
+          </div>
         </div>
 
         {/* Customize Form */}
@@ -540,7 +587,7 @@ export default function ResumeDetailPage() {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-4">
-                      <ATSScoreCircle score={version.atsScore} size="sm" showLabel={false} />
+                      <ScoreCircle score={version.atsScore} size="sm" showLabel={false} />
                       <div>
                         <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                           {version.jobTitle} at {version.companyName}
@@ -562,11 +609,17 @@ export default function ResumeDetailPage() {
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => handleDownload(version.id, 'pdf')}
+                        onClick={() => handleDownload(version.id)}
                         leftIcon={<Download className="h-4 w-4" />}
                       >
-                        PDF
+                        Download
                       </Button>
+                      <button
+                        onClick={(e) => handleDeleteVersion(version.id, e)}
+                        className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -976,6 +1029,21 @@ export default function ResumeDetailPage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Download Modal */}
+        {showDownloadModal && selectedVersionForDownload && (
+          <DownloadModal
+            isOpen={showDownloadModal}
+            onClose={() => {
+              setShowDownloadModal(false);
+              setSelectedVersionForDownload(null);
+            }}
+            resumeId={resumeId}
+            versionId={selectedVersionForDownload.id}
+            versionNumber={selectedVersionForDownload.versionNumber}
+            companyName={selectedVersionForDownload.companyName}
+          />
         )}
       </div>
     </div>

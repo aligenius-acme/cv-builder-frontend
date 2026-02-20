@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useModal } from '@/hooks/useModal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PageHeader from '@/components/shared/PageHeader';
 import {
@@ -122,7 +123,7 @@ export default function ResumeBuilderPage() {
   const [resumeTitle, setResumeTitle] = useState('Untitled Resume');
   const [activeSection, setActiveSection] = useState<Section>('contact');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const downloadModal = useModal();
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -271,7 +272,7 @@ export default function ResumeBuilderPage() {
     }
     // Save before opening modal to ensure latest data
     await handleSave(true);
-    setShowDownloadModal(true);
+    downloadModal.open();
   };
 
   // Section navigation
@@ -453,8 +454,8 @@ export default function ResumeBuilderPage() {
       {/* Download Modal */}
       {currentResumeId && (
         <DownloadModal
-          isOpen={showDownloadModal}
-          onClose={() => setShowDownloadModal(false)}
+          isOpen={downloadModal.isOpen}
+          onClose={() => downloadModal.close()}
           resumeId={currentResumeId}
           versionId={currentResumeId} // Using resumeId as versionId for resume builder
           versionNumber={1}

@@ -179,8 +179,6 @@ export default function DownloadModal({
       return true;
     });
 
-    console.log('Filtered results:', filtered.length, 'out of', templates.length);
-
     // Sort templates
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -260,36 +258,6 @@ export default function DownloadModal({
       if (response.success && response.data) {
         setTemplates(response.data);
 
-        // Debug: Log template properties to understand filtering
-        console.log('=== TEMPLATES LOADED ===');
-        console.log('Total templates:', response.data.length);
-
-        // Log all unique categories
-        const categories = [...new Set(response.data.map((t: ResumeTemplate) => t.primaryCategory || t.category))];
-        console.log('Available categories:', categories);
-
-        // Log all unique ATS levels
-        const atsLevels = [...new Set(response.data.map((t: ResumeTemplate) => t.atsCompatibility))];
-        console.log('Available ATS levels:', atsLevels);
-
-        // Log all unique design styles
-        const designStyles = [...new Set(response.data.map((t: ResumeTemplate) => t.designStyle))];
-        console.log('Available design styles:', designStyles);
-
-        // Log sample template
-        if (response.data.length > 0) {
-          console.log('Sample template:', {
-            name: response.data[0].name,
-            primaryCategory: response.data[0].primaryCategory,
-            category: response.data[0].category,
-            atsCompatibility: response.data[0].atsCompatibility,
-            designStyle: response.data[0].designStyle,
-            experienceLevel: response.data[0].experienceLevel,
-            industryTags: response.data[0].industryTags,
-          });
-        }
-        console.log('======================');
-
         // Select first popular template or first template
         const popular = response.data.find((t: ResumeTemplate) => t.isPopular);
         if (popular) {
@@ -313,7 +281,6 @@ export default function DownloadModal({
       }
     } catch (error) {
       // Silently fail - recommendations are optional
-      console.error('Failed to load recommended templates:', error);
     }
   };
 
@@ -333,7 +300,6 @@ export default function DownloadModal({
       const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
     } catch (error) {
-      console.error('Failed to load preview:', error);
       toast.error('Failed to load preview');
     } finally {
       setIsPreviewLoading(false);

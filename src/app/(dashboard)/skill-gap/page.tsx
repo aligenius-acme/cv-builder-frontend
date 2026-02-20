@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
+import { useModal } from '@/hooks/useModal';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -61,8 +62,8 @@ export default function SkillGapPage() {
   // Saved jobs and resumes state
   const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
-  const [showJobDropdown, setShowJobDropdown] = useState(false);
-  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const jobDropdownModal = useModal();
+  const resumeDropdownModal = useModal();
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function SkillGapPage() {
     if (job.location) {
       // Optionally extract industry from job info
     }
-    setShowJobDropdown(false);
+    jobDropdownModal.close();
     toast.success(`Using "${job.jobTitle}" as target role`);
   };
 
@@ -114,7 +115,7 @@ export default function SkillGapPage() {
     } catch (error) {
       toast.error('Failed to load resume skills');
     }
-    setShowResumeDropdown(false);
+    resumeDropdownModal.close();
   };
 
   const addSkill = () => {
@@ -198,7 +199,7 @@ export default function SkillGapPage() {
                     {savedJobs.length > 0 && (
                       <button
                         type="button"
-                        onClick={() => setShowJobDropdown(!showJobDropdown)}
+                        onClick={() => jobDropdownModal.toggle()}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded-lg text-purple-600"
                         title="Select from saved jobs"
                       >
@@ -206,7 +207,7 @@ export default function SkillGapPage() {
                       </button>
                     )}
                   </div>
-                  {showJobDropdown && savedJobs.length > 0 && (
+                  {jobDropdownModal.isOpen && savedJobs.length > 0 && (
                     <div className="absolute z-20 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
                       <div className="p-2 border-b border-slate-100">
                         <p className="text-xs text-slate-500 flex items-center gap-1">
@@ -301,12 +302,12 @@ export default function SkillGapPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                        onClick={() => resumeDropdownModal.toggle()}
                         leftIcon={<FileText className="h-4 w-4" />}
                       >
                         Import from Resume
                       </Button>
-                      {showResumeDropdown && (
+                      {resumeDropdownModal.isOpen && (
                         <div className="absolute z-20 right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto">
                           <div className="p-2 border-b border-slate-100">
                             <p className="text-xs text-slate-500">Select a resume to import skills</p>

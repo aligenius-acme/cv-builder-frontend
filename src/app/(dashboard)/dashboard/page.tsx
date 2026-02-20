@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -32,46 +32,32 @@ import {
 import api, { CareerDashboardStats } from '@/lib/api';
 import { Resume, CoverLetter } from '@/types';
 import { formatDate } from '@/lib/utils';
-import toast from 'react-hot-toast';
+import { useFetchMultiple } from '@/hooks/useFetchData';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
-  const [careerStats, setCareerStats] = useState<CareerDashboardStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [showUploader, setShowUploader] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Use useFetchMultiple for parallel data loading - replaces 25+ lines!
+  const { data, isLoading, setData } = useFetchMultiple([
+    () => api.getResumes(),
+    () => api.getCoverLetters().catch(() => ({ success: true, data: [] })),
+    () => api.getCareerDashboardStats().catch(() => ({ success: false, data: null })),
+  ], {
+    showErrorToast: false, // Silent errors for dashboard
+  });
 
-  const loadData = async () => {
-    try {
-      const [resumesRes, coverLettersRes, careerStatsRes] = await Promise.all([
-        api.getResumes(),
-        api.getCoverLetters().catch(() => ({ success: true, data: [] })),
-        api.getCareerDashboardStats().catch(() => ({ success: false, data: null })),
-      ]);
-
-      if (resumesRes.success && resumesRes.data) {
-        setResumes(resumesRes.data);
-      }
-      if (coverLettersRes.success && coverLettersRes.data) {
-        setCoverLetters(coverLettersRes.data);
-      }
-      if (careerStatsRes.success && careerStatsRes.data) {
-        setCareerStats(careerStatsRes.data);
-      }
-    } catch (error) {
-      toast.error('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const resumes = (data?.[0] as Resume[]) || [];
+  const coverLetters = (data?.[1] as CoverLetter[]) || [];
+  const careerStats = (data?.[2] as CareerDashboardStats) || null;
 
   const handleUploadComplete = (resume: Resume) => {
-    setResumes((prev) => [resume, ...prev]);
+    // Update resumes in data array
+    setData((prev) => {
+      const newData = [...(prev || [])];
+      newData[0] = [resume, ...(newData[0] || [])];
+      return newData;
+    });
     setShowUploader(false);
   };
 

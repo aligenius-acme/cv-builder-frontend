@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
+import { useFetchData } from '@/hooks/useFetchData';
+import { useModal } from '@/hooks/useModal';
 import {
   MessageSquare,
   Sparkles,
@@ -86,88 +88,49 @@ export default function InterviewPrepPage() {
   const [userAnswer, setUserAnswer] = useState('');
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
-  const [showSampleAnswer, setShowSampleAnswer] = useState(false);
-  const [showTips, setShowTips] = useState(false);
+  const sampleAnswerModal = useModal();
+  const tipsModal = useModal();
   const [practiceMode, setPracticeMode] = useState(false);
-  const [commonQuestions, setCommonQuestions] = useState<Question[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
-  const [showRedFlags, setShowRedFlags] = useState(false);
-  const [showFollowUps, setShowFollowUps] = useState(false);
-  const [showStarTemplate, setShowStarTemplate] = useState(false);
-  const [showScoringRubric, setShowScoringRubric] = useState(false);
+  const redFlagsModal = useModal();
+  const followUpsModal = useModal();
+  const starTemplateModal = useModal();
+  const scoringRubricModal = useModal();
 
   // Saved jobs integration
-  const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
-  const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(true);
+  const { data: savedJobsData, isLoading: isLoadingSavedJobs, setData: setSavedJobsData } = useFetchData({
+    fetchFn: () => api.getJobApplications(),
+    errorMessage: 'Failed to load saved jobs',
+    showErrorToast: false,
+  });
+  const savedJobs = savedJobsData?.applications || [];
   const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('saved');
   const [selectedJobId, setSelectedJobId] = useState('');
-  const [showJobDropdown, setShowJobDropdown] = useState(false);
+  const jobDropdownModal = useModal();
 
   // Resume experience helper
-  const [resumes, setResumes] = useState<any[]>([]);
-  const [isLoadingResumes, setIsLoadingResumes] = useState(true);
+  const { data: resumes, isLoading: isLoadingResumes } = useFetchData({
+    fetchFn: () => api.getResumes(),
+    errorMessage: 'Failed to load resumes',
+    showErrorToast: false,
+  });
   const [selectedResumeId, setSelectedResumeId] = useState('');
-  const [showResumeDropdown, setShowResumeDropdown] = useState(false);
+  const resumeDropdownModal = useModal();
   const [resumeExperiences, setResumeExperiences] = useState<string[]>([]);
-  const [showExperienceHelper, setShowExperienceHelper] = useState(false);
+  const experienceHelperModal = useModal();
 
-  // Loading states
-  const [isLoadingCommonQuestions, setIsLoadingCommonQuestions] = useState(true);
+  // Common questions with dependency on selectedCategory
+  const { data: commonQuestionsData, isLoading: isLoadingCommonQuestions } = useFetchData({
+    fetchFn: () => api.getCommonQuestions(selectedCategory === 'all' ? undefined : selectedCategory),
+    errorMessage: 'Failed to load questions',
+    showErrorToast: false,
+    deps: [selectedCategory],
+  });
+  const commonQuestions = commonQuestionsData?.questions || [];
 
   // Copy state
   const [copiedText, setCopiedText] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadSavedJobs();
-    loadResumes();
-  }, []);
-
-  useEffect(() => {
-    loadCommonQuestions();
-  }, [selectedCategory]);
-
-  const loadSavedJobs = async () => {
-    setIsLoadingSavedJobs(true);
-    try {
-      const response = await api.getJobApplications();
-      if (response.success && response.data?.applications) {
-        setSavedJobs(response.data.applications);
-      }
-    } catch (error) {
-      console.error('Failed to load saved jobs:', error);
-    } finally {
-      setIsLoadingSavedJobs(false);
-    }
-  };
-
-  const loadResumes = async () => {
-    setIsLoadingResumes(true);
-    try {
-      const response = await api.getResumes();
-      if (response.success && response.data) {
-        setResumes(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to load resumes:', error);
-    } finally {
-      setIsLoadingResumes(false);
-    }
-  };
-
-  const loadCommonQuestions = async () => {
-    setIsLoadingCommonQuestions(true);
-    try {
-      const response = await api.getCommonQuestions(selectedCategory === 'all' ? undefined : selectedCategory);
-      if (response.success && response.data) {
-        setCommonQuestions(response.data.questions);
-      }
-    } catch (error) {
-      // Silent fail for common questions
-    } finally {
-      setIsLoadingCommonQuestions(false);
-    }
-  };
 
   const handleSelectSavedJob = (jobId: string) => {
     const job = savedJobs.find((j) => j.id === jobId);
@@ -176,17 +139,17 @@ export default function InterviewPrepPage() {
       setJobTitle(job.jobTitle);
       setCompany(job.companyName);
       setJobDescription(job.jobDescription || '');
-      setShowJobDropdown(false);
+      jobDropdownModal.close();
       toast.success('Job details loaded!');
     }
   };
 
   const handleSelectResume = (resumeId: string) => {
     setSelectedResumeId(resumeId);
-    setShowResumeDropdown(false);
+    resumeDropdownModal.close();
 
     // Extract experience bullet points from resume
-    const resume = resumes.find((r) => r.id === resumeId);
+    const resume = resumes?.find((r) => r.id === resumeId);
     if (resume?.parsedData?.experience) {
       const experiences: string[] = [];
       resume.parsedData.experience.forEach((exp: any) => {
@@ -210,8 +173,8 @@ export default function InterviewPrepPage() {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  const selectedJob = savedJobs.find((j) => j.id === selectedJobId);
-  const selectedResume = resumes.find((r) => r.id === selectedResumeId);
+  const selectedJob = savedJobs?.find((j) => j.id === selectedJobId);
+  const selectedResume = resumes?.find((r) => r.id === selectedResumeId);
 
   // Filter common questions by difficulty
   const filteredCommonQuestions = commonQuestions.filter((q) =>
@@ -279,8 +242,8 @@ export default function InterviewPrepPage() {
   const resetPanels = () => {
     setUserAnswer('');
     setEvaluation(null);
-    setShowSampleAnswer(false);
-    setShowTips(false);
+    sampleAnswerModal.close();
+    tipsModal.close();
     setShowRedFlags(false);
     setShowFollowUps(false);
     setShowStarTemplate(false);
@@ -414,7 +377,7 @@ export default function InterviewPrepPage() {
                       <div className="relative">
                         <button
                           type="button"
-                          onClick={() => setShowJobDropdown(!showJobDropdown)}
+                          onClick={() => jobDropdownModal.toggle()}
                           className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                         >
                           {selectedJob ? (
@@ -422,10 +385,10 @@ export default function InterviewPrepPage() {
                           ) : (
                             <span className="text-slate-500">Select a job to practice for...</span>
                           )}
-                          <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${showJobDropdown ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${jobDropdownModal.isOpen ? 'rotate-180' : ''}`} />
                         </button>
 
-                        {showJobDropdown && (
+                        {jobDropdownModal.isOpen && (
                           <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                             {savedJobs.map((job) => (
                               <button
@@ -730,10 +693,10 @@ export default function InterviewPrepPage() {
                 <div className="flex flex-wrap gap-2 mb-6">
                   {currentQuestion?.tips && (
                     <button
-                      onClick={() => setShowTips(!showTips)}
+                      onClick={() => tipsModal.toggle()}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                        showTips
+                        tipsModal.isOpen
                           ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       )}
@@ -744,10 +707,10 @@ export default function InterviewPrepPage() {
                   )}
                   {currentQuestion?.starTemplate && (
                     <button
-                      onClick={() => setShowStarTemplate(!showStarTemplate)}
+                      onClick={() => starTemplateModal.toggle()}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                        showStarTemplate
+                        starTemplateModal.isOpen
                           ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       )}
@@ -758,10 +721,10 @@ export default function InterviewPrepPage() {
                   )}
                   {currentQuestion?.redFlagAnswers && currentQuestion.redFlagAnswers.length > 0 && (
                     <button
-                      onClick={() => setShowRedFlags(!showRedFlags)}
+                      onClick={() => redFlagsModal.toggle()}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                        showRedFlags
+                        redFlagsModal.isOpen
                           ? 'bg-red-100 text-red-700 ring-1 ring-red-300'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       )}
@@ -772,10 +735,10 @@ export default function InterviewPrepPage() {
                   )}
                   {currentQuestion?.followUpQuestions && currentQuestion.followUpQuestions.length > 0 && (
                     <button
-                      onClick={() => setShowFollowUps(!showFollowUps)}
+                      onClick={() => followUpsModal.toggle()}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                        showFollowUps
+                        followUpsModal.isOpen
                           ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-300'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       )}
@@ -786,10 +749,10 @@ export default function InterviewPrepPage() {
                   )}
                   {currentQuestion?.scoringRubric && (
                     <button
-                      onClick={() => setShowScoringRubric(!showScoringRubric)}
+                      onClick={() => scoringRubricModal.toggle()}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                        showScoringRubric
+                        scoringRubricModal.isOpen
                           ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       )}
@@ -801,7 +764,7 @@ export default function InterviewPrepPage() {
                 </div>
 
                 {/* Tips Panel */}
-                {showTips && currentQuestion?.tips && (
+                {tipsModal.isOpen && currentQuestion?.tips && (
                   <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Lightbulb className="h-4 w-4 text-amber-600" />
@@ -812,7 +775,7 @@ export default function InterviewPrepPage() {
                 )}
 
                 {/* STAR Template Panel */}
-                {showStarTemplate && currentQuestion?.starTemplate && (
+                {starTemplateModal.isOpen && currentQuestion?.starTemplate && (
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-4">
                     <div className="flex items-center gap-2 mb-3">
                       <ClipboardList className="h-4 w-4 text-blue-600" />
@@ -852,7 +815,7 @@ export default function InterviewPrepPage() {
                 )}
 
                 {/* Red Flag Answers Panel */}
-                {showRedFlags && currentQuestion?.redFlagAnswers && currentQuestion.redFlagAnswers.length > 0 && (
+                {redFlagsModal.isOpen && currentQuestion?.redFlagAnswers && currentQuestion.redFlagAnswers.length > 0 && (
                   <div className="p-4 bg-red-50 rounded-xl border border-red-200 mb-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Ban className="h-4 w-4 text-red-600" />
@@ -870,7 +833,7 @@ export default function InterviewPrepPage() {
                 )}
 
                 {/* Follow-up Questions Panel */}
-                {showFollowUps && currentQuestion?.followUpQuestions && currentQuestion.followUpQuestions.length > 0 && (
+                {followUpsModal.isOpen && currentQuestion?.followUpQuestions && currentQuestion.followUpQuestions.length > 0 && (
                   <div className="p-4 bg-purple-50 rounded-xl border border-purple-200 mb-4">
                     <div className="flex items-center gap-2 mb-3">
                       <HelpCircle className="h-4 w-4 text-purple-600" />
@@ -888,7 +851,7 @@ export default function InterviewPrepPage() {
                 )}
 
                 {/* Scoring Rubric Panel */}
-                {showScoringRubric && currentQuestion?.scoringRubric && (
+                {scoringRubricModal.isOpen && currentQuestion?.scoringRubric && (
                   <div className="p-4 bg-gradient-to-r from-green-50 via-amber-50 to-red-50 rounded-xl border border-slate-200 mb-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Award className="h-4 w-4 text-slate-600" />
@@ -915,10 +878,10 @@ export default function InterviewPrepPage() {
                 <div className="mb-4">
                   <button
                     type="button"
-                    onClick={() => setShowExperienceHelper(!showExperienceHelper)}
+                    onClick={() => experienceHelperModal.toggle()}
                     className={cn(
                       'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                      showExperienceHelper
+                      experienceHelperModal.isOpen
                         ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     )}
@@ -928,7 +891,7 @@ export default function InterviewPrepPage() {
                   </button>
                 </div>
 
-                {showExperienceHelper && (
+                {experienceHelperModal.isOpen && (
                   <div className="mb-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -957,7 +920,7 @@ export default function InterviewPrepPage() {
                         <div className="relative mb-3">
                           <button
                             type="button"
-                            onClick={() => setShowResumeDropdown(!showResumeDropdown)}
+                            onClick={() => resumeDropdownModal.toggle()}
                             className="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-emerald-200 bg-white text-slate-900 hover:border-emerald-300 text-sm"
                           >
                             {selectedResume ? (
@@ -965,12 +928,12 @@ export default function InterviewPrepPage() {
                             ) : (
                               <span className="text-slate-500">Select a resume to pull experience from...</span>
                             )}
-                            <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${showResumeDropdown ? 'rotate-180' : ''}`} />
+                            <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${resumeDropdownModal.isOpen ? 'rotate-180' : ''}`} />
                           </button>
 
-                          {showResumeDropdown && (
+                          {resumeDropdownModal.isOpen && (
                             <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                              {resumes.map((resume) => (
+                              {(resumes || []).map((resume) => (
                                 <button
                                   key={resume.id}
                                   type="button"
@@ -1037,16 +1000,16 @@ export default function InterviewPrepPage() {
                     {currentQuestion?.sampleAnswer && (
                       <Button
                         variant="outline"
-                        onClick={() => setShowSampleAnswer(!showSampleAnswer)}
+                        onClick={() => sampleAnswerModal.toggle()}
                       >
-                        {showSampleAnswer ? 'Hide Sample Answer' : 'See Sample Answer'}
+                        {sampleAnswerModal.isOpen ? 'Hide Sample Answer' : 'See Sample Answer'}
                       </Button>
                     )}
                   </div>
                 </div>
 
                 {/* Sample Answer */}
-                {showSampleAnswer && currentQuestion?.sampleAnswer && (
+                {sampleAnswerModal.isOpen && currentQuestion?.sampleAnswer && (
                   <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-blue-900">Sample Answer</h4>

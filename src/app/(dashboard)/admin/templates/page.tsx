@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useModal } from '@/hooks/useModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
@@ -36,7 +37,7 @@ export default function AdminTemplatesPage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const createFormModal = useModal();
   const [isCreating, setIsCreating] = useState(false);
 
   // Form state
@@ -100,7 +101,7 @@ export default function AdminTemplatesPage() {
       });
       if (response.success) {
         toast.success('Template created successfully');
-        setShowCreateForm(false);
+        createFormModal.close();
         setNewTemplate({
           name: '',
           description: '',
@@ -142,20 +143,20 @@ export default function AdminTemplatesPage() {
           <Button
             variant="primary"
             leftIcon={<Plus className="h-4 w-4" />}
-            onClick={() => setShowCreateForm(true)}
+            onClick={() => createFormModal.open()}
           >
             Create Template
           </Button>
         </div>
 
         {/* Create Form */}
-        {showCreateForm && (
+        {createFormModal.isOpen && (
           <Card variant="elevated" className="animate-slide-up">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Create New Template</CardTitle>
                 <button
-                  onClick={() => setShowCreateForm(false)}
+                  onClick={() => createFormModal.close()}
                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 >
                   <X className="h-5 w-5 text-slate-400" />
@@ -234,7 +235,7 @@ export default function AdminTemplatesPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setShowCreateForm(false)}
+                    onClick={() => createFormModal.close()}
                   >
                     Cancel
                   </Button>

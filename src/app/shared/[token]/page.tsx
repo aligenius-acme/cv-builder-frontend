@@ -18,7 +18,7 @@ import {
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import ATSScoreCircle from '@/components/resume/ATSScoreCircle';
+import ScoreCircle from '@/components/ui/ScoreCircle';
 import api from '@/lib/api';
 import { downloadBlob } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -147,7 +147,7 @@ export default function SharedResumePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <ATSScoreCircle score={data.atsScore} size="sm" />
+            <ScoreCircle score={data.atsScore} size="sm" />
             <Button
               variant="outline"
               size="sm"

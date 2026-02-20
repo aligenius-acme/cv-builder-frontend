@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -25,36 +25,24 @@ import {
 import PageHeader from '@/components/shared/PageHeader';
 import api from '@/lib/api';
 import { Resume } from '@/types';
-import { formatDate, getErrorMessage } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { useFetchData } from '@/hooks/useFetchData';
 
 export default function ResumesPage() {
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Use the new useFetchData hook - replaces 15 lines of boilerplate!
+  const { data: resumes, isLoading, setData: setResumes, refetch } = useFetchData<Resume[]>({
+    fetchFn: () => api.getResumes(),
+    errorMessage: 'Failed to load resumes',
+  });
+
   const [showUploader, setShowUploader] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest');
 
-  useEffect(() => {
-    loadResumes();
-  }, []);
-
-  const loadResumes = async () => {
-    try {
-      const response = await api.getResumes();
-      if (response.success && response.data) {
-        setResumes(response.data);
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to load resumes'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleUploadComplete = (resume: Resume) => {
-    setResumes((prev) => [resume, ...prev]);
+    setResumes((prev) => [resume, ...(prev || [])]);
     setShowUploader(false);
   };
 
@@ -68,14 +56,14 @@ export default function ResumesPage() {
 
     try {
       await api.deleteResume(id);
-      setResumes((prev) => prev.filter((r) => r.id !== id));
+      setResumes((prev) => (prev || []).filter((r) => r.id !== id));
       toast.success('Resume deleted');
     } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to delete resume'));
+      toast.error('Failed to delete resume');
     }
   };
 
-  const filteredResumes = resumes
+  const filteredResumes = (resumes || [])
     .filter(
       (resume) =>
         (resume.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
