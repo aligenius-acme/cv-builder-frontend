@@ -20,6 +20,7 @@ import {
   Briefcase,
   Building,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { ResumeVersion, Resume } from '@/types';
 import { formatDate } from '@/lib/utils';
@@ -100,10 +101,7 @@ export default function CompareVersionsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-slate-500">Loading resume...</p>
-        </div>
+        <LoadingSpinner text="Loading resume..." />
       </div>
     );
   }
@@ -180,12 +178,7 @@ export default function CompareVersionsPage() {
 
         {/* Comparison Content */}
         {isComparing ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              <p className="text-slate-500">Comparing versions...</p>
-            </div>
-          </div>
+          <LoadingSpinner text="Comparing versions..." />
         ) : version1 && version2 ? (
           <div className="space-y-6">
             {/* Overview Cards */}

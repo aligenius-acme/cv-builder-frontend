@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -74,10 +75,7 @@ export default function AdminDashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-slate-500">Loading admin dashboard...</p>
-        </div>
+        <LoadingSpinner text="Loading admin dashboard..." />
       </div>
     );
   }

@@ -83,14 +83,17 @@ export default function ResumeExamplesPage() {
         setExamples(response.data.examples || []);
         const occs = response.data.occupations || [];
         if (occs.length > 0) {
-          setOccupations(occs);
+          // Map strings to OccupationItem objects if needed
+          const mappedOccs = occs.map((occ: any) =>
+            typeof occ === 'string'
+              ? { id: occ, title: occ, industry: selectedIndustry || 'General' }
+              : occ
+          );
+          setOccupations(mappedOccs);
         }
-        // Use industries from response if available, otherwise extract from occupations
+        // Use industries from response if available, otherwise extract from examples
         if (response.data.industries?.length > 0) {
           setIndustries(response.data.industries);
-        } else if (occs.length > 0) {
-          const uniqueIndustries = [...new Set(occs.map((o: OccupationItem) => o.industry))];
-          setIndustries(uniqueIndustries);
         }
       }
     } catch (error) {

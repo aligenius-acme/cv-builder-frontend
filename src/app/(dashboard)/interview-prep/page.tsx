@@ -37,6 +37,7 @@ import {
   Search,
   Factory,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -244,10 +245,10 @@ export default function InterviewPrepPage() {
     setEvaluation(null);
     sampleAnswerModal.close();
     tipsModal.close();
-    setShowRedFlags(false);
-    setShowFollowUps(false);
-    setShowStarTemplate(false);
-    setShowScoringRubric(false);
+    redFlagsModal.close();
+    followUpsModal.close();
+    starTemplateModal.close();
+    scoringRubricModal.close();
   };
 
   const nextQuestion = () => {
@@ -353,10 +354,7 @@ export default function InterviewPrepPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Select a Job Application</label>
                     {isLoadingSavedJobs ? (
-                      <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
-                        <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-                        <span className="text-slate-500">Loading saved jobs...</span>
-                      </div>
+                      <LoadingSpinner size="sm" text="Loading saved jobs..." centered={false} />
                     ) : savedJobs.length === 0 ? (
                       <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
                         <Heart className="h-8 w-8 text-slate-300 mx-auto mb-2" />
@@ -595,10 +593,7 @@ export default function InterviewPrepPage() {
 
                 {/* Questions List */}
                 {isLoadingCommonQuestions ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                    <span className="ml-3 text-slate-500">Loading questions...</span>
-                  </div>
+                  <LoadingSpinner text="Loading questions..." />
                 ) : filteredCommonQuestions.length === 0 ? (
                   <div className="py-12 text-center">
                     <BookOpen className="h-12 w-12 text-slate-300 mx-auto mb-3" />
@@ -902,11 +897,8 @@ export default function InterviewPrepPage() {
 
                     {/* Resume Selection */}
                     {isLoadingResumes ? (
-                      <div className="flex items-center gap-2 py-3">
-                        <Loader2 className="h-5 w-5 text-emerald-600 animate-spin" />
-                        <span className="text-emerald-700 text-sm">Loading resumes...</span>
-                      </div>
-                    ) : resumes.length === 0 ? (
+                      <LoadingSpinner size="sm" text="Loading resumes..." centered={false} />
+                    ) : !resumes || resumes.length === 0 ? (
                       <div className="text-center py-4">
                         <p className="text-emerald-700 text-sm">No resumes found</p>
                         <Link href="/resumes">

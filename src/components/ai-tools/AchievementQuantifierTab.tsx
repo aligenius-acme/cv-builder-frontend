@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -11,9 +13,13 @@ import {
   Copy,
   CheckCircle,
   ChevronDown,
+  ChevronRight,
   Upload,
   FileText,
   Sparkles,
+  Briefcase,
+  Edit3,
+  XCircle,
 } from 'lucide-react';
 import api, {
   AchievementQuantifierResult,

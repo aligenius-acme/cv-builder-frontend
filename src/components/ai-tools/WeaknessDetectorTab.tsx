@@ -23,6 +23,12 @@ import {
   FileText,
   Briefcase,
   Building,
+  CheckCircle,
+  Copy,
+  XCircle,
+  Target,
+  TrendingUp,
+  RefreshCw,
 } from 'lucide-react';
 import api, {
   JobApplication,
@@ -338,82 +344,6 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
               </CardContent>
             </Card>
 
-            {/* Quick Fixes Section - NEW */}
-            {result.quickFixes && result.quickFixes.length > 0 && (
-              <Card variant="elevated" className="border-emerald-200">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-emerald-800 flex items-center gap-2 text-base">
-                      <Zap className="h-5 w-5" />
-                      Quick Fixes - Copy & Paste
-                      <Badge className="bg-emerald-200 text-emerald-800 ml-2">
-                        {result.quickFixes.length} fixes
-                      </Badge>
-                    </CardTitle>
-                    <button
-                      onClick={() => setShowQuickFixes(!showQuickFixes)}
-                      className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
-                    >
-                      {showQuickFixes ? 'Hide' : 'Show'}
-                    </button>
-                  </div>
-                </CardHeader>
-                {showQuickFixes && (
-                  <CardContent className="space-y-4">
-                    {result.quickFixes.map((fix: any, idx: number) => (
-                      <div key={idx} className="bg-white rounded-xl p-4 border border-emerald-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge className={`${
-                            fix.changeType === 'rewrite' ? 'bg-purple-100 text-purple-700' :
-                            fix.changeType === 'add' ? 'bg-blue-100 text-blue-700' :
-                            fix.changeType === 'remove' ? 'bg-red-100 text-red-700' :
-                            'bg-amber-100 text-amber-700'
-                          }`}>
-                            {fix.changeType.charAt(0).toUpperCase() + fix.changeType.slice(1)}
-                          </Badge>
-                          <span className="text-sm font-medium text-slate-700">{fix.section}</span>
-                        </div>
-
-                        {/* Before */}
-                        <div className="mb-3">
-                          <span className="text-xs text-slate-500 uppercase tracking-wide font-medium">Before</span>
-                          <p className="text-sm text-slate-500 bg-slate-50 p-2 rounded-lg mt-1 line-through">
-                            {fix.original}
-                          </p>
-                        </div>
-
-                        {/* After */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-emerald-600 uppercase tracking-wide font-medium">After (Improved)</span>
-                            <button
-                              onClick={() => copyToClipboard(fix.improved, idx)}
-                              className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
-                            >
-                              {copiedIndex === idx ? (
-                                <>
-                                  <CheckCircle className="h-3.5 w-3.5" />
-                                  Copied!
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-3.5 w-3.5" />
-                                  Copy
-                                </>
-                              )}
-                            </button>
-                          </div>
-                          <p className="text-sm text-slate-900 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
-                            {fix.improved}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                )}
-              </Card>
-            )}
-
             {/* Positives */}
             {result.positives.length > 0 && (
               <Card variant="elevated" className="bg-green-50 border-green-200">
@@ -525,73 +455,6 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
                 </Card>
               ))}
             </div>
-
-            {/* Industry Insights - NEW */}
-            {result.industryInsights && (
-              <Card variant="elevated" className="border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-blue-800 flex items-center gap-2 text-base">
-                    <Briefcase className="h-5 w-5" />
-                    Industry Insights
-                    {targetRole && <Badge className="bg-indigo-200 text-blue-800 ml-2">{targetRole}</Badge>}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Common Mistakes */}
-                  {result.industryInsights.commonMistakes && result.industryInsights.commonMistakes.length > 0 && (
-                    <div>
-                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        Common Mistakes to Avoid
-                      </h5>
-                      <ul className="space-y-1">
-                        {result.industryInsights.commonMistakes.map((mistake: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-blue-800">
-                            <XCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
-                            {mistake}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Industry Keywords */}
-                  {result.industryInsights.industryKeywords && result.industryInsights.industryKeywords.length > 0 && (
-                    <div>
-                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
-                        <Target className="h-4 w-4" />
-                        Keywords to Include
-                      </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {result.industryInsights.industryKeywords.map((keyword: string, idx: number) => (
-                          <Badge key={idx} className="bg-blue-100 text-blue-700 cursor-pointer hover:bg-blue-200" onClick={() => copyToClipboard(keyword, idx + 2000)}>
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Competitor Advantages */}
-                  {result.industryInsights.competitorAdvantages && result.industryInsights.competitorAdvantages.length > 0 && (
-                    <div>
-                      <h5 className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4" />
-                        What Top Candidates Do Differently
-                      </h5>
-                      <ul className="space-y-1">
-                        {result.industryInsights.competitorAdvantages.map((advantage: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-blue-800">
-                            <CheckCircle className="h-4 w-4 mt-0.5 shrink-0 text-emerald-500" />
-                            {advantage}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
             {/* Priority Actions */}
             <Card variant="elevated">

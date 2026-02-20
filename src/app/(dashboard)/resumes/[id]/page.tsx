@@ -45,6 +45,7 @@ import {
   Edit2,
   Trash2,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
 import { formatDate, downloadBlob, getScoreColor, getErrorMessage } from '@/lib/utils';
@@ -361,10 +362,7 @@ export default function ResumeDetailPage() {
                         Select from Saved Jobs
                       </label>
                       {isLoadingSavedJobs ? (
-                        <div className="flex items-center gap-2 p-4 border border-slate-200 rounded-xl">
-                          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-                          <span className="text-slate-500">Loading saved jobs...</span>
-                        </div>
+                        <LoadingSpinner size="sm" text="Loading saved jobs..." centered={false} />
                       ) : savedJobs.length === 0 ? (
                         <div className="p-6 border border-dashed border-slate-300 rounded-xl text-center">
                           <Heart className="h-10 w-10 text-slate-300 mx-auto mb-3" />
@@ -672,9 +670,9 @@ export default function ResumeDetailPage() {
                     {/* ── CONTACT HEADER ── */}
                     {pd.contact && (pd.contact.name || pd.contact.email) && (
                       <div className="flex flex-col sm:flex-row items-start gap-5 p-5 bg-blue-50 rounded-xl border border-blue-100">
-                        {(resume.photoUrl || pd.contact.photoUrl) && (
+                        {(pd.photoUrl || pd.contact.photoUrl) && (
                           <img
-                            src={resume.photoUrl || pd.contact.photoUrl}
+                            src={pd.photoUrl || pd.contact.photoUrl}
                             alt={pd.contact.name || 'Profile photo'}
                             className="w-20 h-20 rounded-xl object-cover shadow-md border-2 border-white flex-shrink-0"
                           />
@@ -837,12 +835,15 @@ export default function ResumeDetailPage() {
                       <div>
                         <SectionHeader icon={<Award className="h-4 w-4 text-white" />} title="Certifications" color="from-amber-500 to-orange-500" />
                         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {pd.certifications.map((cert: string, i: number) => (
+                          {pd.certifications.map((cert, i: number) => (
                             <div key={i} className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
                               <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Award className="h-3.5 w-3.5 text-white" />
                               </div>
-                              <span className="text-xs text-slate-700 font-medium leading-tight">{cert}</span>
+                              <span className="text-xs text-slate-700 font-medium leading-tight">
+                                {typeof cert === 'string' ? cert : cert.name}
+                                {typeof cert !== 'string' && cert.issuer && <span className="text-slate-500"> • {cert.issuer}</span>}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -932,12 +933,15 @@ export default function ResumeDetailPage() {
                       <div>
                         <SectionHeader icon={<Trophy className="h-4 w-4 text-white" />} title="Awards & Honors" color="from-yellow-500 to-amber-500" />
                         <div className="mt-3 space-y-2">
-                          {pd.awards.map((award: string, i: number) => (
+                          {pd.awards.map((award, i: number) => (
                             <div key={i} className="flex items-start gap-3 p-3.5 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
                               <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Trophy className="h-4 w-4 text-white" />
                               </div>
-                              <span className="text-sm text-slate-700 leading-relaxed">{award}</span>
+                              <span className="text-sm text-slate-700 leading-relaxed">
+                                {typeof award === 'string' ? award : award.name}
+                                {typeof award !== 'string' && award.issuer && <span className="text-slate-500 text-xs block mt-0.5">{award.issuer}</span>}
+                              </span>
                             </div>
                           ))}
                         </div>

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import Link from 'next/link';
 import {
   Users,
@@ -10,9 +12,11 @@ import {
   Copy,
   CheckCircle,
   ChevronDown,
+  ChevronRight,
   Upload,
   FileText,
   Send,
+  MessageCircle,
 } from 'lucide-react';
 import api, {
   NetworkingMessageResult,

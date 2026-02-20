@@ -25,7 +25,8 @@ interface AIWritingAssistantProps {
   context?: {
     jobTitle?: string;
     industry?: string;
-    section?: 'experience' | 'summary' | 'skills' | 'education';
+    section?: 'experience' | 'summary' | 'skills' | 'education' | 'volunteerWork';
+    role?: string;
   };
   className?: string;
   minRows?: number;

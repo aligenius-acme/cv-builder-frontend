@@ -64,13 +64,7 @@ export default function CoverLettersPage() {
 
     setIsGenerating(true);
     try {
-      // Try enhanced endpoint first, fallback to regular
-      let response;
-      try {
-        response = await api.generateEnhancedCoverLetter(data);
-      } catch {
-        response = await api.generateCoverLetter(data);
-      }
+      const response = await api.generateCoverLetter(data);
 
       if (response.success && response.data) {
         // Update cover letters in the data array

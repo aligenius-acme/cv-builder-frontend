@@ -62,9 +62,9 @@ export default function TemplateCard({
         title={template.name}
       >
         {/* Template preview image */}
-        {template.previewImageUrl ? (
+        {template.preview ? (
           <img
-            src={template.previewImageUrl}
+            src={template.preview}
             alt={template.name}
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -198,9 +198,9 @@ export default function TemplateCard({
       >
         {/* Large Preview Thumbnail */}
         <div className="relative mb-3 rounded-lg overflow-hidden aspect-[3/4] bg-gray-100">
-          {template.previewImageUrl ? (
+          {template.preview ? (
             <img
-              src={template.previewImageUrl}
+              src={template.preview}
               alt={template.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -328,9 +328,9 @@ export default function TemplateCard({
     >
       <div className="flex items-center gap-3">
         {/* Preview image or color */}
-        {template.previewImageUrl ? (
+        {template.preview ? (
           <img
-            src={template.previewImageUrl}
+            src={template.preview}
             alt={template.name}
             className="w-10 h-10 rounded-md flex-shrink-0 shadow-md object-cover ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300"
           />

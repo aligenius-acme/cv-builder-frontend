@@ -35,6 +35,7 @@ import {
   Languages,
   Heart,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -165,7 +166,7 @@ export default function ResumeBuilderPage() {
                 languages: response.data.parsedData.languages || [],
                 awards: response.data.parsedData.awards || [],
                 volunteerWork: response.data.parsedData.volunteerWork || [],
-              } as ResumeData);
+              } as unknown as ResumeData);
             }
           }
         }
@@ -292,10 +293,7 @@ export default function ResumeBuilderPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-          <p className="text-slate-500">Loading resume builder...</p>
-        </div>
+        <LoadingSpinner text="Loading resume builder..." />
       </div>
     );
   }

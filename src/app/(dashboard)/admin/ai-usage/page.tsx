@@ -19,6 +19,7 @@ import {
   User,
   TrendingUp,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -210,9 +211,7 @@ export default function AdminAIUsagePage() {
         <Card variant="elevated">
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              </div>
+              <LoadingSpinner />
             ) : logs.length === 0 ? (
               <div className="text-center py-12">
                 <Cpu className="h-12 w-12 text-slate-300 mx-auto mb-4" />

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import Link from 'next/link';
 import {
   Mail,
@@ -11,6 +13,7 @@ import {
   Copy,
   CheckCircle,
   ChevronDown,
+  ChevronRight,
   Upload,
   FileText,
   Heart,
@@ -18,6 +21,10 @@ import {
   Building,
   MapPin,
   DollarSign,
+  Edit3,
+  Briefcase,
+  Send,
+  Users,
 } from 'lucide-react';
 import api, {
   JobApplication,
@@ -261,7 +268,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
                               <Badge className="mt-1 text-xs" variant={
                                 job.status === 'INTERVIEWING' ? 'info' :
                                 job.status === 'APPLIED' ? 'warning' :
-                                job.status === 'REJECTED' ? 'error' : 'secondary'
+                                job.status === 'REJECTED' ? 'error' : 'default'
                               }>
                                 {job.status.toLowerCase()}
                               </Badge>

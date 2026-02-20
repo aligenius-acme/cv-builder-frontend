@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { Check, Crown, Zap, Building, Loader2, Sparkles, Star } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { Plan } from '@/types';
+import { getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function SubscriptionPage() {
@@ -51,10 +53,7 @@ export default function SubscriptionPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-slate-500">Loading subscription data...</p>
-        </div>
+        <LoadingSpinner text="Loading subscription data..." />
       </div>
     );
   }

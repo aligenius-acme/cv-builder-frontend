@@ -17,7 +17,8 @@ import {
   Search,
 } from 'lucide-react';
 import Link from 'next/link';
-import { JobApplication, Resume } from '@/types';
+import { JobApplication } from '@/lib/api';
+import { Resume } from '@/types';
 
 interface CoverLetterGeneratorProps {
   savedJobs: JobApplication[];

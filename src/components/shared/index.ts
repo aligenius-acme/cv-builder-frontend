@@ -3,7 +3,7 @@ export { default as PageHeader } from './PageHeader';
 
 export { default as EmptyState } from './EmptyState';
 
-export { default as LoadingSpinner, ButtonSpinner } from './LoadingSpinner';
+export { default as LoadingSpinner, ButtonSpinner, LoadingSkeleton } from './LoadingSpinner';
 
 export { default as SkeletonCard, SkeletonLine, SkeletonCircle, SkeletonBox } from './SkeletonCard';
 

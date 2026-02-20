@@ -689,8 +689,9 @@ class ApiClient {
     context?: {
       jobTitle?: string;
       industry?: string;
-      section?: 'experience' | 'summary' | 'skills' | 'education';
+      section?: 'experience' | 'summary' | 'skills' | 'education' | 'volunteerWork';
       previousBullets?: string[];
+      role?: string;
     };
     suggestionType: 'improve' | 'expand' | 'quantify' | 'action-verb' | 'complete';
   }) {

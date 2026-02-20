@@ -31,6 +31,7 @@ import {
   Shield,
   XCircle,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -377,9 +378,7 @@ export default function SalaryAnalyzerPage() {
                     {analyzeJobInputMode === 'saved' && (
                       <div>
                         {isLoadingSavedJobs ? (
-                          <div className="flex items-center justify-center py-4">
-                            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                          </div>
+                          <LoadingSpinner size="sm" />
                         ) : (
                           <>
                             <select
@@ -673,9 +672,7 @@ export default function SalaryAnalyzerPage() {
                     {negotiateJobInputMode === 'saved' && (
                       <div>
                         {isLoadingSavedJobs ? (
-                          <div className="flex items-center justify-center py-4">
-                            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                          </div>
+                          <LoadingSpinner size="sm" />
                         ) : (
                           <>
                             <select

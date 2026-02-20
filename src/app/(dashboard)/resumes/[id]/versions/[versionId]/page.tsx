@@ -203,7 +203,7 @@ export default function VersionDetailPage() {
       const keys = Object.keys(exp);
       if (keys.includes('id') || keys.includes('current') || keys.includes('startDate') || keys.includes('endDate')) {
         // Force clean it again
-        tailoredData.experience[i] = cleanExperience(exp);
+        tailoredData.experience![i] = cleanExperience(exp);
       }
     });
   }

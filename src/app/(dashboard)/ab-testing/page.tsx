@@ -26,12 +26,12 @@ import {
   Trash2,
   ExternalLink,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api, { ABTest, ABTestVariant, ABTestAnalytics } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/lib/utils';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { AB_TEST_STATUS_CONFIG } from '@/lib/colors';
 
 export default function ABTestingPage() {
@@ -188,7 +188,7 @@ export default function ABTestingPage() {
             {isLoading ? (
               <Card variant="elevated">
                 <CardContent className="py-8 text-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
+                  <LoadingSpinner />
                 </CardContent>
               </Card>
             ) : !tests || tests.length === 0 ? (

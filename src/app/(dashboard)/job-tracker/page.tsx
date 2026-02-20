@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import api, { JobApplication, JobActivity } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getErrorMessage } from '@/lib/utils';
 import { useFetchData } from '@/hooks/useFetchData';
 import { useModal } from '@/hooks/useModal';
 
@@ -56,7 +56,7 @@ const VISIBLE_COLUMNS: ApplicationStatus[] = ['WISHLIST', 'APPLIED', 'SCREENING'
 
 export default function JobTrackerPage() {
   // Use useFetchData hook - replaces 20+ lines!
-  const { data: jobData, isLoading, refetch } = useFetchData<{
+  const { data: jobData, isLoading, refetch, setData: setJobData } = useFetchData<{
     applications: JobApplication[];
     grouped: Record<string, JobApplication[]>;
     stats: any;
@@ -105,11 +105,16 @@ export default function JobTrackerPage() {
 
     // Optimistic update
     const updatedApp = { ...draggedItem, status: newStatus };
-    setGrouped(prev => {
-      const newGrouped = { ...prev };
-      newGrouped[draggedItem.status] = prev[draggedItem.status].filter(a => a.id !== draggedItem.id);
-      newGrouped[newStatus] = [...(prev[newStatus] || []), updatedApp];
-      return newGrouped;
+    setJobData(prev => {
+      if (!prev) return prev;
+      const newGrouped = { ...prev.grouped };
+      newGrouped[draggedItem.status] = (prev.grouped[draggedItem.status] || []).filter(a => a.id !== draggedItem.id);
+      newGrouped[newStatus] = [...(prev.grouped[newStatus] || []), updatedApp];
+      return {
+        ...prev,
+        grouped: newGrouped,
+        applications: prev.applications.map(a => a.id === draggedItem.id ? updatedApp : a)
+      };
     });
 
     try {

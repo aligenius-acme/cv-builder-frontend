@@ -18,6 +18,7 @@ import {
   Loader2,
   X,
 } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -247,9 +248,7 @@ export default function AdminTemplatesPage() {
 
         {/* Templates List */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          </div>
+          <LoadingSpinner />
         ) : templates.length === 0 ? (
           <Card variant="elevated">
             <CardContent className="py-12">
