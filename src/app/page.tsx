@@ -1,8 +1,27 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Target, Zap, Shield, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
+import { useAuthStore } from '@/store/auth';
 
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    // Redirect authenticated users to dashboard
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show nothing while checking auth or if authenticated (will redirect)
+  if (isLoading || isAuthenticated) {
+    return null;
+  }
   const features = [
     {
       icon: Target,
