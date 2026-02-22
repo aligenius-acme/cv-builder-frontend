@@ -114,8 +114,6 @@ export default function AdminUsersPage() {
     switch (role) {
       case 'ADMIN':
         return <Badge variant="error" size="sm">{role}</Badge>;
-      case 'ORG_ADMIN':
-        return <Badge variant="info" size="sm">{role}</Badge>;
       default:
         return <Badge variant="default" size="sm">{role}</Badge>;
     }
@@ -165,8 +163,6 @@ export default function AdminUsersPage() {
               >
                 <option value="" className="text-slate-500">All Roles</option>
                 <option value="USER">User</option>
-                <option value="ORG_USER">Org User</option>
-                <option value="ORG_ADMIN">Org Admin</option>
                 <option value="ADMIN">Admin</option>
               </select>
               <Button type="submit" variant="primary">
@@ -225,7 +221,7 @@ export default function AdminUsersPage() {
                             </button>
                             {actionUserId === u.id && (
                               <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-10 min-w-[120px]">
-                                {['USER', 'ORG_USER', 'ORG_ADMIN', 'ADMIN'].map((role) => (
+                                {['USER', 'ADMIN'].map((role) => (
                                   <button
                                     key={role}
                                     onClick={() => handleUpdateRole(u.id, role)}

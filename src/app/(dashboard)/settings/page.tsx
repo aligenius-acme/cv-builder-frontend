@@ -91,10 +91,6 @@ export default function SettingsPage() {
     switch (role) {
       case 'ADMIN':
         return <Badge variant="error">Admin</Badge>;
-      case 'ORG_ADMIN':
-        return <Badge variant="primary">Org Admin</Badge>;
-      case 'ORG_USER':
-        return <Badge variant="info">Org User</Badge>;
       default:
         return <Badge variant="default">User</Badge>;
     }
