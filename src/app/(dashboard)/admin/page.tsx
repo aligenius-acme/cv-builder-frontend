@@ -17,7 +17,6 @@ import {
   Activity,
   ChevronRight,
   Shield,
-  Building,
   AlertCircle,
   Loader2,
 } from 'lucide-react';
@@ -124,7 +123,6 @@ export default function AdminDashboardPage() {
 
   const adminLinks = [
     { title: 'User Management', description: 'View and manage all users', href: '/admin/users', icon: Users },
-    { title: 'Organizations', description: 'View B2B organizations', href: '/admin/organizations', icon: Building },
     { title: 'AI Usage', description: 'Monitor AI API usage and costs', href: '/admin/ai-usage', icon: Cpu },
     { title: 'AI Prompts', description: 'Manage AI prompt templates', href: '/admin/prompts', icon: FileText },
     { title: 'Templates', description: 'Manage resume templates', href: '/admin/templates', icon: FileText },

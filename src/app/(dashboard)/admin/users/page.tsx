@@ -37,7 +37,6 @@ interface AdminUser {
   firstName: string | null;
   lastName: string | null;
   role: string;
-  organization: { id: string; name: string } | null;
   resumeCount: number;
   coverLetterCount: number;
   createdAt: string;
