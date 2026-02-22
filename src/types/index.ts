@@ -4,9 +4,7 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
-  role: 'USER' | 'ORG_ADMIN' | 'ORG_USER' | 'ADMIN';
-  organizationId?: string;
-  organizationName?: string;
+  role: 'USER' | 'ADMIN';
   emailVerified?: boolean;
   aiCredits?: number;
   aiCreditsUsed?: number;
