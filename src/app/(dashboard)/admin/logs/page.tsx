@@ -132,10 +132,10 @@ export default function AdminLogsPage() {
   }
 
   const getActionIcon = (action: string) => {
-    if (action.includes('VIEW')) return <Eye className="h-4 w-4" />;
     if (action.includes('DELETE')) return <Trash2 className="h-4 w-4" />;
     if (action.includes('UPDATE')) return <Edit3 className="h-4 w-4" />;
     if (action.includes('CREATE')) return <UserPlus className="h-4 w-4" />;
+    if (action.includes('VIEW')) return <Activity className="h-4 w-4" />;
     return <Settings className="h-4 w-4" />;
   };
 
