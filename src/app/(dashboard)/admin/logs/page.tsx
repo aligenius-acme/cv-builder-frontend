@@ -8,19 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import {
-  Activity,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
   FileText,
-  Loader2,
   Shield,
   Eye,
-  Trash2,
-  Edit3,
-  UserPlus,
-  Settings,
   X,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -130,14 +124,6 @@ export default function AdminLogsPage() {
   if (user?.role !== 'ADMIN') {
     return null;
   }
-
-  const getActionIcon = (action: string) => {
-    if (action.includes('DELETE')) return <Trash2 className="h-4 w-4" />;
-    if (action.includes('UPDATE')) return <Edit3 className="h-4 w-4" />;
-    if (action.includes('CREATE')) return <UserPlus className="h-4 w-4" />;
-    if (action.includes('VIEW')) return <Activity className="h-4 w-4" />;
-    return <Settings className="h-4 w-4" />;
-  };
 
   const getActionBadge = (action: string) => {
     if (action.includes('DELETE')) return <Badge variant="error" size="sm">{action}</Badge>;
@@ -295,10 +281,7 @@ export default function AdminLogsPage() {
                             >
                               <Eye className="h-4 w-4" />
                             </button>
-                            <div className="flex items-center gap-2">
-                              {getActionIcon(log.action)}
-                              {getActionBadge(log.action)}
-                            </div>
+                            {getActionBadge(log.action)}
                           </div>
                         </td>
                         <td className="py-3 px-4">
