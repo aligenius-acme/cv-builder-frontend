@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
@@ -71,6 +71,13 @@ export default function Navbar() {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
   const isMoreActive = moreNavigation.some(item => isActive(item.href));
+
+  // Auto-close all dropdowns when route changes
+  useEffect(() => {
+    setShowUserMenu(false);
+    setShowMoreMenu(false);
+    setIsOpen(false);
+  }, [pathname]);
 
   return (
     <nav className="sticky top-0 z-50 bg-[var(--surface)] border-b border-[var(--border)]">
