@@ -280,17 +280,25 @@ export default function AdminLogsPage() {
                       <th className="text-left py-4 px-6 text-sm font-medium text-slate-600">Action</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Admin</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Target</th>
-                      <th className="text-right py-4 px-4 text-sm font-medium text-slate-600">Time</th>
-                      <th className="text-center py-4 px-4 text-sm font-medium text-slate-600"></th>
+                      <th className="text-right py-4 px-6 text-sm font-medium text-slate-600">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {auditLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-slate-50 transition-colors">
                         <td className="py-3 px-6">
-                          <div className="flex items-center gap-2">
-                            {getActionIcon(log.action)}
-                            {getActionBadge(log.action)}
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleViewDetails(log)}
+                              className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors text-blue-600 hover:text-blue-700"
+                              title="View details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                              {getActionIcon(log.action)}
+                              {getActionBadge(log.action)}
+                            </div>
                           </div>
                         </td>
                         <td className="py-3 px-4">
@@ -323,18 +331,8 @@ export default function AdminLogsPage() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-6 text-right">
                           <span className="text-sm text-slate-500">{formatDate(log.createdAt)}</span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDetails(log)}
-                            leftIcon={<Eye className="h-4 w-4" />}
-                          >
-                            Details
-                          </Button>
                         </td>
                       </tr>
                     ))}
