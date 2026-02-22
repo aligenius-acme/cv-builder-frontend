@@ -28,7 +28,6 @@ import toast from 'react-hot-toast';
 
 interface DashboardStats {
   totalUsers: number;
-  activeSubscriptions: number;
   totalResumes: number;
   totalCoverLetters: number;
   aiRequests30d: number;
@@ -90,13 +89,6 @@ export default function AdminDashboardPage() {
       value: stats?.totalUsers || 0,
       icon: Users,
       color: 'bg-blue-600',
-      href: '/admin/users',
-    },
-    {
-      title: 'Active Subscriptions',
-      value: stats?.activeSubscriptions || 0,
-      icon: CreditCard,
-      color: 'bg-emerald-600',
       href: '/admin/users',
     },
     {

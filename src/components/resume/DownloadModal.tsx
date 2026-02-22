@@ -64,8 +64,8 @@ export default function DownloadModal({
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showRecommended, setShowRecommended] = useState(true);
 
-  // B2B feature - only available for org users or business plan
-  const canAnonymize = user?.organizationId || user?.planType === 'BUSINESS';
+  // Anonymization available to all users
+  const canAnonymize = true;
 
   // All categories matching database - IDs match template data (lowercase with hyphens)
   const categories: Array<{ id: string; label: string }> = [

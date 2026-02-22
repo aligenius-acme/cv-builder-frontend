@@ -37,8 +37,6 @@ interface AdminUser {
   firstName: string | null;
   lastName: string | null;
   role: string;
-  planType: string;
-  status: string;
   organization: { id: string; name: string } | null;
   resumeCount: number;
   coverLetterCount: number;
@@ -112,28 +110,6 @@ export default function AdminUsersPage() {
   if (user?.role !== 'ADMIN') {
     return null;
   }
-
-  const getPlanIcon = (planType: string) => {
-    switch (planType) {
-      case 'BUSINESS':
-        return <Building className="h-4 w-4" />;
-      case 'PRO':
-        return <Crown className="h-4 w-4" />;
-      default:
-        return <Zap className="h-4 w-4" />;
-    }
-  };
-
-  const getPlanBadge = (planType: string) => {
-    switch (planType) {
-      case 'BUSINESS':
-        return <Badge variant="primary" size="sm">{planType}</Badge>;
-      case 'PRO':
-        return <Badge variant="warning" size="sm">{planType}</Badge>;
-      default:
-        return <Badge variant="default" size="sm">{planType}</Badge>;
-    }
-  };
 
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -218,7 +194,6 @@ export default function AdminUsersPage() {
                     <tr className="border-b border-slate-200 bg-slate-50">
                       <th className="text-left py-4 px-6 text-sm font-medium text-slate-600">User</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Role</th>
-                      <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Plan</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Content</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Joined</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Last Login</th>
@@ -267,7 +242,6 @@ export default function AdminUsersPage() {
                             )}
                           </div>
                         </td>
-                        <td className="py-4 px-4">{getPlanBadge(u.planType)}</td>
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3 text-sm text-slate-600">
                             <span className="flex items-center gap-1">

@@ -61,7 +61,6 @@ export default function DashboardPage() {
     setShowUploader(false);
   };
 
-  const isPro = user?.planType === 'PRO' || user?.planType === 'BUSINESS';
   const totalVersions = resumes.reduce((acc, r) => acc + (r.versionCount || 0), 0);
 
   return (
@@ -78,27 +77,14 @@ export default function DashboardPage() {
               : 'Your AI-powered career toolkit is ready. Track applications and optimize your job search.'
           }
           actions={
-            <div className="flex flex-wrap gap-3">
-              {!isPro && (
-                <Link href="/subscription">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    leftIcon={<Crown className="h-5 w-5 text-amber-500" />}
-                  >
-                    Upgrade to Pro
-                  </Button>
-                </Link>
-              )}
-              <Button
-                variant="primary"
-                size="lg"
-                leftIcon={<Plus className="h-5 w-5" />}
-                onClick={() => setShowUploader(!showUploader)}
-              >
-                Upload Resume
-              </Button>
-            </div>
+            <Button
+              variant="primary"
+              size="lg"
+              leftIcon={<Plus className="h-5 w-5" />}
+              onClick={() => setShowUploader(!showUploader)}
+            >
+              Upload Resume
+            </Button>
           }
         />
 
@@ -339,26 +325,6 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ))}
-
-            {/* Pro Features Card */}
-            {!isPro && (
-              <Card className="bg-slate-900 border-0 text-white">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Crown className="h-5 w-5 text-amber-400" />
-                    <span className="font-semibold text-white">Upgrade to Pro</span>
-                  </div>
-                  <p className="text-slate-400 text-sm mb-4">
-                    Unlock unlimited customizations, cover letters, and priority support.
-                  </p>
-                  <Link href="/subscription">
-                    <Button variant="outline" size="sm" className="w-full border-white/20 text-white hover:bg-white/10 hover:text-white hover:border-white/30">
-                      View Plans
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
 

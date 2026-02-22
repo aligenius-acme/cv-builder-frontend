@@ -28,10 +28,6 @@ interface Organization {
   name: string;
   domain: string | null;
   userCount: number;
-  subscription: {
-    planType: string;
-    status: string;
-  } | null;
   createdAt: string;
 }
 
@@ -76,30 +72,6 @@ export default function AdminOrganizationsPage() {
   if (user?.role !== 'ADMIN') {
     return null;
   }
-
-  const getPlanBadge = (planType: string | undefined) => {
-    switch (planType) {
-      case 'BUSINESS':
-        return <Badge variant="primary" size="sm">Business</Badge>;
-      case 'PRO':
-        return <Badge variant="warning" size="sm">Pro</Badge>;
-      default:
-        return <Badge variant="default" size="sm">Free</Badge>;
-    }
-  };
-
-  const getStatusBadge = (status: string | undefined) => {
-    switch (status) {
-      case 'ACTIVE':
-        return <Badge variant="success" size="sm">Active</Badge>;
-      case 'CANCELLED':
-        return <Badge variant="error" size="sm">Cancelled</Badge>;
-      case 'PAST_DUE':
-        return <Badge variant="warning" size="sm">Past Due</Badge>;
-      default:
-        return <Badge variant="default" size="sm">{status || 'N/A'}</Badge>;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
@@ -161,17 +133,6 @@ export default function AdminOrganizationsPage() {
                         Users
                       </span>
                       <span className="font-semibold text-slate-900">{org.userCount}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-500 flex items-center gap-1.5">
-                        <CreditCard className="h-4 w-4" />
-                        Plan
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {getPlanBadge(org.subscription?.planType)}
-                        {getStatusBadge(org.subscription?.status)}
-                      </div>
                     </div>
 
                     <div className="flex items-center justify-between">

@@ -1,13 +1,13 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import toast from 'react-hot-toast';
 
-export default function GitHubCallbackPage() {
+function GitHubCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setUser } = useAuthStore();
@@ -114,5 +114,26 @@ export default function GitHubCallbackPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GitHubCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white rounded-xl shadow-xl p-8 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Loader2 className="h-8 w-8 text-slate-700 animate-spin" />
+            </div>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+              Loading...
+            </h2>
+          </div>
+        </div>
+      </div>
+    }>
+      <GitHubCallbackContent />
+    </Suspense>
   );
 }

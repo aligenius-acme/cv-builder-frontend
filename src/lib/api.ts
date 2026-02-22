@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { ApiResponse, User, Resume, ResumeVersion, CoverLetter, Plan, ATSAnalysis, ResumeTemplate } from '@/types';
+import { ApiResponse, User, Resume, ResumeVersion, CoverLetter, ATSAnalysis, ResumeTemplate } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -119,6 +119,15 @@ class ApiClient {
 
   async resendVerification() {
     const response = await this.client.post<ApiResponse>('/auth/resend-verification');
+    return response.data;
+  }
+
+  async getCredits() {
+    const response = await this.client.get<ApiResponse<{
+      total: number;
+      used: number;
+      remaining: number;
+    }>>('/auth/credits');
     return response.data;
   }
 
@@ -391,38 +400,6 @@ class ApiClient {
   // Subscription endpoints
   async getSubscription() {
     const response = await this.client.get<ApiResponse<any>>('/subscription');
-    return response.data;
-  }
-
-  async getPlans() {
-    const response = await this.client.get<ApiResponse<{ plans: Plan[] }>>('/subscription/plans');
-    return response.data;
-  }
-
-  async createCheckout(planType: 'pro' | 'business') {
-    const response = await this.client.post<ApiResponse<{ checkoutUrl: string }>>('/subscription/checkout', {
-      planType,
-    });
-    return response.data;
-  }
-
-  async createPortalSession() {
-    const response = await this.client.post<ApiResponse<{ portalUrl: string }>>('/subscription/portal');
-    return response.data;
-  }
-
-  async cancelSubscription() {
-    const response = await this.client.post<ApiResponse>('/subscription/cancel');
-    return response.data;
-  }
-
-  async reactivateSubscription() {
-    const response = await this.client.post<ApiResponse>('/subscription/reactivate');
-    return response.data;
-  }
-
-  async getUsage() {
-    const response = await this.client.get<ApiResponse<any>>('/subscription/usage');
     return response.data;
   }
 

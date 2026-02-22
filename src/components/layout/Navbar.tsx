@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
+import CreditBadge from '@/components/shared/CreditBadge';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +67,6 @@ export default function Navbar() {
 
   const userNavigation = [
     { name: 'Settings', href: '/settings', icon: Settings },
-    { name: 'Subscription', href: '/subscription', icon: CreditCard },
   ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
@@ -177,6 +177,15 @@ export default function Navbar() {
                     <Shield className="h-4 w-4 mr-2 text-amber-500" />
                     Admin
                   </Link>
+                )}
+
+                {/* AI Credits Badge */}
+                {user?.aiCredits !== undefined && (
+                  <CreditBadge
+                    total={user.aiCredits}
+                    used={user.aiCreditsUsed || 0}
+                    showLabel={false}
+                  />
                 )}
 
                 {/* Theme Toggle */}
@@ -304,6 +313,18 @@ export default function Navbar() {
                     <p className="text-xs text-[var(--text-secondary)]">{user?.email}</p>
                   </div>
                 </div>
+
+                {/* AI Credits Badge (Mobile) */}
+                {user?.aiCredits !== undefined && (
+                  <div className="px-3 mb-3">
+                    <CreditBadge
+                      total={user.aiCredits}
+                      used={user.aiCreditsUsed || 0}
+                      showLabel={true}
+                      className="w-full justify-center"
+                    />
+                  </div>
+                )}
 
                 {/* All navigation items for mobile */}
                 {allNavigation.map((item) => (

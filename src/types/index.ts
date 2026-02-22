@@ -5,24 +5,16 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role: 'USER' | 'ORG_ADMIN' | 'ORG_USER' | 'ADMIN';
-  planType: 'FREE' | 'PRO' | 'BUSINESS';
   organizationId?: string;
   organizationName?: string;
   emailVerified?: boolean;
-  subscription?: SubscriptionInfo;
+  aiCredits?: number;
+  aiCreditsUsed?: number;
   stats?: {
     resumes: number;
     coverLetters: number;
   };
   createdAt?: string;
-}
-
-export interface SubscriptionInfo {
-  status: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'TRIALING' | 'PAUSED';
-  currentPeriodEnd?: string;
-  cancelAtPeriodEnd: boolean;
-  resumeLimit: number;
-  resumesCreated: number;
 }
 
 // Resume types
@@ -245,19 +237,6 @@ export interface CoverLetter {
   updatedAt: string;
 }
 
-// Subscription types
-export interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  interval?: 'month' | 'year';
-  stripePriceId?: string;
-  features: string[];
-  limitations?: string[];
-  popular?: boolean;
-  forTeams?: boolean;
-}
-
 // API Response types
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -353,7 +332,6 @@ export interface RecommendedTemplatesResponse {
 // Admin types
 export interface DashboardStats {
   totalUsers: number;
-  activeSubscriptions: number;
   totalResumes: number;
   totalCoverLetters: number;
   aiRequests30d: number;
