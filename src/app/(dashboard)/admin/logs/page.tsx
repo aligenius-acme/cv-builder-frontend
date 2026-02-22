@@ -281,7 +281,7 @@ export default function AdminLogsPage() {
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Admin</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Target</th>
                       <th className="text-right py-4 px-4 text-sm font-medium text-slate-600">Time</th>
-                      <th className="text-center py-4 px-4 text-sm font-medium text-slate-600">Actions</th>
+                      <th className="text-center py-4 px-4 text-sm font-medium text-slate-600"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
