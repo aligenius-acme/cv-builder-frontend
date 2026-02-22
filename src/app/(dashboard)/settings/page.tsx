@@ -15,7 +15,6 @@ import {
   Shield,
   Bell,
   Palette,
-  Building,
   CheckCircle,
   AlertCircle,
   Loader2,
@@ -134,12 +133,6 @@ export default function SettingsPage() {
                 <p className="text-slate-500">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-3">
                   {getRoleBadge(user?.role)}
-                  {user?.organizationId && (
-                    <Badge variant="info">
-                      <Building className="h-3 w-3 mr-1" />
-                      Organization
-                    </Badge>
-                  )}
                 </div>
               </div>
               {user?.emailVerified ? (
