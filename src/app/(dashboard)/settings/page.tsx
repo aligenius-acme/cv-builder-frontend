@@ -101,17 +101,6 @@ export default function SettingsPage() {
     }
   };
 
-  const getPlanBadge = (planType: string | undefined) => {
-    switch (planType) {
-      case 'BUSINESS':
-        return <Badge variant="primary">Business</Badge>;
-      case 'PRO':
-        return <Badge variant="warning">Pro</Badge>;
-      default:
-        return <Badge variant="default">Free</Badge>;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -145,7 +134,6 @@ export default function SettingsPage() {
                 <p className="text-slate-500">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-3">
                   {getRoleBadge(user?.role)}
-                  {getPlanBadge(user?.planType)}
                   {user?.organizationId && (
                     <Badge variant="info">
                       <Building className="h-3 w-3 mr-1" />

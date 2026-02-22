@@ -37,7 +37,7 @@ export default function LoginPage() {
     google: boolean;
     github: boolean;
     urls: { google?: string; github?: string };
-  }>({ google: false, github: false, urls: {} });
+  }>({ google: true, github: true, urls: {} }); // Always show for demo
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,13 +45,18 @@ export default function LoginPage() {
     api.getOAuthProviders().then((res) => {
       if (res.success && res.data) {
         setOAuthProviders({
-          google: res.data.providers.google,
-          github: res.data.providers.github,
+          google: res.data.providers.google || true, // Fallback to true for demo
+          github: res.data.providers.github || true, // Fallback to true for demo
           urls: res.data.urls,
         });
       }
     }).catch(() => {
-      // OAuth not configured
+      // OAuth not configured, but show buttons anyway for demo
+      setOAuthProviders({
+        google: true,
+        github: true,
+        urls: {},
+      });
     });
   }, []);
 
@@ -73,6 +78,9 @@ export default function LoginPage() {
     if (url) {
       setOAuthLoading(provider);
       window.location.href = url;
+    } else {
+      // OAuth not configured in backend
+      toast.error(`${provider === 'google' ? 'Google' : 'GitHub'} OAuth is not configured. Please add credentials to backend .env file.`);
     }
   };
 

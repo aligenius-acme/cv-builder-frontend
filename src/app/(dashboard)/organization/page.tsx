@@ -45,11 +45,6 @@ interface Organization {
   logoUrl: string | null;
   primaryColor: string | null;
   anonymizationEnabled: boolean;
-  subscription: {
-    seatsTotal: number;
-    seatsUsed: number;
-    status: string;
-  } | null;
   members: Member[];
   isAdmin: boolean;
 }
@@ -346,22 +341,6 @@ export default function OrganizationPage() {
                 <div>
                   <p className="text-sm text-slate-500">Members</p>
                   <p className="text-2xl font-bold text-slate-900">{organization.members.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card variant="elevated">
-            <CardContent className="py-5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <Crown className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Seats Used</p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {organization.subscription?.seatsUsed || 0} / {organization.subscription?.seatsTotal || 5}
-                  </p>
                 </div>
               </div>
             </CardContent>

@@ -99,8 +99,6 @@ export default function ResumeDetailPage() {
     url?: string;
   } | null>(null);
 
-  const isPro = user?.planType === 'PRO' || user?.planType === 'BUSINESS';
-
   useEffect(() => {
     loadResume();
     loadSavedJobs();
@@ -1007,33 +1005,6 @@ export default function ResumeDetailPage() {
             </Card>
           );
         })()}
-
-        {/* ATS Simulator CTA */}
-        {!isPro && (
-          <Card className="bg-slate-900 border-0 text-white overflow-hidden relative">
-            <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'%3E%3C/path%3E%3C/svg%3E\")"}} />
-            <CardContent className="py-6 relative">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                    <Crown className="h-6 w-6 text-amber-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Unlock ATS Simulator</h3>
-                    <p className="text-white/80 text-sm">
-                      See exactly how ATS systems read your resume. Upgrade to Pro.
-                    </p>
-                  </div>
-                </div>
-                <Link href="/subscription">
-                  <Button variant="secondary" size="lg">
-                    Upgrade Now
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Download Modal */}
         {showDownloadModal && selectedVersionForDownload && (

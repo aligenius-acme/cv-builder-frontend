@@ -10,7 +10,6 @@ import { CoverLetter, Resume } from '@/types';
 import { downloadBlob, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useFetchMultiple } from '@/hooks/useFetchData';
-import UpgradePrompt from '@/components/cover-letters/UpgradePrompt';
 import CoverLetterGenerator from '@/components/cover-letters/CoverLetterGenerator';
 import CoverLetterCard from '@/components/cover-letters/CoverLetterCard';
 
@@ -27,16 +26,9 @@ interface EnhancedCoverLetter extends CoverLetter {
 }
 
 export default function CoverLettersPage() {
-  const [hasAccess, setHasAccess] = useState(true);
-
   // Use useFetchMultiple for parallel data loading - replaces 30+ lines!
   const { data, isLoading, setData } = useFetchMultiple([
-    () => api.getCoverLetters().catch((err) => {
-      if (err.response?.status === 403) {
-        setHasAccess(false);
-      }
-      return { success: false, data: [] };
-    }),
+    () => api.getCoverLetters().catch(() => ({ success: false, data: [] })),
     () => api.getResumes(),
     () => api.getJobApplications().catch(() => ({ success: false, data: { applications: [] } })),
   ]);
@@ -124,10 +116,6 @@ export default function CoverLettersPage() {
       [id]: !prev[id],
     }));
   };
-
-  if (!hasAccess) {
-    return <UpgradePrompt />;
-  }
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
