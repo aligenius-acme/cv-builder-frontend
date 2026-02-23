@@ -24,6 +24,7 @@ export interface Resume {
   parseError?: string;
   parsedData?: ParsedResumeData;
   rawText?: string;
+  originalFileKey?: string;
   versionCount?: number;
   versions?: ResumeVersionSummary[];
   createdAt: string;

@@ -297,14 +297,16 @@ export default function ResumeDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadOriginal}
-              leftIcon={<Download className="h-4 w-4" />}
-            >
-              Download Original
-            </Button>
+            {resume.originalFileKey && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadOriginal}
+                leftIcon={<Download className="h-4 w-4" />}
+              >
+                Download Original
+              </Button>
+            )}
             <Badge variant={resume.parseStatus === 'completed' ? 'success' : 'warning'} size="lg">
               {resume.parseStatus}
             </Badge>
