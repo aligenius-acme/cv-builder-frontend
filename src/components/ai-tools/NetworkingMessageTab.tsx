@@ -152,7 +152,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value as NetworkingPurpose)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900"
               >
                 {purposes.map((p) => (
                   <option key={p.value} value={p.value}>{p.label}</option>
@@ -169,7 +169,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
           <CardContent className="space-y-4">
             {/* Resume selector — auto-fills name + background */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5.5">
                 <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-blue-500" />Load from Resume (auto-fills your info)</span>
               </label>
               {isLoadingResumes ? (
@@ -180,7 +180,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
                 <select
                   value={selectedResumeId}
                   onChange={(e) => handleSelectResume(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900"
                 >
                   <option value="">— Select a resume to auto-fill —</option>
                   {resumes.map((r) => (
@@ -190,32 +190,32 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Your Name *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Your Name *</label>
               <input
                 type="text"
                 value={formData.senderName}
                 onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Your Background *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Your Background *</label>
               <textarea
                 value={formData.senderBackground}
                 onChange={(e) => setFormData({ ...formData, senderBackground: e.target.value })}
                 placeholder="e.g., Software engineer with 5 years experience in fintech"
                 rows={2}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Target Role</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Target Role</label>
               <input
                 type="text"
                 value={formData.targetRole}
                 onChange={(e) => setFormData({ ...formData, targetRole: e.target.value })}
                 placeholder="e.g., Senior Product Manager"
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>
           </CardContent>
@@ -228,41 +228,41 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Name *</label>
                 <input
                   type="text"
                   value={formData.recipientName}
                   onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Title *</label>
                 <input
                   type="text"
                   value={formData.recipientTitle}
                   onChange={(e) => setFormData({ ...formData, recipientTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                  className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Company *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Company *</label>
               <input
                 type="text"
                 value={formData.recipientCompany}
                 onChange={(e) => setFormData({ ...formData, recipientCompany: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Common Ground</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Common Ground</label>
               <input
                 type="text"
                 value={formData.commonGround}
                 onChange={(e) => setFormData({ ...formData, commonGround: e.target.value })}
                 placeholder="Same university, mutual connection, etc. (comma-separated)"
-                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>
 

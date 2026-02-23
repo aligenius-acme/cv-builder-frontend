@@ -194,7 +194,7 @@ export default function SkillGapPage() {
                       value={targetRole}
                       onChange={(e) => setTargetRole(e.target.value)}
                       placeholder="e.g., Senior Software Engineer"
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                     />
                     {savedJobs.length > 0 && (
                       <button
@@ -258,7 +258,7 @@ export default function SkillGapPage() {
                   <select
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-slate-900"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-slate-900"
                   >
                     <option value="" className="text-slate-500">Select level</option>
                     <option value="entry">Entry Level (0-2 years)</option>
@@ -275,7 +275,7 @@ export default function SkillGapPage() {
                   <select
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-slate-900"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-slate-900"
                   >
                     <option value="" className="text-slate-500">Select industry</option>
                     <option value="technology">Technology</option>
@@ -345,7 +345,7 @@ export default function SkillGapPage() {
                     onChange={(e) => setSkillInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Add a skill..."
-                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   />
                   <Button variant="primary" onClick={addSkill}>
                     <Plus className="h-5 w-5" />
@@ -402,7 +402,7 @@ export default function SkillGapPage() {
             {!analysis ? (
               <Card variant="elevated">
                 <CardContent className="py-16 text-center">
-                  <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6">
                     <GraduationCap className="h-10 w-10 text-purple-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">

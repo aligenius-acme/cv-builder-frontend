@@ -24,14 +24,14 @@ export default function SegmentedControl<T extends string>({
   className = '',
 }: SegmentedControlProps<T>) {
   return (
-    <div className={`flex items-center gap-2 p-1 bg-slate-100 rounded-xl w-fit ${className}`}>
+    <div className={`flex items-center gap-2 p-1 bg-slate-200 rounded-xl w-fit ${className}`}>
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           onClick={() => !option.disabled && onChange(option.value)}
           disabled={option.disabled}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             value === option.value
               ? 'bg-white text-blue-600 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'

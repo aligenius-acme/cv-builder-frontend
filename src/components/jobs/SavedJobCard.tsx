@@ -75,7 +75,7 @@ export default function SavedJobCard({
                 ) : (
                   <button
                     onClick={onAddToTracker}
-                    className="p-2 rounded-lg transition-all flex-shrink-0 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600"
+                    className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600"
                     title="Add to Job Tracker"
                   >
                     <Target className="h-4 w-4" />
@@ -83,7 +83,7 @@ export default function SavedJobCard({
                 )}
                 <button
                   onClick={onRemove}
-                  className="p-2 rounded-lg transition-all flex-shrink-0 hover:bg-red-50 text-slate-400 hover:text-red-500"
+                  className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-red-50 text-slate-400 hover:text-red-500"
                   title="Remove from saved"
                 >
                   <Trash2 className="h-4 w-4" />

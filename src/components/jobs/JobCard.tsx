@@ -66,7 +66,7 @@ export default function JobCard({
               <button
                 onClick={onSave}
                 className={cn(
-                  'p-2 rounded-lg transition-all flex-shrink-0',
+                  'p-2 rounded-lg transition-all duration-200 flex-shrink-0',
                   isSaved
                     ? 'bg-blue-100 text-blue-600'
                     : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'

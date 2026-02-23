@@ -31,11 +31,40 @@ export default function CoverLettersPage() {
     () => api.getCoverLetters().catch(() => ({ success: false, data: [] })),
     () => api.getResumes(),
     () => api.getJobApplications().catch(() => ({ success: false, data: { applications: [] } })),
+    () => api.getSavedJobs(1, 100).catch(() => ({ success: false, data: { jobs: [] } })),
   ]);
 
   const coverLetters = (data?.[0] as EnhancedCoverLetter[]) || [];
   const resumes = (data?.[1] as Resume[]) || [];
-  const savedJobs = ((data?.[2] as any)?.applications || []).filter((job: JobApplication) => job.jobDescription);
+
+  // Merge jobs from Job Tracker and Saved Jobs (same as AI Tools)
+  const jobTrackerJobs = ((data?.[2] as any)?.applications || []) as JobApplication[];
+  const savedJobsFromSearch = ((data?.[3] as any)?.jobs || []);
+
+  const mergedJobs: JobApplication[] = [
+    ...jobTrackerJobs,
+    ...savedJobsFromSearch.map((job: any) => ({
+      id: job.savedJobId || job.id,
+      jobTitle: job.title,
+      companyName: job.company,
+      location: job.location,
+      salary: job.salary,
+      jobUrl: job.url,
+      jobDescription: job.description || '',
+      source: job.source || 'Saved Jobs',
+    }))
+  ];
+
+  // Deduplicate and filter for those with descriptions (required for cover letters)
+  const uniqueJobs = mergedJobs.reduce((acc, job) => {
+    const key = `${job.jobTitle}-${job.companyName}`.toLowerCase();
+    if (!acc.has(key) && job.jobDescription) {
+      acc.set(key, job);
+    }
+    return acc;
+  }, new Map<string, JobApplication>());
+
+  const savedJobs = Array.from(uniqueJobs.values());
 
   const [showGenerator, setShowGenerator] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -172,7 +201,7 @@ export default function CoverLettersPage() {
           <Card variant="elevated">
             <CardContent className="py-16">
               <div className="text-center">
-                <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6">
                   <FileText className="h-10 w-10 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">No cover letters yet</h3>

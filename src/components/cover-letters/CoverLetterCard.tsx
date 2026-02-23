@@ -67,13 +67,13 @@ export default function CoverLetterCard({
   return (
     <Card
       variant="elevated"
-      className="group hover:border-purple-300 hover:shadow-lg transition-all duration-300"
+      className="group hover:border-purple-300 hover:shadow-md transition-all duration-200"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <CardContent className="py-5">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-slate-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950 transition-colors">
+            <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
               <FileText className="h-6 w-6 text-purple-600" />
             </div>
             <div>

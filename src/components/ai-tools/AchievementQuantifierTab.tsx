@@ -1,25 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import Link from 'next/link';
+import { ResumeSelector } from '@/components/ui/ResumeSelector';
 import {
   TrendingUp,
   Loader2,
   Copy,
   CheckCircle,
-  ChevronDown,
   ChevronRight,
-  Upload,
-  FileText,
   Sparkles,
   Briefcase,
   Edit3,
   XCircle,
+  FileText,
 } from 'lucide-react';
 import api, {
   AchievementQuantifierResult,
@@ -40,13 +37,11 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
   // Resume import state
   const [bulletSource, setBulletSource] = useState<'manual' | 'resume'>('manual');
   const [selectedResumeId, setSelectedResumeId] = useState('');
-  const resumeDropdown = useModal();
   const [resumeBullets, setResumeBullets] = useState<string[]>([]);
   const [selectedBulletIndices, setSelectedBulletIndices] = useState<Set<number>>(new Set());
 
   const handleSelectResume = async (resumeId: string) => {
     setSelectedResumeId(resumeId);
-    resumeDropdown.close();
     setSelectedBulletIndices(new Set());
 
     // Extract bullet points from resume
@@ -157,7 +152,7 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
               Target Job (Optional)
             </label>
             <div className="relative">
-              <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={jobContext}
@@ -180,68 +175,14 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
 
           {bulletSource === 'resume' ? (
             <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Resume</label>
-                {isLoadingResumes ? (
-                  <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
-                    <Loader2 className="h-5 w-5 text-green-600 animate-spin" />
-                    <span className="text-slate-500">Loading resumes...</span>
-                  </div>
-                ) : resumes.length === 0 ? (
-                  <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
-                    <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
-                    <Link href="/resumes">
-                      <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
-                        Upload Resume
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => resumeDropdown.toggle()}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all"
-                    >
-                      {selectedResume ? (
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                            <FileText className="h-4 w-4 text-green-600" />
-                          </div>
-                          <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
-                        </div>
-                      ) : (
-                        <span className="text-slate-500">Choose a resume to import from...</span>
-                      )}
-                      <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${resumeDropdown.isOpen ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {resumeDropdown.isOpen && (
-                      <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                        {resumes.map((resume) => (
-                          <button
-                            key={resume.id}
-                            type="button"
-                            onClick={() => handleSelectResume(resume.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
-                              selectedResumeId === resume.id ? 'bg-green-50' : ''
-                            }`}
-                          >
-                            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
-                              <p className="text-xs text-slate-500">{resume.fileName}</p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <ResumeSelector
+                resumes={resumes}
+                selectedResumeId={selectedResumeId}
+                onSelect={handleSelectResume}
+                isLoading={isLoadingResumes}
+                placeholder="Choose a resume to import from..."
+                colorTheme="green"
+              />
 
               {/* Bullet points from resume */}
               {selectedResumeId && resumeBullets.length > 0 && (

@@ -31,16 +31,46 @@ const tabs = [
 export default function AIToolsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('job-match');
 
-  // Use useFetchMultiple for parallel data loading - replaces 30+ lines!
+  // Use useFetchMultiple for parallel data loading - now fetches from BOTH sources!
   const { data, isLoading } = useFetchMultiple([
     () => api.getResumes(),
     () => api.getJobApplications(),
+    () => api.getSavedJobs(1, 100), // Get saved jobs from job search
   ], {
     showErrorToast: false, // Silent errors
   });
 
   const resumes = (data?.[0] as any[]) || [];
-  const savedJobs = ((data?.[1] as any)?.applications || []).filter((job: JobApplication) => job.jobDescription);
+
+  // Merge jobs from Job Tracker (JobApplication) and Jobs page (SavedJob)
+  const jobTrackerJobs = ((data?.[1] as any)?.applications || []) as JobApplication[];
+  const savedJobsFromSearch = ((data?.[2] as any)?.jobs || []);
+
+  // Convert saved jobs to JobApplication format and merge
+  const mergedJobs: JobApplication[] = [
+    ...jobTrackerJobs,
+    ...savedJobsFromSearch.map((job: any) => ({
+      id: job.savedJobId || job.id,
+      jobTitle: job.title,
+      companyName: job.company,
+      location: job.location,
+      salary: job.salary,
+      jobUrl: job.url,
+      jobDescription: job.description || '', // May be empty
+      source: job.source || 'Saved Jobs',
+    }))
+  ];
+
+  // Deduplicate by job title + company (in case job exists in both tables)
+  const uniqueJobs = mergedJobs.reduce((acc, job) => {
+    const key = `${job.jobTitle}-${job.companyName}`.toLowerCase();
+    if (!acc.has(key)) {
+      acc.set(key, job);
+    }
+    return acc;
+  }, new Map<string, JobApplication>());
+
+  const savedJobs = Array.from(uniqueJobs.values());
   const isLoadingResumes = isLoading;
   const isLoadingSavedJobs = isLoading;
 

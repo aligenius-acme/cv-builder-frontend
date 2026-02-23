@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
-import Link from 'next/link';
+import { SavedJobsDropdown } from '@/components/ui/SavedJobsDropdown';
+import { ResumeSelector } from '@/components/ui/ResumeSelector';
 import {
   Shield,
   Loader2,
@@ -15,14 +15,7 @@ import {
   Zap,
   Heart,
   Edit3,
-  ChevronDown,
-  MapPin,
-  DollarSign,
-  Upload,
-  Search,
-  FileText,
   Briefcase,
-  Building,
   CheckCircle,
   Copy,
   XCircle,
@@ -56,21 +49,17 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
   // Input mode and dropdowns
   const [roleInputMode, setRoleInputMode] = useState<'saved' | 'manual'>('saved');
   const [selectedJobId, setSelectedJobId] = useState('');
-  const resumeDropdown = useModal();
-  const jobDropdown = useModal();
 
   const handleSelectSavedJob = (jobId: string) => {
     const job = savedJobs.find((j) => j.id === jobId);
     if (job) {
       setSelectedJobId(jobId);
       setTargetRole(job.jobTitle);
-      jobDropdown.close();
     }
   };
 
   const handleSelectResume = (resumeId: string) => {
     setSelectedResumeId(resumeId);
-    resumeDropdown.close();
   };
 
   const handleDetect = async () => {
@@ -131,68 +120,13 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Resume Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Resume</label>
-            {isLoadingResumes ? (
-              <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
-                <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />
-                <span className="text-slate-500">Loading resumes...</span>
-              </div>
-            ) : resumes.length === 0 ? (
-              <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
-                <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
-                <Link href="/resumes">
-                  <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
-                    Upload Resume
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => resumeDropdown.toggle()}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-                >
-                  {selectedResume ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-                        <FileText className="h-4 w-4 text-amber-600" />
-                      </div>
-                      <span className="font-medium truncate">{selectedResume.title || selectedResume.fileName}</span>
-                    </div>
-                  ) : (
-                    <span className="text-slate-500">Choose a resume...</span>
-                  )}
-                  <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform flex-shrink-0 ${resumeDropdown.isOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {resumeDropdown.isOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {resumes.map((resume) => (
-                      <button
-                        key={resume.id}
-                        type="button"
-                        onClick={() => handleSelectResume(resume.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
-                          selectedResumeId === resume.id ? 'bg-amber-50' : ''
-                        }`}
-                      >
-                        <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-                          <FileText className="h-4 w-4 text-amber-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
-                          <p className="text-xs text-slate-500 truncate">{resume.fileName}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <ResumeSelector
+            resumes={resumes}
+            selectedResumeId={selectedResumeId}
+            onSelect={handleSelectResume}
+            isLoading={isLoadingResumes}
+            colorTheme="amber"
+          />
 
           {/* Target Role - with saved jobs option */}
           <div>
@@ -214,68 +148,27 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
             />
 
             {roleInputMode === 'saved' ? (
-              isLoadingSavedJobs ? (
-                <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
-                  <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />
-                  <span className="text-slate-500 text-sm">Loading...</span>
-                </div>
-              ) : savedJobs.length === 0 ? (
-                <div className="p-3 border border-dashed border-slate-300 rounded-xl text-center">
-                  <p className="text-slate-500 text-sm">No saved jobs</p>
-                  <button
-                    type="button"
-                    onClick={() => setRoleInputMode('manual')}
-                    className="text-amber-600 text-sm font-medium mt-1"
-                  >
-                    Enter manually
-                  </button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => jobDropdown.toggle()}
-                    className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all text-sm"
-                  >
-                    {selectedJob ? (
-                      <span className="truncate">{selectedJob.jobTitle}</span>
-                    ) : (
-                      <span className="text-slate-500">Select a job...</span>
-                    )}
-                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform flex-shrink-0 ${jobDropdown.isOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {jobDropdown.isOpen && (
-                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                      {savedJobs.map((job) => (
-                        <button
-                          key={job.id}
-                          type="button"
-                          onClick={() => handleSelectSavedJob(job.id)}
-                          className={`w-full flex items-center gap-2 px-3 py-2 hover:bg-amber-50 transition-colors text-left border-b border-slate-100 last:border-0 ${
-                            selectedJobId === job.id ? 'bg-amber-50' : ''
-                          }`}
-                        >
-                          <Building className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 truncate">{job.jobTitle}</p>
-                            <p className="text-xs text-slate-500 truncate">{job.companyName}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
+              <SavedJobsDropdown
+                jobs={savedJobs}
+                selectedJobId={selectedJobId}
+                onSelect={handleSelectSavedJob}
+                isLoading={isLoadingSavedJobs}
+                label=""
+                placeholder="Select a job..."
+                colorTheme="amber"
+                onSwitchToManual={() => setRoleInputMode('manual')}
+                showFooter={false}
+                requireDescription={false}
+              />
             ) : (
               <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Briefcase className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="e.g., Data Scientist"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm placeholder:text-slate-400"
+                  className="w-full pl-11 pr-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm placeholder:text-slate-400"
                 />
               </div>
             )}
