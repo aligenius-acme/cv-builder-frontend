@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter, Sparkles, ArrowUpDown } from 'lucide-react';
+import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { useAuthStore } from '@/store/auth';
@@ -51,7 +51,8 @@ export default function DownloadModal({
   const [recommendedTemplates, setRecommendedTemplates] = useState<ResumeTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState<'pdf' | 'docx' | null>(null);
+  const isDownloading = downloadingFormat !== null;
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [anonymize, setAnonymize] = useState(false);
@@ -62,7 +63,6 @@ export default function DownloadModal({
   const [selectedExperience, setSelectedExperience] = useState<string>('All');
   const [selectedDesignStyle, setSelectedDesignStyle] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('popular');
-  const [showRecommended, setShowRecommended] = useState(true);
 
   // Anonymization available to all users
   const canAnonymize = true;
@@ -200,23 +200,6 @@ export default function DownloadModal({
     return filtered;
   }, [templates, searchQuery, selectedCategory, selectedATS, selectedIndustry, selectedExperience, selectedDesignStyle, sortBy]);
 
-  // Group templates by layout for display
-  const groupedTemplates = useMemo(() => {
-    const groups: Record<string, ResumeTemplate[]> = {};
-    for (const t of filteredTemplates) {
-      const layoutName = t.layoutName || t.name.split(' ')[0];
-      if (!groups[layoutName]) groups[layoutName] = [];
-      groups[layoutName].push(t);
-    }
-    return groups;
-  }, [filteredTemplates]);
-
-  // Get layout info for grouped display
-  const getLayoutCategory = (layoutName: string): string => {
-    const template = templates.find(t => t.layoutName === layoutName);
-    return template?.primaryCategory || template?.category || 'ATS-Professional';
-  };
-
   // Check if any filters are active
   const hasActiveFilters = searchQuery || selectedCategory !== 'All' || selectedATS !== 'All' ||
     selectedIndustry !== 'All' || selectedExperience !== 'All' || selectedDesignStyle !== 'All';
@@ -308,7 +291,7 @@ export default function DownloadModal({
 
   const handleDownload = async (format: 'pdf' | 'docx') => {
     try {
-      setIsDownloading(true);
+      setDownloadingFormat(format);
 
       // Use different API method based on context
       const blob = isResumeBuilder
@@ -326,7 +309,7 @@ export default function DownloadModal({
     } catch (error) {
       toast.error('Failed to download resume');
     } finally {
-      setIsDownloading(false);
+      setDownloadingFormat(null);
     }
   };
 
@@ -345,27 +328,21 @@ export default function DownloadModal({
 
         {/* Modal */}
         <div className="relative bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[92vh] overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
-          {/* Header with Gradient */}
-          <div className="bg-slate-900 p-6 border-b border-white/10">
+          {/* Header */}
+          <div className="bg-slate-900 px-6 py-4 border-b border-white/10">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Download className="h-7 w-7" />
-                  Download Resume
-                </h2>
-                <p className="text-blue-100 mt-1.5 flex items-center gap-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
-                    {templates.length} templates
-                  </span>
-                  <span>•</span>
-                  <span>Choose your perfect style</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <Download className="h-5 w-5 text-white flex-shrink-0" />
+                <div>
+                  <h2 className="text-base font-bold text-white">Download Resume</h2>
+                  <p className="text-slate-400 text-xs mt-0.5">{templates.length} templates available</p>
+                </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2.5 hover:bg-white/20 rounded-full transition-all duration-200 text-white hover:rotate-90 transform"
+                className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 text-white hover:rotate-90 transform"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -377,150 +354,79 @@ export default function DownloadModal({
               {/* Search and Filters */}
               <div className="p-4 border-b border-slate-200 bg-white space-y-3 shadow-sm">
                 {/* Search */}
-                <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search templates..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 text-sm border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:border-slate-300"
+                    className="w-full pl-10 pr-10 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white"
                   />
                   {searchQuery && (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
                     >
                       <X className="h-3.5 w-3.5 text-slate-400" />
                     </Button>
                   )}
                 </div>
 
-                {/* Quick Filters - Category */}
-                <div>
-                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Category</label>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {categories.map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={cn(
-                          'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
-                          selectedCategory === cat.id
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-                        )}
-                      >
-                        {cat.label === 'All Templates' ? 'All' : cat.label}
-                      </button>
-                    ))}
-                  </div>
+                {/* Category chips — single scrollable row */}
+                <div
+                  className="flex items-center gap-1.5 overflow-x-auto pb-0.5"
+                  style={{ scrollbarWidth: 'none' }}
+                >
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={cn(
+                        'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-xl transition-all duration-200',
+                        selectedCategory === cat.id
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      )}
+                    >
+                      {cat.label === 'All Templates' ? 'All' : cat.label}
+                    </button>
+                  ))}
                 </div>
 
-                {/* Advanced Filters */}
-                <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Filters</label>
-                    {hasActiveFilters && (
-                      <button
-                        onClick={clearAllFilters}
-                        className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold hover:underline"
-                      >
-                        Clear All
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {/* ATS Compatibility */}
+                {/* Secondary filters — one compact row */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {[
+                    { label: 'Sort', value: sortBy, onChange: setSortBy, options: sortOptions },
+                    { label: 'ATS', value: selectedATS, onChange: setSelectedATS, options: atsLevels },
+                    { label: 'Style', value: selectedDesignStyle, onChange: setSelectedDesignStyle, options: designStyles },
+                    { label: 'Level', value: selectedExperience, onChange: setSelectedExperience, options: experienceLevels },
+                    { label: 'Industry', value: selectedIndustry, onChange: setSelectedIndustry, options: industries },
+                  ].map(({ label, value, onChange, options }) => (
                     <select
-                      value={selectedATS}
-                      onChange={(e) => setSelectedATS(e.target.value)}
+                      key={label}
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
                       className={cn(
-                        "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedATS !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
+                        'px-2.5 py-1.5 text-xs border rounded-xl bg-white font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all',
+                        value !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-600'
                       )}
                     >
-                      {atsLevels.map(ats => (
-                        <option key={ats.id} value={ats.id}>{ats.label}</option>
+                      {options.map(opt => (
+                        <option key={opt.id} value={opt.id}>{opt.label}</option>
                       ))}
                     </select>
-
-                    {/* Design Style */}
-                    <select
-                      value={selectedDesignStyle}
-                      onChange={(e) => setSelectedDesignStyle(e.target.value)}
-                      className={cn(
-                        "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedDesignStyle !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
-                      )}
+                  ))}
+                  {hasActiveFilters && (
+                    <button
+                      onClick={clearAllFilters}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-medium ml-1"
                     >
-                      {designStyles.map(style => (
-                        <option key={style.id} value={style.id}>{style.label}</option>
-                      ))}
-                    </select>
-
-                    {/* Experience Level */}
-                    <select
-                      value={selectedExperience}
-                      onChange={(e) => setSelectedExperience(e.target.value)}
-                      className={cn(
-                        "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedExperience !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
-                      )}
-                    >
-                      {experienceLevels.map(exp => (
-                        <option key={exp.id} value={exp.id}>{exp.label}</option>
-                      ))}
-                    </select>
-
-                    {/* Industry */}
-                    <select
-                      value={selectedIndustry}
-                      onChange={(e) => setSelectedIndustry(e.target.value)}
-                      className={cn(
-                        "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedIndustry !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
-                      )}
-                    >
-                      {industries.map(ind => (
-                        <option key={ind.id} value={ind.id}>{ind.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Sort */}
-                <div className="pt-2 border-t border-slate-100">
-                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Sort By</label>
-                  <div className="flex items-center gap-2">
-                    {sortOptions.map(opt => (
-                      <button
-                        key={opt.id}
-                        onClick={() => setSortBy(opt.id)}
-                        className={cn(
-                          'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
-                          sortBy === opt.id
-                            ? 'bg-slate-700 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Results indicator */}
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between px-2 py-1.5 bg-slate-50 rounded-lg">
-                    <span className="text-[11px] text-slate-600 font-medium">Showing Results</span>
-                    <span className="text-[11px] font-bold text-slate-900 bg-white px-2 py-0.5 rounded-full">
-                      {filteredTemplates.length} / {templates.length}
-                    </span>
-                  </div>
+                      Clear all
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -549,7 +455,7 @@ export default function DownloadModal({
                 ) : (
                   <div className="space-y-4">
                     {/* Recommended Templates Section */}
-                    {recommendedTemplates.length > 0 && showRecommended && !hasActiveFilters && (
+                    {recommendedTemplates.length > 0 && !hasActiveFilters && (
                       <div className="mb-6 animate-in slide-in-from-top-4 fade-in duration-500">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -656,7 +562,7 @@ export default function DownloadModal({
                     ) : (
                       <div className="space-y-4">
                         {/* Section header - shown when recommended exists or filters active */}
-                        {(recommendedTemplates.length > 0 && showRecommended && !hasActiveFilters) || hasActiveFilters ? (
+                        {(recommendedTemplates.length > 0 && !hasActiveFilters) || hasActiveFilters ? (
                           <div className="mb-3 animate-in fade-in slide-in-from-top-2 duration-300">
                             <div className="flex items-center justify-between px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
                               <div className="flex items-center gap-2">
@@ -706,56 +612,41 @@ export default function DownloadModal({
 
             {/* Preview */}
             <div className="lg:w-1/2 p-6 bg-slate-50 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-blue-600" />
-                    Live Preview
-                    {selectedTemplateData && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                        {selectedTemplateData.name}
-                      </span>
-                    )}
+              <div className="flex items-center gap-3 mb-4">
+                <Eye className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900 truncate">
+                    {selectedTemplateData ? selectedTemplateData.name : 'Live Preview'}
                   </h3>
-                  {selectedTemplateData && (
-                    <p className="text-sm text-gray-600 mt-1 flex items-start gap-1.5">
-                      <span className="inline-block w-1 h-1 rounded-full bg-blue-500 mt-1.5"></span>
-                      {selectedTemplateData.description}
-                    </p>
+                  {selectedTemplateData?.description && (
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">{selectedTemplateData.description}</p>
                   )}
                 </div>
-                {isPreviewLoading && (
-                  <span className="text-sm text-blue-600 flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-200 animate-in fade-in slide-in-from-right-4 duration-300">
-                    <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
-                    <span className="font-medium">Loading preview...</span>
-                  </span>
-                )}
               </div>
 
-              <div className="flex-1 bg-white rounded-xl border-2 border-gray-200 shadow-lg overflow-hidden relative group hover:shadow-xl transition-all duration-300">
+              <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden relative">
+                {/* Loading overlay */}
+                {isPreviewLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full" />
+                      <span className="text-sm font-medium">Loading preview...</span>
+                    </div>
+                  </div>
+                )}
                 {previewUrl ? (
-                  <>
-                    <iframe
-                      src={previewUrl}
-                      className="w-full h-full animate-in fade-in duration-300"
-                      title="Resume Preview"
-                    />
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="px-2.5 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg shadow-sm">
-                        Live Preview
-                      </span>
-                    </div>
-                  </>
+                  <iframe
+                    src={previewUrl}
+                    className="w-full h-full"
+                    title="Resume Preview"
+                  />
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 animate-in fade-in duration-500">
-                    <div className="relative mb-4">
-                      <div className="" />
-                      <div className="relative bg-gray-50 p-8 rounded-xl">
-                        <FileText className="h-16 w-16 text-gray-300" />
-                      </div>
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <div className="bg-slate-50 p-8 rounded-2xl mb-4">
+                      <FileText className="h-14 w-14 text-slate-300" />
                     </div>
-                    <p className="text-sm font-medium text-gray-500">Select a template to preview</p>
-                    <p className="text-xs text-gray-400 mt-1">Choose from the templates on the left</p>
+                    <p className="text-sm font-medium text-slate-500">Select a template to preview</p>
+                    <p className="text-xs text-slate-400 mt-1">Choose from the list on the left</p>
                   </div>
                 )}
               </div>
@@ -827,17 +718,20 @@ export default function DownloadModal({
                 variant="outline"
                 onClick={() => handleDownload('docx')}
                 disabled={isDownloading || !selectedTemplate}
-                className="flex-1 sm:flex-none bg-emerald-50 border-emerald-200 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 disabled:opacity-50"
+                isLoading={downloadingFormat === 'docx'}
+                leftIcon={<Download className="h-4 w-4" />}
+                className="flex-1 sm:flex-none"
               >
-                <Download className="h-4 w-4 mr-2" />
                 DOCX
               </Button>
               <Button
+                variant="primary"
                 onClick={() => handleDownload('pdf')}
                 disabled={isDownloading || !selectedTemplate}
-                className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 shadow-sm disabled:opacity-50"
+                isLoading={downloadingFormat === 'pdf'}
+                leftIcon={<Download className="h-4 w-4" />}
+                className="flex-1 sm:flex-none"
               >
-                <Download className="h-4 w-4 mr-2" />
                 PDF
               </Button>
             </div>

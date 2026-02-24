@@ -83,7 +83,7 @@ export default function SavedJobCard({
                 )}
                 <button
                   onClick={onRemove}
-                  className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-red-50 text-slate-400 hover:text-red-500"
+                  className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-red-50 text-red-600 hover:text-red-700"
                   title="Remove from saved"
                 >
                   <Trash2 className="h-4 w-4" />

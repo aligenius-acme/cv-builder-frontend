@@ -286,7 +286,7 @@ export default function TemplateCard({
           {template.primaryCategory && (
             <span
               className={cn(
-                'text-[9px] px-2 py-0.5 rounded-full font-semibold',
+                'text-[10px] px-2 py-0.5 rounded-full font-semibold',
                 getCategoryColor(template.primaryCategory)
               )}
             >
@@ -294,20 +294,20 @@ export default function TemplateCard({
             </span>
           )}
           {template.designStyle && (
-            <span className="text-[9px] px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
               {template.designStyle}
             </span>
           )}
           {template.isPopular && (
-            <span className="text-[9px] px-2 py-0.5 rounded-full font-semibold bg-amber-500 text-white">
-              ⭐ Popular
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-amber-500 text-white">
+              Popular
             </span>
           )}
         </div>
 
         {/* Description */}
         {template.description && (
-          <p className="text-[10px] text-gray-600 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
             {template.description}
           </p>
         )}

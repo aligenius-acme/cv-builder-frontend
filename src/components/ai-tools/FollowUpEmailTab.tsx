@@ -183,7 +183,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
                 <select
                   value={selectedResumeId}
                   onChange={(e) => handleSelectResume(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-slate-900"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-slate-900"
                 >
                   <option value="">— Select a resume (optional) —</option>
                   {resumes.map((r) => (
