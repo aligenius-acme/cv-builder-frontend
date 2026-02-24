@@ -455,10 +455,7 @@ export default function ResumeBuilderPage() {
           isOpen={downloadModal.isOpen}
           onClose={() => downloadModal.close()}
           resumeId={currentResumeId}
-          versionId={currentResumeId} // Using resumeId as versionId for resume builder
-          versionNumber={1}
-          companyName={resumeTitle}
-          isResumeBuilder={true}
+          label={resumeTitle}
         />
       )}
     </div>

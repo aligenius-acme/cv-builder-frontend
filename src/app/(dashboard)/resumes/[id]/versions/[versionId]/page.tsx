@@ -941,7 +941,7 @@ export default function VersionDetailPage() {
         resumeId={resumeId}
         versionId={versionId}
         versionNumber={version.versionNumber}
-        companyName={version.companyName}
+        label={version.companyName}
       />
 
       <ShareModal

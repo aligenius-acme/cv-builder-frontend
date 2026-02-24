@@ -48,7 +48,7 @@ import {
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
-import { formatDate, downloadBlob, getScoreColor, getErrorMessage } from '@/lib/utils';
+import { formatDate, getScoreColor, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function ResumeDetailPage() {
@@ -65,7 +65,7 @@ export default function ResumeDetailPage() {
   const [selectedVersionForDownload, setSelectedVersionForDownload] = useState<{
     id: string;
     versionNumber: number;
-    companyName: string;
+    label: string;
   } | null>(null);
 
   // Customize form state
@@ -173,6 +173,11 @@ export default function ResumeDetailPage() {
     }
   };
 
+  const handleDownloadResume = () => {
+    setSelectedVersionForDownload(null);
+    setShowDownloadModal(true);
+  };
+
   const handleDownload = (versionId: string) => {
     const version = resume?.versions?.find((v) => v.id === versionId);
     if (!version) return;
@@ -180,7 +185,7 @@ export default function ResumeDetailPage() {
     setSelectedVersionForDownload({
       id: version.id,
       versionNumber: version.versionNumber,
-      companyName: version.companyName,
+      label: version.companyName,
     });
     setShowDownloadModal(true);
   };
@@ -202,17 +207,6 @@ export default function ResumeDetailPage() {
     }
   };
 
-  const handleDownloadOriginal = async () => {
-    try {
-      const response = await api.downloadOriginalResume(resumeId);
-      if (response.success && response.data?.downloadUrl) {
-        window.open(response.data.downloadUrl, '_blank');
-        toast.success('Download started');
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Failed to download original resume'));
-    }
-  };
 
   const handleSelectSavedJob = (jobId: string) => {
     const job = savedJobs.find((j) => j.id === jobId);
@@ -297,11 +291,11 @@ export default function ResumeDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {resume.originalFileKey && (
+            {resume.parseStatus === 'completed' && (
               <Button
-                variant="outline"
+                variant="primary"
                 size="sm"
-                onClick={handleDownloadOriginal}
+                onClick={handleDownloadResume}
                 leftIcon={<Download className="h-4 w-4" />}
               >
                 Download Original
@@ -1009,7 +1003,7 @@ export default function ResumeDetailPage() {
         })()}
 
         {/* Download Modal */}
-        {showDownloadModal && selectedVersionForDownload && (
+        {showDownloadModal && (
           <DownloadModal
             isOpen={showDownloadModal}
             onClose={() => {
@@ -1017,9 +1011,9 @@ export default function ResumeDetailPage() {
               setSelectedVersionForDownload(null);
             }}
             resumeId={resumeId}
-            versionId={selectedVersionForDownload.id}
-            versionNumber={selectedVersionForDownload.versionNumber}
-            companyName={selectedVersionForDownload.companyName}
+            versionId={selectedVersionForDownload?.id}
+            versionNumber={selectedVersionForDownload?.versionNumber}
+            label={selectedVersionForDownload?.label || resume?.title}
           />
         )}
       </div>

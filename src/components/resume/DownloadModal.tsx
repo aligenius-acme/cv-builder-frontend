@@ -15,10 +15,9 @@ interface DownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
   resumeId: string;
-  versionId: string;
-  versionNumber: number;
-  companyName: string;
-  isResumeBuilder?: boolean; // Flag to indicate if used from resume-builder
+  versionId?: string;     // if provided → version download mode; omit for base resume download
+  versionNumber?: number; // used in filename for version mode
+  label?: string;         // company name for versions, resume title for base download
 }
 
 // INDUSTRY_TAGS matching backend
@@ -43,8 +42,7 @@ export default function DownloadModal({
   resumeId,
   versionId,
   versionNumber,
-  companyName,
-  isResumeBuilder = false,
+  label,
 }: DownloadModalProps) {
   const { user } = useAuthStore();
   const [templates, setTemplates] = useState<ResumeTemplate[]>([]);
@@ -275,10 +273,10 @@ export default function DownloadModal({
         URL.revokeObjectURL(previewUrl);
       }
 
-      // Use different API method based on context
-      const blob = isResumeBuilder
-        ? await api.previewBuiltResume(resumeId, selectedTemplate)
-        : await api.previewTemplate(selectedTemplate, resumeId, versionId);
+      // Use different API method based on context (versionId presence determines mode)
+      const blob = versionId
+        ? await api.previewTemplate(selectedTemplate, resumeId, versionId)
+        : await api.previewBuiltResume(resumeId, selectedTemplate);
 
       const url = URL.createObjectURL(blob);
       setPreviewUrl(url);
@@ -293,15 +291,15 @@ export default function DownloadModal({
     try {
       setDownloadingFormat(format);
 
-      // Use different API method based on context
-      const blob = isResumeBuilder
-        ? await api.downloadBuiltResume(resumeId, format, selectedTemplate)
-        : await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize);
+      // Use different API method based on context (versionId presence determines mode)
+      const blob = versionId
+        ? await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize)
+        : await api.downloadBuiltResume(resumeId, format, selectedTemplate);
 
       const prefix = anonymize ? 'anonymous-resume' : 'resume';
-      const filename = isResumeBuilder
-        ? `${companyName || 'resume'}.${format}`
-        : `${prefix}-${companyName || 'tailored'}-v${versionNumber}.${format}`;
+      const filename = versionId
+        ? `${prefix}-${label || 'tailored'}-v${versionNumber}.${format}`
+        : `${label || 'resume'}.${format}`;
 
       downloadBlob(blob, filename);
       toast.success(`Downloaded ${anonymize ? 'anonymized ' : ''}${format.toUpperCase()}`);
