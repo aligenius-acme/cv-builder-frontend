@@ -495,10 +495,16 @@ class ApiClient {
     sortBy?: string;
     limit?: number;
   }) {
-    const response = await this.client.get<ApiResponse<ResumeTemplate[]>>('/templates', {
+    const response = await this.client.get<ApiResponse<any[]>>('/templates', {
       params: filters,
     });
-    return response.data;
+    if (response.data?.data) {
+      response.data.data = response.data.data.map((t: any) => ({
+        ...t,
+        preview: t.preview || t.previewImageUrl || null,
+      }));
+    }
+    return response.data as ApiResponse<ResumeTemplate[]>;
   }
 
   async getTemplateById(id: string) {
@@ -513,7 +519,7 @@ class ApiClient {
     skills?: string[];
   }) {
     const response = await this.client.post<ApiResponse<{
-      templates: ResumeTemplate[];
+      templates: any[];
       reason?: string;
       basedOn?: {
         industry?: string;
@@ -521,6 +527,12 @@ class ApiClient {
         skills?: string[];
       };
     }>>('/templates/recommended', userData || {});
+    if (response.data?.data?.templates) {
+      response.data.data.templates = response.data.data.templates.map((t: any) => ({
+        ...t,
+        preview: t.preview || t.previewImageUrl || null,
+      }));
+    }
     return response.data;
   }
 
