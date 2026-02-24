@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import {
   ArrowLeft,
   ChevronLeft,
@@ -171,34 +172,14 @@ export default function AdminLogsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('errors')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              activeTab === 'errors'
-                ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Parsing Errors
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('audit')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              activeTab === 'audit'
-                ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Audit Logs
-            </span>
-          </button>
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'errors', label: 'Parsing Errors', icon: <AlertTriangle className="h-4 w-4" /> },
+            { value: 'audit', label: 'Audit Logs', icon: <Shield className="h-4 w-4" /> },
+          ]}
+          value={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Content */}
         <Card variant="elevated">
@@ -274,13 +255,15 @@ export default function AdminLogsPage() {
                       <tr key={log.id} className="hover:bg-slate-50 transition-colors">
                         <td className="py-3 px-6">
                           <div className="flex items-center gap-3">
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => handleViewDetails(log)}
-                              className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors text-blue-600 hover:text-blue-700"
+                              className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
                               title="View details"
                             >
                               <Eye className="h-4 w-4" />
-                            </button>
+                            </Button>
                             {getActionBadge(log.action)}
                           </div>
                         </td>
@@ -365,14 +348,14 @@ export default function AdminLogsPage() {
           <div className="flex min-h-screen items-center justify-center p-4">
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-900/75 backdrop-blur-sm"
               onClick={closeDetailsModal}
             />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-gray-200">
+            <div className="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-slate-200">
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-slate-50">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-blue-600" />
                   <div>
@@ -380,12 +363,9 @@ export default function AdminLogsPage() {
                     <p className="text-sm text-slate-500">{formatDate(selectedLog.createdAt)}</p>
                   </div>
                 </div>
-                <button
-                  onClick={closeDetailsModal}
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                >
+                <Button variant="ghost" size="icon" onClick={closeDetailsModal}>
                   <X className="h-5 w-5" />
-                </button>
+                </Button>
               </div>
 
               {/* Content */}

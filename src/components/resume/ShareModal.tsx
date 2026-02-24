@@ -139,12 +139,9 @@ export default function ShareModal({
                 <p className="text-sm text-slate-500">{jobTitle} at {companyName}</p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-            >
+            <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-5 w-5 text-slate-500" />
-            </button>
+            </Button>
           </div>
 
           {/* Content */}

@@ -156,12 +156,9 @@ export default function AdminTemplatesPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Create New Template</CardTitle>
-                <button
-                  onClick={() => createFormModal.close()}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                >
+                <Button variant="ghost" size="icon" onClick={() => createFormModal.close()}>
                   <X className="h-5 w-5 text-slate-400" />
-                </button>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>

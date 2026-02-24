@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
+import SegmentedControl, { SegmentOption } from '@/components/ui/SegmentedControl';
 import { useFetchMultiple } from '@/hooks/useFetchData';
 import {
   Sparkles,
@@ -20,12 +21,12 @@ import NetworkingMessageTab from '@/components/ai-tools/NetworkingMessageTab';
 
 type TabType = 'job-match' | 'quantifier' | 'weakness' | 'follow-up' | 'networking';
 
-const tabs = [
-  { id: 'job-match' as TabType, label: 'Job Match', icon: Target },
-  { id: 'quantifier' as TabType, label: 'Achievement Quantifier', icon: TrendingUp },
-  { id: 'weakness' as TabType, label: 'Weakness Detector', icon: Shield },
-  { id: 'follow-up' as TabType, label: 'Follow-up Emails', icon: Mail },
-  { id: 'networking' as TabType, label: 'Networking Messages', icon: Users },
+const tabs: SegmentOption<TabType>[] = [
+  { value: 'job-match', label: 'Job Match', icon: <Target className="h-4 w-4" /> },
+  { value: 'quantifier', label: 'Achievement Quantifier', icon: <TrendingUp className="h-4 w-4" /> },
+  { value: 'weakness', label: 'Weakness Detector', icon: <Shield className="h-4 w-4" /> },
+  { value: 'follow-up', label: 'Follow-up Emails', icon: <Mail className="h-4 w-4" /> },
+  { value: 'networking', label: 'Networking Messages', icon: <Users className="h-4 w-4" /> },
 ];
 
 export default function AIToolsPage() {
@@ -85,22 +86,11 @@ export default function AIToolsPage() {
         />
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 bg-white rounded-xl p-2 shadow-lg border border-slate-100">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span className="font-medium text-sm">{tab.label}</span>
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={tabs}
+          value={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Tab Content */}
         <div className="min-h-[600px]">

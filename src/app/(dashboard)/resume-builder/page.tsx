@@ -673,26 +673,15 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                   <span className="font-medium text-slate-900">Position {index + 1}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => moveExperience(index, 'up')}
-                    disabled={index === 0}
-                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                  >
+                  <Button variant="ghost" size="icon" className="p-1" onClick={() => moveExperience(index, 'up')} disabled={index === 0}>
                     <ChevronUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => moveExperience(index, 'down')}
-                    disabled={index === data.length - 1}
-                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                  >
+                  </Button>
+                  <Button variant="ghost" size="icon" className="p-1" onClick={() => moveExperience(index, 'down')} disabled={index === data.length - 1}>
                     <ChevronDown className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => removeExperience(index)}
-                    className="p-1 hover:bg-red-100 rounded text-red-600"
-                  >
+                  </Button>
+                  <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeExperience(index)}>
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -786,12 +775,9 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                         maxRows={3}
                       />
                       {exp.description.length > 1 && (
-                        <button
-                          onClick={() => removeBullet(index, bIndex)}
-                          className="p-2 hover:bg-red-100 rounded text-red-600 self-start"
-                        >
+                        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-50 hover:text-red-700 self-start" onClick={() => removeBullet(index, bIndex)}>
                           <X className="h-4 w-4" />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}
@@ -855,12 +841,9 @@ function EducationEditor({ data, onChange }: { data: Education[]; onChange: (dat
             <div key={edu.id} className="p-4 border border-slate-200 rounded-xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-slate-900">Education {index + 1}</span>
-                <button
-                  onClick={() => removeEducation(index)}
-                  className="p-1 hover:bg-red-100 rounded text-red-600"
-                >
+                <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeEducation(index)}>
                   <Trash2 className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1034,12 +1017,9 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (data: 
             <div key={project.id} className="p-4 border border-slate-200 rounded-xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-slate-900">Project {index + 1}</span>
-                <button
-                  onClick={() => removeProject(index)}
-                  className="p-1 hover:bg-red-100 rounded text-red-600"
-                >
+                <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeProject(index)}>
                   <Trash2 className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1139,12 +1119,9 @@ function CertificationsEditor({ data, onChange }: { data: string[]; onChange: (d
           {data.map((cert, index) => (
             <li key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <span className="text-slate-700">{cert}</span>
-              <button
-                onClick={() => removeCertification(index)}
-                className="p-1 hover:bg-red-100 rounded text-red-600"
-              >
+              <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeCertification(index)}>
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -1240,12 +1217,9 @@ function AwardsEditor({ data, onChange }: { data: string[]; onChange: (data: str
                 <Award className="h-4 w-4 text-amber-600" />
                 <span className="text-slate-700">{award}</span>
               </div>
-              <button
-                onClick={() => removeAward(index)}
-                className="p-1 hover:bg-red-100 rounded text-red-600"
-              >
+              <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeAward(index)}>
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -1335,26 +1309,15 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                   <span className="font-medium text-slate-900">Volunteer Position {index + 1}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => moveVolunteerWork(index, 'up')}
-                    disabled={index === 0}
-                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                  >
+                  <Button variant="ghost" size="icon" className="p-1" onClick={() => moveVolunteerWork(index, 'up')} disabled={index === 0}>
                     <ChevronUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => moveVolunteerWork(index, 'down')}
-                    disabled={index === data.length - 1}
-                    className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                  >
+                  </Button>
+                  <Button variant="ghost" size="icon" className="p-1" onClick={() => moveVolunteerWork(index, 'down')} disabled={index === data.length - 1}>
                     <ChevronDown className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => removeVolunteerWork(index)}
-                    className="p-1 hover:bg-red-100 rounded text-red-600"
-                  >
+                  </Button>
+                  <Button variant="ghost" size="icon" className="p-1 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeVolunteerWork(index)}>
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -1448,12 +1411,9 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                         maxRows={3}
                       />
                       {vol.description.length > 1 && (
-                        <button
-                          onClick={() => removeBullet(index, bIndex)}
-                          className="p-2 hover:bg-red-100 rounded text-red-600 self-start"
-                        >
+                        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-50 hover:text-red-700 self-start" onClick={() => removeBullet(index, bIndex)}>
                           <X className="h-4 w-4" />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}

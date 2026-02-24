@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import Badge from '@/components/ui/Badge';
 import {
   Plus,
@@ -520,9 +521,9 @@ function ApplicationModal({
           <h2 className="text-xl font-bold text-slate-900">
             {application?.id ? 'Edit Application' : 'Add Application'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -531,33 +532,17 @@ function ApplicationModal({
             <div className="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-slate-700">Import from Saved Jobs</span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setJobInputMode('saved')}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                      jobInputMode === 'saved'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'
-                    }`}
-                  >
-                    Saved Jobs
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setJobInputMode('manual');
-                      setSelectedJobId('');
-                    }}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                      jobInputMode === 'manual'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'
-                    }`}
-                  >
-                    Manual Entry
-                  </button>
-                </div>
+                <SegmentedControl
+                  options={[
+                    { value: 'saved', label: 'Saved Jobs' },
+                    { value: 'manual', label: 'Manual Entry' },
+                  ]}
+                  value={jobInputMode}
+                  onChange={(mode) => {
+                    setJobInputMode(mode);
+                    if (mode === 'manual') setSelectedJobId('');
+                  }}
+                />
               </div>
 
               {jobInputMode === 'saved' && (
@@ -813,15 +798,15 @@ function DetailsPanel({
       <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900">Application Details</h2>
         <div className="flex items-center gap-2">
-          <button onClick={onEdit} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+          <Button variant="ghost" size="icon" onClick={onEdit}>
             <Edit2 className="h-5 w-5 text-slate-600" />
-          </button>
-          <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-xl transition-colors">
-            <Trash2 className="h-5 w-5 text-red-600" />
-          </button>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onDelete} className="text-red-600 hover:bg-red-50 hover:text-red-700">
+            <Trash2 className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
       </div>
 

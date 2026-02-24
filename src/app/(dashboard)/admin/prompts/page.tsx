@@ -184,16 +184,17 @@ export default function AdminPromptsPage() {
                           Active
                         </Badge>
                       )}
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setExpandedPrompt(expandedPrompt === name ? null : name)}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                       >
                         {expandedPrompt === name ? (
                           <ChevronUp className="h-5 w-5 text-slate-400" />
                         ) : (
                           <ChevronDown className="h-5 w-5 text-slate-400" />
                         )}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>

@@ -373,32 +373,34 @@ export default function DownloadModal({
           {/* Content */}
           <div className="flex flex-col lg:flex-row h-[calc(92vh-200px)]">
             {/* Template Selection */}
-            <div className="lg:w-1/2 border-r border-gray-200 flex flex-col bg-gray-50/50">
+            <div className="lg:w-1/2 border-r border-slate-200 flex flex-col bg-slate-50/50">
               {/* Search and Filters */}
-              <div className="p-4 border-b border-gray-200 bg-white space-y-3 shadow-sm">
+              <div className="p-4 border-b border-slate-200 bg-white space-y-3 shadow-sm">
                 {/* Search */}
                 <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="text"
                     placeholder="Search templates..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:border-gray-300"
+                    className="w-full pl-10 pr-10 py-2.5 text-sm border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:border-slate-300"
                   />
                   {searchQuery && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
                     >
-                      <X className="h-3.5 w-3.5 text-gray-400" />
-                    </button>
+                      <X className="h-3.5 w-3.5 text-slate-400" />
+                    </Button>
                   )}
                 </div>
 
                 {/* Quick Filters - Category */}
                 <div>
-                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Category</label>
+                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Category</label>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {categories.map(cat => (
                       <button
@@ -408,7 +410,7 @@ export default function DownloadModal({
                           'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
                           selectedCategory === cat.id
                             ? 'bg-blue-600 text-white shadow-sm'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                         )}
                       >
                         {cat.label === 'All Templates' ? 'All' : cat.label}
@@ -418,9 +420,9 @@ export default function DownloadModal({
                 </div>
 
                 {/* Advanced Filters */}
-                <div className="space-y-2 pt-2 border-t border-gray-100">
+                <div className="space-y-2 pt-2 border-t border-slate-100">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Filters</label>
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Filters</label>
                     {hasActiveFilters && (
                       <button
                         onClick={clearAllFilters}
@@ -438,7 +440,7 @@ export default function DownloadModal({
                       onChange={(e) => setSelectedATS(e.target.value)}
                       className={cn(
                         "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedATS !== 'All' ? 'border-blue-500 text-blue-700' : 'border-gray-200 text-gray-700'
+                        selectedATS !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
                       )}
                     >
                       {atsLevels.map(ats => (
@@ -452,7 +454,7 @@ export default function DownloadModal({
                       onChange={(e) => setSelectedDesignStyle(e.target.value)}
                       className={cn(
                         "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedDesignStyle !== 'All' ? 'border-blue-500 text-blue-700' : 'border-gray-200 text-gray-700'
+                        selectedDesignStyle !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
                       )}
                     >
                       {designStyles.map(style => (
@@ -466,7 +468,7 @@ export default function DownloadModal({
                       onChange={(e) => setSelectedExperience(e.target.value)}
                       className={cn(
                         "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedExperience !== 'All' ? 'border-blue-500 text-blue-700' : 'border-gray-200 text-gray-700'
+                        selectedExperience !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
                       )}
                     >
                       {experienceLevels.map(exp => (
@@ -480,7 +482,7 @@ export default function DownloadModal({
                       onChange={(e) => setSelectedIndustry(e.target.value)}
                       className={cn(
                         "px-2 py-1.5 text-[11px] border-2 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium",
-                        selectedIndustry !== 'All' ? 'border-blue-500 text-blue-700' : 'border-gray-200 text-gray-700'
+                        selectedIndustry !== 'All' ? 'border-blue-500 text-blue-700' : 'border-slate-200 text-slate-700'
                       )}
                     >
                       {industries.map(ind => (
@@ -491,8 +493,8 @@ export default function DownloadModal({
                 </div>
 
                 {/* Sort */}
-                <div className="pt-2 border-t border-gray-100">
-                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Sort By</label>
+                <div className="pt-2 border-t border-slate-100">
+                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Sort By</label>
                   <div className="flex items-center gap-2">
                     {sortOptions.map(opt => (
                       <button
@@ -502,7 +504,7 @@ export default function DownloadModal({
                           'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-200',
                           sortBy === opt.id
                             ? 'bg-slate-700 text-white shadow-sm'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         )}
                       >
                         {opt.label}
@@ -512,10 +514,10 @@ export default function DownloadModal({
                 </div>
 
                 {/* Results indicator */}
-                <div className="pt-2 border-t border-gray-100">
-                  <div className="flex items-center justify-between px-2 py-1.5 bg-gray-50 rounded-lg">
-                    <span className="text-[11px] text-gray-600 font-medium">Showing Results</span>
-                    <span className="text-[11px] font-bold text-gray-900 bg-white px-2 py-0.5 rounded-full">
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between px-2 py-1.5 bg-slate-50 rounded-lg">
+                    <span className="text-[11px] text-slate-600 font-medium">Showing Results</span>
+                    <span className="text-[11px] font-bold text-slate-900 bg-white px-2 py-0.5 rounded-full">
                       {filteredTemplates.length} / {templates.length}
                     </span>
                   </div>
@@ -643,13 +645,13 @@ export default function DownloadModal({
                           </div>
                         )}
 
-                        <button
+                        <Button
+                          variant="primary"
                           onClick={clearAllFilters}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 shadow-sm transition-all duration-200"
+                          leftIcon={<X className="h-4 w-4" />}
                         >
-                          <X className="h-4 w-4" />
                           Clear All Filters
-                        </button>
+                        </Button>
                       </div>
                     ) : (
                       <div className="space-y-4">
