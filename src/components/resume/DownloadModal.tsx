@@ -268,10 +268,11 @@ export default function DownloadModal({
   const loadPreview = async () => {
     try {
       setIsPreviewLoading(true);
-      // Revoke previous URL
+      // Revoke and clear previous preview immediately so old template doesn't linger
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      setPreviewUrl(null);
 
       // Use different API method based on context (versionId presence determines mode)
       const blob = versionId
@@ -325,7 +326,7 @@ export default function DownloadModal({
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[92vh] overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="relative bg-white rounded-xl shadow-2xl max-w-[98vw] w-full max-h-[96vh] overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
           <div className="bg-slate-900 px-6 py-4 border-b border-white/10">
             <div className="flex items-center justify-between">
@@ -346,9 +347,9 @@ export default function DownloadModal({
           </div>
 
           {/* Content */}
-          <div className="flex flex-col lg:flex-row h-[calc(92vh-200px)]">
+          <div className="flex flex-col lg:flex-row h-[calc(96vh-152px)]">
             {/* Template Selection */}
-            <div className="lg:w-1/2 border-r border-slate-200 flex flex-col bg-slate-50/50">
+            <div className="lg:w-[56%] border-r border-slate-200 flex flex-col bg-slate-50/50">
               {/* Search and Filters */}
               <div className="p-4 border-b border-slate-200 bg-white space-y-3 shadow-sm">
                 {/* Search */}
@@ -466,8 +467,7 @@ export default function DownloadModal({
                             AI-Powered
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-3 bg-blue-50 p-3 rounded-xl border border-blue-200 shadow-sm relative overflow-hidden">
-                          <div className="" />
+                        <div className="grid grid-cols-2 gap-3 bg-blue-50 p-3 rounded-xl border border-blue-200 shadow-sm relative overflow-hidden">
                           {recommendedTemplates.slice(0, 6).map((template, idx) => (
                             <div key={template.id} className="relative animate-in zoom-in duration-300" style={{ animationDelay: `${idx * 50}ms` }}>
                               <TemplateCard
@@ -589,7 +589,7 @@ export default function DownloadModal({
                         ) : null}
 
                         {/* All Templates Grid */}
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 gap-4">
                           {filteredTemplates.map((template, idx) => (
                             <div key={template.id} className="animate-in zoom-in duration-200" style={{ animationDelay: `${idx * 20}ms` }}>
                               <TemplateCard
@@ -609,7 +609,7 @@ export default function DownloadModal({
             </div>
 
             {/* Preview */}
-            <div className="lg:w-1/2 p-6 bg-slate-50 flex flex-col">
+            <div className="flex-1 p-6 bg-slate-50 flex flex-col">
               <div className="flex items-center gap-3 mb-4">
                 <Eye className="h-4 w-4 text-blue-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">

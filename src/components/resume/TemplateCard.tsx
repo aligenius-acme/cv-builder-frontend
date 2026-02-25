@@ -197,16 +197,16 @@ export default function TemplateCard({
         )}
       >
         {/* Large Preview Thumbnail */}
-        <div className="relative mb-3 rounded-lg overflow-hidden aspect-[3/4] bg-gray-100">
+        <div className="relative mb-3 rounded-lg overflow-hidden bg-gray-100">
           {template.preview ? (
             <img
               src={template.preview}
               alt={template.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full block group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div
-              className="w-full h-full relative"
+              className="w-full aspect-[4/5] relative"
               style={{
                 background: `linear-gradient(135deg, ${template.colorHex || '#1e3a5f'} 0%, ${template.colorHex || '#1e3a5f'}dd 100%)`
               }}
