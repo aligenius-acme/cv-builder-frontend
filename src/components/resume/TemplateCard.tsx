@@ -66,6 +66,8 @@ export default function TemplateCard({
           <img
             src={template.preview}
             alt={template.name}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
@@ -202,6 +204,8 @@ export default function TemplateCard({
             <img
               src={template.preview}
               alt={template.name}
+              loading="lazy"
+              decoding="async"
               className="w-full block group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
@@ -332,6 +336,8 @@ export default function TemplateCard({
           <img
             src={template.preview}
             alt={template.name}
+            loading="lazy"
+            decoding="async"
             className="w-10 h-10 rounded-md flex-shrink-0 shadow-md object-cover ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300"
           />
         ) : (
