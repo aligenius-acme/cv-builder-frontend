@@ -217,11 +217,13 @@ export interface ATSAnalysis {
 }
 
 export interface TruthGuardWarning {
-  type: 'exaggeration' | 'inconsistency' | 'unsupported_claim';
+  type: 'fabrication' | 'inflation' | 'exaggeration' | 'inconsistency' | 'unsupported_claim';
   section: string;
   original: string;
+  tailored?: string;
   concern: string;
   severity: 'low' | 'medium' | 'high';
+  recommendation?: string;
 }
 
 // Cover Letter types

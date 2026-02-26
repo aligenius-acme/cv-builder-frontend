@@ -1,10 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import ScoreCircle from '@/components/ui/ScoreCircle';
 import {
   Eye,
   AlertTriangle,
@@ -15,9 +13,9 @@ import {
   Lightbulb,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   BarChart3,
   Target,
-  Loader2,
   Zap,
   TrendingUp,
   Shield,
@@ -26,8 +24,6 @@ import {
   Sparkles,
   RefreshCw,
   AlertCircle,
-  ThumbsUp,
-  ThumbsDown,
   Rocket,
   Star,
   CheckCheck,
@@ -36,8 +32,12 @@ import {
   Monitor,
   ScanLine,
   AlertOctagon,
+  Briefcase,
+  GraduationCap,
+  LayoutDashboard,
+  Info,
 } from 'lucide-react';
-import { ATSAnalysis } from '@/types';
+import { ATSAnalysis, SectionAnalysis, SkillsAnalysis, SectionImprovement, BulletImprovement } from '@/types';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
@@ -47,6 +47,14 @@ interface ATSSimulatorProps {
   versionId: string;
   initialScore?: number;
   initialAnalysis?: ATSAnalysis;
+}
+
+function isSkillsAnalysis(data: SectionAnalysis | SkillsAnalysis): data is SkillsAnalysis {
+  return 'matched' in data;
+}
+
+function isBulletImprovement(imp: SectionImprovement | BulletImprovement): imp is BulletImprovement {
+  return 'bulletPoint' in imp;
 }
 
 export default function ATSSimulator({
@@ -59,6 +67,7 @@ export default function ATSSimulator({
   const [isLoading, setIsLoading] = useState(false);
   const [showExtractedView, setShowExtractedView] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const runSimulation = async () => {
     setIsLoading(true);
@@ -68,8 +77,10 @@ export default function ATSSimulator({
         setAnalysis(response.data);
         toast.success('ATS simulation complete');
       }
-    } catch (error) {
-      toast.error('Failed to run ATS simulation');
+    } catch (error: unknown) {
+      const axiosErr = error as { response?: { data?: { error?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.error || axiosErr?.message || 'Failed to run ATS simulation';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -90,14 +101,30 @@ export default function ATSSimulator({
     return { status: 'AT RISK', icon: XCircle, color: 'red', bg: 'bg-red-600' };
   };
 
+  const getSectionConfig = (section: string) => {
+    switch (section) {
+      case 'summary': return { icon: FileText, label: 'Summary' };
+      case 'experience': return { icon: Briefcase, label: 'Experience' };
+      case 'skills': return { icon: Zap, label: 'Skills' };
+      case 'education': return { icon: GraduationCap, label: 'Education' };
+      case 'formatting': return { icon: LayoutDashboard, label: 'Formatting' };
+      default: return { icon: FileText, label: section.charAt(0).toUpperCase() + section.slice(1) };
+    }
+  };
+
+  const getSectionStatus = (score: number) => {
+    if (score >= 80) return { label: 'Strong', color: 'text-emerald-600', barColor: 'bg-emerald-500', trackColor: 'bg-emerald-100', badgeBg: 'bg-emerald-100 text-emerald-700' };
+    if (score >= 60) return { label: 'Needs Polish', color: 'text-amber-600', barColor: 'bg-amber-500', trackColor: 'bg-amber-100', badgeBg: 'bg-amber-100 text-amber-700' };
+    if (score >= 40) return { label: 'Needs Work', color: 'text-orange-600', barColor: 'bg-orange-500', trackColor: 'bg-orange-100', badgeBg: 'bg-orange-100 text-orange-700' };
+    return { label: 'Critical Gap', color: 'text-red-600', barColor: 'bg-red-500', trackColor: 'bg-red-100', badgeBg: 'bg-red-100 text-red-700' };
+  };
+
   if (!analysis) {
     return (
       <Card variant="elevated" className="overflow-hidden">
         <div className="relative">
-          {/* Background Pattern */}
           <div className="absolute inset-0 bg-blue-50/20" />
-          <div className="absolute inset-0 opacity-30" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-
+          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
           <CardContent className="relative py-16">
             <div className="text-center max-w-lg mx-auto">
               <div className="w-24 h-24 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-8 animate-pulse">
@@ -107,7 +134,6 @@ export default function ATSSimulator({
               <p className="text-slate-500 mb-8 text-lg">
                 Discover how Applicant Tracking Systems will read, parse, and score your resume. Get actionable insights to improve your chances.
               </p>
-
               <div className="flex flex-wrap justify-center gap-4 mb-8">
                 <div className="flex items-center gap-2 text-sm text-slate-600 bg-white px-4 py-2 rounded-full shadow-sm">
                   <Target className="h-4 w-4 text-blue-500" />
@@ -122,7 +148,6 @@ export default function ATSSimulator({
                   ATS Preview
                 </div>
               </div>
-
               <Button
                 variant="primary"
                 size="lg"
@@ -144,7 +169,6 @@ export default function ATSSimulator({
   const passStatus = getPassStatus(analysis.score);
   const PassIcon = passStatus.icon;
 
-  // Parse potential score from actionPlan (e.g. "42/100 → 75/100" or "42 → 75")
   const potentialScore = (() => {
     const raw = analysis.actionPlan?.estimatedScoreAfterFixes || '';
     const match = raw.match(/→\s*(\d+)/);
@@ -162,11 +186,8 @@ export default function ATSSimulator({
           analysis.score >= 60 ? "bg-amber-600" :
           "bg-red-600"
         )}>
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}} />
-
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
-            {/* Score Display */}
             <div className="flex items-center gap-8">
               <div className="relative">
                 <div className="w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -184,7 +205,6 @@ export default function ATSSimulator({
                     </div>
                   </div>
                 </div>
-                {/* Grade Badge */}
                 <div className={cn(
                   "absolute -bottom-2 -right-2 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-lg",
                   analysis.score >= 75 ? "bg-emerald-500 text-white" :
@@ -194,7 +214,6 @@ export default function ATSSimulator({
                   {scoreGrade.grade}
                 </div>
               </div>
-
               <div className="text-white">
                 <div className="flex items-center gap-2 mb-2">
                   <PassIcon className="h-5 w-5" />
@@ -210,8 +229,6 @@ export default function ATSSimulator({
                 </p>
               </div>
             </div>
-
-            {/* Quick Stats */}
             <div className="flex gap-4">
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-5 text-center min-w-[120px]">
                 <Target className="h-6 w-6 text-white mx-auto mb-2" />
@@ -230,8 +247,6 @@ export default function ATSSimulator({
               </div>
             </div>
           </div>
-
-          {/* Rescan Button */}
           <button
             onClick={runSimulation}
             disabled={isLoading}
@@ -243,10 +258,22 @@ export default function ATSSimulator({
         </div>
       </Card>
 
+      {/* Honest Assessment */}
+      {analysis.honestAssessment && (
+        <div className="flex items-start gap-4 p-5 bg-slate-900 rounded-xl border border-slate-700 shadow-sm">
+          <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Info className="h-5 w-5 text-slate-300" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">AI Honest Assessment</p>
+            <p className="text-slate-200 leading-relaxed text-sm">{analysis.honestAssessment}</p>
+          </div>
+        </div>
+      )}
+
       {/* Potential Score Banner */}
       {potentialScore !== null && scoreGain !== null && scoreGain > 0 && (
-        <div className="rounded-xl bg-slate-900 p-5 shadow-sm">
-          <div className="absolute inset-0 opacity-10" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3C/g%3E%3C/svg%3E\")"}} />
+        <div className="relative rounded-xl bg-slate-900 p-5 shadow-sm overflow-hidden">
           <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm flex-shrink-0">
@@ -271,10 +298,7 @@ export default function ATSSimulator({
               </div>
               <div className="text-center bg-white/10 rounded-xl px-5 py-3">
                 <div className="text-white/70 text-xs mb-1">Gap to close</div>
-                <div className={cn(
-                  "text-xl font-bold",
-                  scoreGain >= 25 ? "text-amber-300" : "text-emerald-300"
-                )}>{scoreGain} pts</div>
+                <div className={cn("text-xl font-bold", scoreGain >= 25 ? "text-amber-300" : "text-emerald-300")}>{scoreGain} pts</div>
               </div>
             </div>
           </div>
@@ -287,76 +311,306 @@ export default function ATSSimulator({
         </div>
       )}
 
-      {/* Section Scores - Visual Gauges */}
+      {/* Resume Intelligence Report — replaces Section Performance */}
       <Card variant="elevated">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-blue-600" />
-                Section Performance
+                Resume Intelligence Report
               </CardTitle>
-              <CardDescription>How each section of your resume scores</CardDescription>
+              <CardDescription>Click any section to see exactly what&apos;s holding it back and get AI-suggested fixes</CardDescription>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-700 font-medium">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-emerald-500" /> 80+</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500" /> 60-79</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500" /> &lt;60</span>
+            <div className="flex items-center gap-3 text-xs text-slate-500 flex-shrink-0 pt-1">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> 80+ Strong</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> 60–79 Polish</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> &lt;60 Fix now</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(analysis.sectionScores).map(([section, score]) => (
+        <CardContent className="space-y-2">
+          {Object.entries(analysis.sectionScores).map(([section, score]) => {
+            const { icon: SectionIcon, label } = getSectionConfig(section);
+            const status = getSectionStatus(score);
+            const isExpanded = expandedSection === section;
+
+            // Get per-section detailed data
+            const sbsData = analysis.detailedRecommendations?.sectionBySection;
+            const sectionData = (section !== 'formatting' && sbsData)
+              ? sbsData[section as keyof typeof sbsData] as SectionAnalysis | SkillsAnalysis | undefined
+              : undefined;
+
+            // Count actionable issues
+            const issueCount = (() => {
+              if (section === 'formatting') return analysis.formattingIssues.length + analysis.riskyElements.length;
+              if (!sectionData) return 0;
+              if (isSkillsAnalysis(sectionData)) return sectionData.missing.length;
+              return sectionData.issues.length;
+            })();
+
+            return (
               <div
                 key={section}
                 className={cn(
-                  "relative p-4 rounded-xl border-2 transition-all hover:shadow-md",
-                  score >= 80 ? "border-emerald-200 bg-emerald-50/50" :
-                  score >= 60 ? "border-amber-200 bg-amber-50/50" :
-                  "border-red-200 bg-red-50/50"
+                  "rounded-xl border-2 overflow-hidden transition-all duration-200",
+                  isExpanded
+                    ? score >= 80 ? "border-emerald-300 shadow-sm" : score >= 60 ? "border-amber-300 shadow-sm" : "border-red-300 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
                 )}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold text-slate-700 capitalize">{section}</span>
+                {/* Section row — always visible */}
+                <button
+                  onClick={() => setExpandedSection(isExpanded ? null : section)}
+                  className="w-full flex items-center gap-3 p-4 text-left hover:bg-slate-50 transition-colors"
+                >
+                  {/* Icon */}
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg",
-                    score >= 80 ? "bg-emerald-500 text-white" :
-                    score >= 60 ? "bg-amber-500 text-white" :
-                    "bg-red-500 text-white"
+                    "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+                    score >= 80 ? "bg-emerald-100" : score >= 60 ? "bg-amber-100" : "bg-red-100"
                   )}>
-                    {score}
+                    <SectionIcon className={cn(
+                      "h-[18px] w-[18px]",
+                      score >= 80 ? "text-emerald-600" : score >= 60 ? "text-amber-600" : "text-red-600"
+                    )} />
                   </div>
-                </div>
-                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={cn(
-                      "h-full rounded-full transition-all duration-700",
-                      score >= 80 ? "bg-emerald-600" :
-                      score >= 60 ? "bg-amber-600" :
-                      "bg-red-600"
+
+                  {/* Section label */}
+                  <span className="font-semibold text-slate-800 w-24 flex-shrink-0 text-sm">{label}</span>
+
+                  {/* Progress bar */}
+                  <div className="flex-1 flex items-center gap-3 min-w-0">
+                    <div className={cn("h-2.5 rounded-full flex-1 overflow-hidden", status.trackColor)}>
+                      <div
+                        className={cn("h-full rounded-full transition-all duration-700", status.barColor)}
+                        style={{ width: `${score}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Score + status + issue count + arrow */}
+                  <div className="flex items-center gap-2.5 flex-shrink-0">
+                    <div className="flex items-baseline gap-0.5">
+                      <span className={cn("text-xl font-black", status.color)}>{score}</span>
+                      <span className="text-slate-400 text-sm">/100</span>
+                    </div>
+                    <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full hidden sm:inline", status.badgeBg)}>
+                      {status.label}
+                    </span>
+                    {issueCount > 0 && !isExpanded && (
+                      <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full hidden md:inline">
+                        {issueCount} issue{issueCount !== 1 ? 's' : ''}
+                      </span>
                     )}
-                    style={{ width: `${score}%` }}
-                  />
-                </div>
-                <div className="mt-2 flex items-center gap-1 text-xs">
-                  {score >= 80 ? (
-                    <><ThumbsUp className="h-3 w-3 text-emerald-600" /><span className="text-emerald-600">Excellent</span></>
-                  ) : score >= 60 ? (
-                    <><TrendingUp className="h-3 w-3 text-amber-600" /><span className="text-amber-600">Room to improve</span></>
-                  ) : (
-                    <><ThumbsDown className="h-3 w-3 text-red-600" /><span className="text-red-600">Needs attention</span></>
-                  )}
-                </div>
+                    <div className={cn(
+                      "w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center transition-transform duration-200",
+                      isExpanded && "rotate-90 bg-blue-100"
+                    )}>
+                      <ChevronRight className={cn("h-4 w-4", isExpanded ? "text-blue-600" : "text-slate-400")} />
+                    </div>
+                  </div>
+                </button>
+
+                {/* Expanded content */}
+                {isExpanded && (
+                  <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-5">
+
+                    {/* FORMATTING section */}
+                    {section === 'formatting' && (
+                      <>
+                        {analysis.formattingIssues.length === 0 && analysis.riskyElements.length === 0 ? (
+                          <div className="flex items-center gap-2 text-emerald-600">
+                            <CheckCircle className="h-4 w-4" />
+                            <span className="text-sm font-medium">No formatting issues detected. ATS can read your resume cleanly.</span>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Issues to fix:</p>
+                            {analysis.formattingIssues.map((issue, i) => (
+                              <div key={`fi-${i}`} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-orange-200 shadow-sm">
+                                <XCircle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-slate-700">{issue}</p>
+                              </div>
+                            ))}
+                            {analysis.riskyElements.map((el, i) => (
+                              <div key={`re-${i}`} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-amber-200 shadow-sm">
+                                <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-slate-700">{el}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* SKILLS section */}
+                    {section === 'skills' && sectionData && isSkillsAnalysis(sectionData) && (
+                      <div className="space-y-4">
+                        {sectionData.missing.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-red-600 uppercase tracking-wide mb-2">
+                              Missing critical skills — add these to your resume:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {sectionData.missing.map((s, i) => (
+                                <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
+                                  <XCircle className="h-3 w-3" />{s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {sectionData.matched.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">
+                              Skills matching this job&apos;s requirements:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {sectionData.matched.map((s, i) => (
+                                <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                                  <CheckCircle className="h-3 w-3" />{s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {sectionData.irrelevant.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+                              De-emphasize these (not relevant to this role):
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {sectionData.irrelevant.map((s, i) => (
+                                <span key={i} className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-sm line-through">{s}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {sectionData.reorder && (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <p className="text-xs font-bold text-blue-700 uppercase mb-1">Reorder suggestion:</p>
+                            <p className="text-sm text-slate-700">{sectionData.reorder}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* STANDARD sections: summary, experience, education */}
+                    {section !== 'formatting' && section !== 'skills' && sectionData && !isSkillsAnalysis(sectionData) && (
+                      <div className="space-y-4">
+                        {/* Issues */}
+                        {sectionData.issues.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+                              What&apos;s holding this section back:
+                            </p>
+                            <div className="space-y-2">
+                              {sectionData.issues.map((issue, i) => (
+                                <div key={i} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-red-100 shadow-sm">
+                                  <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                  <p className="text-sm text-slate-700">{issue}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Improvements */}
+                        {sectionData.improvements.length > 0 && (
+                          <div>
+                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">
+                              AI-suggested improvements:
+                            </p>
+                            <div className="space-y-3">
+                              {sectionData.improvements.slice(0, 3).map((imp, i) => {
+                                if (isBulletImprovement(imp)) {
+                                  return (
+                                    <div key={i} className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+                                      <div className="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-slate-500 uppercase">Bullet Enhancement</span>
+                                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{imp.impact}</span>
+                                      </div>
+                                      <div className="grid grid-cols-2 divide-x divide-slate-200">
+                                        <div className="p-4">
+                                          <p className="text-xs font-bold text-red-500 uppercase mb-1.5">Current</p>
+                                          <p className="text-sm text-slate-600 italic leading-relaxed">&quot;{imp.bulletPoint}&quot;</p>
+                                          {imp.weaknesses.length > 0 && (
+                                            <div className="mt-2 space-y-0.5">
+                                              {imp.weaknesses.map((w, wi) => (
+                                                <p key={wi} className="text-xs text-red-500">• {w}</p>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="p-4 bg-emerald-50">
+                                          <p className="text-xs font-bold text-emerald-600 uppercase mb-1.5">Improved</p>
+                                          <p className="text-sm text-slate-700 font-medium leading-relaxed">&quot;{imp.enhanced}&quot;</p>
+                                          {imp.keywordsAdded.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                              {imp.keywordsAdded.map((kw, ki) => (
+                                                <span key={ki} className="px-1.5 py-0.5 bg-emerald-200 text-emerald-700 rounded text-xs font-medium">+{kw}</span>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                } else {
+                                  return (
+                                    <div key={i} className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+                                      <div className="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                                        <span className="text-xs text-slate-600">{imp.change}</span>
+                                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{imp.impact}</span>
+                                      </div>
+                                      <div className="grid grid-cols-2 divide-x divide-slate-200">
+                                        <div className="p-4">
+                                          <p className="text-xs font-bold text-red-500 uppercase mb-1.5">Current</p>
+                                          <p className="text-sm text-slate-600 italic leading-relaxed">&quot;{imp.before}&quot;</p>
+                                        </div>
+                                        <div className="p-4 bg-emerald-50">
+                                          <p className="text-xs font-bold text-emerald-600 uppercase mb-1.5">Improved</p>
+                                          <p className="text-sm text-slate-700 font-medium leading-relaxed">&quot;{imp.after}&quot;</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* All good */}
+                        {sectionData.issues.length === 0 && sectionData.improvements.length === 0 && (
+                          <div className="flex items-center gap-2 text-emerald-600">
+                            <CheckCircle className="h-4 w-4" />
+                            <span className="text-sm">This section is well-optimized. No critical issues found.</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* No detailed data yet */}
+                    {section !== 'formatting' && !sectionData && (
+                      <div className={cn("text-sm flex items-center gap-2", score >= 80 ? "text-emerald-600" : "text-slate-500")}>
+                        {score >= 80 ? (
+                          <><CheckCircle className="h-4 w-4" /> This section looks strong for ATS.</>
+                        ) : (
+                          <><Info className="h-4 w-4" /> Run a rescan to get detailed analysis with specific improvements for this section.</>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </CardContent>
       </Card>
 
       {/* Keywords Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Matched Keywords */}
         <Card variant="elevated" className="border-l-4 border-l-emerald-500">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
@@ -364,17 +618,14 @@ export default function ATSSimulator({
                 <CheckCircle className="h-5 w-5" />
                 Keywords Found
               </span>
-              <Badge variant="success" size="lg">{analysis.matchedKeywords.length}</Badge>
+              <span className="text-sm font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">{analysis.matchedKeywords.length}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             {analysis.matchedKeywords.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {analysis.matchedKeywords.map((keyword, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-medium"
-                  >
+                  <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-medium">
                     <CheckCircle className="h-3.5 w-3.5" />
                     {keyword}
                   </span>
@@ -386,7 +637,6 @@ export default function ATSSimulator({
           </CardContent>
         </Card>
 
-        {/* Missing Keywords */}
         <Card variant="elevated" className="border-l-4 border-l-red-500">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
@@ -394,7 +644,7 @@ export default function ATSSimulator({
                 <XCircle className="h-5 w-5" />
                 Keywords Missing
               </span>
-              <Badge variant="error" size="lg">{analysis.missingKeywords.length}</Badge>
+              <span className="text-sm font-bold bg-red-100 text-red-700 px-2.5 py-1 rounded-full">{analysis.missingKeywords.length}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -405,10 +655,7 @@ export default function ATSSimulator({
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {analysis.missingKeywords.map((keyword, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium"
-                    >
+                    <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium">
                       <XCircle className="h-3.5 w-3.5" />
                       {keyword}
                     </span>
@@ -440,10 +687,7 @@ export default function ATSSimulator({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analysis.riskyElements.map((element, i) => (
-                <div
-                  key={`risk-${i}`}
-                  className="flex items-start gap-3 p-4 bg-white rounded-xl border border-amber-200 shadow-sm"
-                >
+                <div key={`risk-${i}`} className="flex items-start gap-3 p-4 bg-white rounded-xl border border-amber-200 shadow-sm">
                   <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
                   </div>
@@ -454,10 +698,7 @@ export default function ATSSimulator({
                 </div>
               ))}
               {analysis.formattingIssues.map((issue, i) => (
-                <div
-                  key={`format-${i}`}
-                  className="flex items-start gap-3 p-4 bg-white rounded-xl border border-orange-200 shadow-sm"
-                >
+                <div key={`format-${i}`} className="flex items-start gap-3 p-4 bg-white rounded-xl border border-orange-200 shadow-sm">
                   <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <XCircle className="h-4 w-4 text-orange-600" />
                   </div>
@@ -472,38 +713,30 @@ export default function ATSSimulator({
         </Card>
       )}
 
-      {/* Quick Wins - Most Important Section */}
+      {/* Quick Wins */}
       {analysis.quickWins && analysis.quickWins.length > 0 && (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 shadow-sm">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4">
-            <div className="w-24 h-24 bg-yellow-400/20 rounded-full blur-2xl" />
-          </div>
+        <div className="rounded-xl border border-amber-300 bg-amber-50 shadow-sm overflow-hidden">
           <div className="bg-amber-600 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-4 ring-white/30 animate-pulse">
-                  <Zap className="h-8 w-8 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-4 ring-white/30 animate-pulse">
+                <Zap className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-2xl font-black text-white">⚡ QUICK WINS</h3>
+                  <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-bounce">
+                    START HERE
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-2xl font-black text-white">⚡ QUICK WINS</h3>
-                    <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-bounce">
-                      START HERE
-                    </span>
-                  </div>
-                  <p className="text-yellow-100 text-sm mt-1 font-medium">
-                    Make these changes NOW for instant score boost!
-                  </p>
-                </div>
+                <p className="text-yellow-100 text-sm mt-1 font-medium">
+                  Make these changes NOW for instant score boost!
+                </p>
               </div>
             </div>
           </div>
           <div className="p-6 space-y-3">
             {analysis.quickWins.map((win, i) => (
-              <div
-                key={i}
-                className="relative group bg-white rounded-xl p-5 border-2 border-yellow-200 hover:border-yellow-400 shadow-md hover:shadow-xl transition-all"
-              >
+              <div key={i} className="relative group bg-white rounded-xl p-5 border-2 border-yellow-200 hover:border-yellow-400 shadow-md hover:shadow-xl transition-all">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white font-bold text-lg">
                     {i + 1}
@@ -525,7 +758,7 @@ export default function ATSSimulator({
 
       {/* Action Plan */}
       {analysis.actionPlan && (
-        <div className="rounded-xl border border-blue-200 bg-blue-50 shadow-sm">
+        <div className="rounded-xl border border-blue-200 bg-blue-50 shadow-sm overflow-hidden">
           <div className="bg-blue-600 p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -573,9 +806,9 @@ export default function ATSSimulator({
         </div>
       )}
 
-      {/* Critical Issues - Before/After Examples */}
+      {/* Critical Issues — Before/After Examples */}
       {analysis.detailedRecommendations?.criticalIssues && analysis.detailedRecommendations.criticalIssues.length > 0 && (
-        <div className="rounded-xl border border-red-200 bg-[var(--surface)] shadow-sm">
+        <div className="rounded-xl border border-red-200 bg-[var(--surface)] shadow-sm overflow-hidden">
           <div className="bg-red-700 p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -656,7 +889,7 @@ export default function ATSSimulator({
 
       {/* Missing Keywords with Examples */}
       {analysis.detailedRecommendations?.missingKeywordDetails && analysis.detailedRecommendations.missingKeywordDetails.length > 0 && (
-        <div className="rounded-xl border border-purple-200 bg-[var(--surface)] shadow-sm">
+        <div className="rounded-xl border border-purple-200 bg-[var(--surface)] shadow-sm overflow-hidden">
           <div className="bg-purple-700 p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
@@ -732,13 +965,11 @@ export default function ATSSimulator({
         </div>
       )}
 
-      {/* Original Recommendations */}
+      {/* All Recommendations */}
       {analysis.recommendations.length > 0 && (
-        <div className="rounded-xl border border-blue-200 bg-[var(--surface)] shadow-sm">
-          {/* Header with gradient */}
+        <div className="rounded-xl border border-blue-200 bg-[var(--surface)] shadow-sm overflow-hidden">
           <div className="bg-blue-600 p-6">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
-            <div className="relative flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30">
                   <Rocket className="h-7 w-7 text-white" />
@@ -760,7 +991,6 @@ export default function ATSSimulator({
             </div>
           </div>
 
-          {/* Recommendations list */}
           <div className="p-6 space-y-4">
             {(showAllRecommendations ? analysis.recommendations : analysis.recommendations.slice(0, 3)).map((rec, i) => {
               const priorityConfig = [
@@ -779,11 +1009,8 @@ export default function ATSSimulator({
                     config.border
                   )}
                 >
-                  {/* Left gradient accent */}
                   <div className={cn("absolute left-0 top-0 bottom-0 w-1", config.bg)} />
-
                   <div className="flex items-start gap-4 p-5 pl-6">
-                    {/* Number badge */}
                     <div className={cn(
                       "relative flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ring-4",
                       config.bg,
@@ -791,7 +1018,6 @@ export default function ATSSimulator({
                     )}>
                       <span className="text-xl font-bold text-white">{i + 1}</span>
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <span className={cn(
@@ -806,8 +1032,6 @@ export default function ATSSimulator({
                       </div>
                       <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{rec}</p>
                     </div>
-
-                    {/* Action arrow */}
                     <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                         <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
@@ -819,7 +1043,6 @@ export default function ATSSimulator({
             })}
           </div>
 
-          {/* Show more button */}
           {analysis.recommendations.length > 3 && (
             <div className="px-6 pb-6">
               <button
@@ -835,7 +1058,6 @@ export default function ATSSimulator({
             </div>
           )}
 
-          {/* Footer tip */}
           <div className="px-6 pb-6">
             <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
               <CheckCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
@@ -850,7 +1072,6 @@ export default function ATSSimulator({
       {/* ATS Extracted View */}
       {analysis.atsExtractedView && (
         <div className="relative overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-sm">
-          {/* Header */}
           <button
             onClick={() => setShowExtractedView(!showExtractedView)}
             className="w-full relative bg-slate-800 p-6 hover:bg-slate-700 transition-colors"
@@ -888,12 +1109,9 @@ export default function ATSSimulator({
             </div>
           </button>
 
-          {/* Expandable content */}
           {showExtractedView && (
             <div className="p-6 pt-0">
-              {/* Terminal window */}
               <div className="relative mt-6 rounded-xl overflow-hidden border border-slate-600/50 shadow-2xl">
-                {/* macOS-style title bar */}
                 <div className="flex items-center justify-between px-4 py-3 bg-slate-700 border-b border-slate-600">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-red-500 shadow-lg" />
@@ -904,18 +1122,14 @@ export default function ATSSimulator({
                     <Code className="h-3.5 w-3.5 text-slate-400" />
                     <span className="text-xs text-slate-400 font-mono">ats_parser_output.txt</span>
                   </div>
-                  <div className="w-16" /> {/* Spacer for balance */}
+                  <div className="w-16" />
                 </div>
-
-                {/* Terminal content */}
                 <div className="relative bg-slate-900">
-                  {/* Scan line effect */}
                   <div className="absolute inset-0 pointer-events-none opacity-5">
                     <div className="absolute inset-0" style={{
                       backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
                     }} />
                   </div>
-
                   <div className="p-6 font-mono text-sm whitespace-pre-wrap overflow-x-auto max-h-96 overflow-y-auto text-emerald-400 leading-relaxed relative z-10">
                     <span className="text-cyan-400">$ </span>
                     <span className="text-slate-400">ats_parser --extract resume.pdf</span>
@@ -930,8 +1144,6 @@ export default function ATSSimulator({
                   </div>
                 </div>
               </div>
-
-              {/* Info cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
@@ -961,9 +1173,7 @@ export default function ATSSimulator({
                   </div>
                 </div>
               </div>
-
-              {/* Pro tip */}
-              <div className="mt-4 flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <div className="mt-4 flex items-center gap-3 p-4 bg-blue-950/50 rounded-xl border border-blue-900/50">
                 <Lightbulb className="h-5 w-5 text-cyan-400 flex-shrink-0" />
                 <p className="text-sm text-slate-300">
                   <span className="font-medium text-cyan-300">Pro tip:</span> If your key qualifications don&apos;t appear clearly in this view, consider simplifying your resume&apos;s formatting.

@@ -590,9 +590,6 @@ export default function ResumeDetailPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={version.atsScore >= 80 ? 'success' : version.atsScore >= 60 ? 'warning' : 'error'}>
-                        ATS: {version.atsScore}%
-                      </Badge>
                       <Link href={`/resumes/${resumeId}/versions/${version.id}`}>
                         <Button variant="outline" size="sm">
                           View Details
