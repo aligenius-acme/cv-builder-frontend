@@ -36,17 +36,26 @@ import {
   GraduationCap,
   LayoutDashboard,
   Info,
+  BookOpen,
+  ExternalLink,
 } from 'lucide-react';
 import { ATSAnalysis, SectionAnalysis, SkillsAnalysis, SectionImprovement, BulletImprovement } from '@/types';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 
+interface CourseRecommendation {
+  title: string;
+  url: string;
+  provider: string;
+}
+
 interface ATSSimulatorProps {
   resumeId: string;
   versionId: string;
   initialScore?: number;
   initialAnalysis?: ATSAnalysis;
+  initialCourseRecommendations?: CourseRecommendation[];
 }
 
 function isSkillsAnalysis(data: SectionAnalysis | SkillsAnalysis): data is SkillsAnalysis {
@@ -62,8 +71,12 @@ export default function ATSSimulator({
   versionId,
   initialScore,
   initialAnalysis,
+  initialCourseRecommendations,
 }: ATSSimulatorProps) {
   const [analysis, setAnalysis] = useState<ATSAnalysis | null>(initialAnalysis || null);
+  const [courseRecommendations, setCourseRecommendations] = useState<CourseRecommendation[]>(
+    initialCourseRecommendations || []
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [showExtractedView, setShowExtractedView] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
@@ -75,6 +88,9 @@ export default function ATSSimulator({
       const response = await api.simulateATS(resumeId, versionId);
       if (response.success && response.data) {
         setAnalysis(response.data);
+        if ((response.data as any).courseRecommendations) {
+          setCourseRecommendations((response.data as any).courseRecommendations);
+        }
         toast.success('ATS simulation complete');
       }
     } catch (error: unknown) {
@@ -661,6 +677,32 @@ export default function ATSSimulator({
                     </span>
                   ))}
                 </div>
+                {/* Affiliate course recommendations */}
+                {courseRecommendations.length > 0 && (
+                  <div className="mt-5 pt-5 border-t border-slate-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookOpen className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm font-semibold text-slate-700">Level Up These Skills</p>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {courseRecommendations.slice(0, 4).map((course, i) => (
+                        <a
+                          key={i}
+                          href={course.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group"
+                        >
+                          <div>
+                            <p className="text-xs font-medium text-blue-700 mb-0.5">{course.provider}</p>
+                            <p className="text-sm text-slate-700 line-clamp-1">{course.title}</p>
+                          </div>
+                          <ExternalLink className="h-3.5 w-3.5 text-blue-400 group-hover:text-blue-600 flex-shrink-0 ml-2" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="flex items-center gap-2 text-emerald-600">

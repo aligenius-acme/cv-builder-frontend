@@ -172,7 +172,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
           <CardContent className="space-y-4">
             {/* Resume Selector */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5.5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-purple-500" />Your Resume (optional — personalizes the email)</span>
               </label>
               {isLoadingResumes ? (
@@ -211,7 +211,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
             {/* Saved Jobs Dropdown */}
             {jobInputMode === 'saved' && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5.5">Select Application</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Select Application</label>
                 {isLoadingSavedJobs ? (
                   <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
                     <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />

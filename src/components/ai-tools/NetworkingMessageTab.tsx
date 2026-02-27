@@ -10,12 +10,8 @@ import {
   Users,
   Loader2,
   Copy,
-  CheckCircle,
-  ChevronDown,
   ChevronRight,
-  Upload,
   FileText,
-  Send,
   MessageCircle,
 } from 'lucide-react';
 import api, {
@@ -169,7 +165,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
           <CardContent className="space-y-4">
             {/* Resume selector — auto-fills name + background */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5.5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
                 <span className="flex items-center gap-1.5"><FileText className="h-4 w-4 text-blue-500" />Load from Resume (auto-fills your info)</span>
               </label>
               {isLoadingResumes ? (
@@ -262,6 +258,16 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
                 value={formData.commonGround}
                 onChange={(e) => setFormData({ ...formData, commonGround: e.target.value })}
                 placeholder="Same university, mutual connection, etc. (comma-separated)"
+                className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Specific Ask</label>
+              <input
+                type="text"
+                value={formData.specificAsk}
+                onChange={(e) => setFormData({ ...formData, specificAsk: e.target.value })}
+                placeholder="e.g., 15-min call, referral to hiring manager"
                 className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
               />
             </div>

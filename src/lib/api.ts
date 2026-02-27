@@ -34,6 +34,11 @@ class ApiClient {
             window.location.href = '/login';
           }
         }
+        if (error.response?.status === 402) {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/out-of-credits';
+          }
+        }
         throw error;
       }
     );
@@ -399,15 +404,31 @@ class ApiClient {
     return response.data;
   }
 
+  // Billing endpoints
+  async getBillingStatus() {
+    const response = await this.client.get<ApiResponse<any>>('/billing/status');
+    return response.data;
+  }
+
+  async createCheckoutSession() {
+    const response = await this.client.post<ApiResponse<{ url: string }>>('/billing/checkout');
+    return response.data;
+  }
+
+  async createPortalSession() {
+    const response = await this.client.post<ApiResponse<{ url: string }>>('/billing/portal');
+    return response.data;
+  }
+
   // Admin endpoints
   async getAdminDashboard() {
     const response = await this.client.get<ApiResponse<any>>('/admin/dashboard');
     return response.data;
   }
 
-  async getAdminUsers(page = 1, limit = 20, search?: string, role?: string) {
+  async getAdminUsers(page = 1, limit = 20, search?: string, role?: string, plan?: string) {
     const response = await this.client.get<ApiResponse<any>>('/admin/users', {
-      params: { page, limit, search, role },
+      params: { page, limit, search, role, plan },
     });
     return response.data;
   }
@@ -417,7 +438,7 @@ class ApiClient {
     return response.data;
   }
 
-  async updateAdminUser(id: string, data: { role?: string; emailVerified?: boolean }) {
+  async updateAdminUser(id: string, data: { role?: string; emailVerified?: boolean; plan?: string }) {
     const response = await this.client.put<ApiResponse<any>>(`/admin/users/${id}`, data);
     return response.data;
   }
@@ -472,6 +493,27 @@ class ApiClient {
     isAtsSafe?: boolean;
   }) {
     const response = await this.client.post<ApiResponse<any>>('/admin/templates', data);
+    return response.data;
+  }
+
+  // Admin affiliate management
+  async getAdminAffiliates() {
+    const response = await this.client.get<ApiResponse<any[]>>('/admin/affiliates');
+    return response.data;
+  }
+
+  async createAdminAffiliate(data: { skill: string; title: string; url: string; provider: string; isActive?: boolean }) {
+    const response = await this.client.post<ApiResponse<any>>('/admin/affiliates', data);
+    return response.data;
+  }
+
+  async updateAdminAffiliate(id: string, data: { skill?: string; title?: string; url?: string; provider?: string; isActive?: boolean }) {
+    const response = await this.client.put<ApiResponse<any>>(`/admin/affiliates/${id}`, data);
+    return response.data;
+  }
+
+  async deleteAdminAffiliate(id: string) {
+    const response = await this.client.delete<ApiResponse>(`/admin/affiliates/${id}`);
     return response.data;
   }
 

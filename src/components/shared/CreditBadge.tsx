@@ -43,7 +43,7 @@ export default function CreditBadge({
   // If no credits remaining, make it clickable to the out-of-credits page
   if (remaining === 0) {
     return (
-      <Link href="/dashboard/out-of-credits" className="hover:opacity-80 transition-opacity">
+      <Link href="/out-of-credits" className="hover:opacity-80 transition-opacity">
         {content}
       </Link>
     );

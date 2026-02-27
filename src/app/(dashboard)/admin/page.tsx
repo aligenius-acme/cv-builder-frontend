@@ -25,6 +25,7 @@ import {
   AlertCircle,
   CheckCircle2,
   BarChart3,
+  Crown,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
@@ -40,6 +41,7 @@ interface DashboardStats {
   totalSavedJobs: number;
   activeUsers30d: number;
   newUsers30d: number;
+  proUsers: number;
   userGrowthRate: number;
   avgVersionsPerResume: number;
   aiRequests30d: number;
@@ -158,16 +160,17 @@ export default function AdminDashboardPage() {
 
   const secondaryCards = [
     {
+      title: 'Pro Users',
+      value: stats?.proUsers || 0,
+      icon: Crown,
+      color: 'bg-blue-600',
+      subtext: 'Active subscriptions',
+    },
+    {
       title: 'Job Applications',
       value: stats?.totalJobApplications || 0,
       icon: Briefcase,
       color: 'bg-emerald-600',
-    },
-    {
-      title: 'Saved Jobs',
-      value: stats?.totalSavedJobs || 0,
-      icon: Bookmark,
-      color: 'bg-cyan-600',
     },
     {
       title: 'Active Users (30d)',
@@ -229,6 +232,7 @@ export default function AdminDashboardPage() {
     { title: 'AI Usage', description: 'Monitor AI API usage and costs', href: '/admin/ai-usage', icon: Cpu },
     { title: 'AI Prompts', description: 'Manage AI prompt templates', href: '/admin/prompts', icon: FileText },
     { title: 'Templates', description: 'Manage resume templates', href: '/admin/templates', icon: FileText },
+    { title: 'Affiliate Links', description: 'Manage course recommendation URLs', href: '/admin/affiliates', icon: TrendingUp },
     { title: 'System Logs', description: 'View parsing errors and audit logs', href: '/admin/logs', icon: Activity },
   ];
 
@@ -286,6 +290,9 @@ export default function AdminDashboardPage() {
                         </Badge>
                       )}
                     </div>
+                    {(stat as any).subtext && (
+                      <p className="text-xs text-slate-400 mt-1">{(stat as any).subtext}</p>
+                    )}
                   </div>
                   <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center`}>
                     <stat.icon className="h-5 w-5 text-white" />

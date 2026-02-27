@@ -43,7 +43,6 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<WeaknessDetectorResult | null>(null);
   const [expandedWeakness, setExpandedWeakness] = useState<number | null>(null);
-  const [showQuickFixes, setShowQuickFixes] = useState(true);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Input mode and dropdowns
@@ -367,6 +366,53 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
                 </ol>
               </CardContent>
             </Card>
+
+            {/* Blunt Assessment */}
+            {(result as any).bluntAssessment && (
+              <Card variant="elevated" className="bg-slate-900 border-slate-800">
+                <CardContent className="py-4">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Honest Assessment</p>
+                  <p className="text-slate-100 text-sm">{(result as any).bluntAssessment}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Industry Insights */}
+            {(result as any).industryInsights && (
+              <Card variant="elevated">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Target className="h-5 w-5 text-blue-600" />
+                    Industry Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(result as any).industryInsights.missingKeywords?.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 mb-2">Missing Keywords</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(result as any).industryInsights.missingKeywords.map((kw: string, i: number) => (
+                          <span key={i} className="px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">{kw}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(result as any).industryInsights.competitorAdvantages?.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 mb-2">What Top Candidates Have</p>
+                      <ul className="space-y-1">
+                        {(result as any).industryInsights.competitorAdvantages.map((adv: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                            <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                            {adv}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
       </div>

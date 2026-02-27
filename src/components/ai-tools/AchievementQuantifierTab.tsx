@@ -80,13 +80,6 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
     setSelectedBulletIndices(newSet);
   };
 
-  const importSelectedBullets = () => {
-    const selected = Array.from(selectedBulletIndices).map((i) => resumeBullets[i]);
-    setBullets(selected.length > 0 ? selected : ['']);
-    setBulletSource('manual');
-    toast.success(`Imported ${selected.length} bullet point${selected.length !== 1 ? 's' : ''}`);
-  };
-
   const addBullet = () => {
     if (bullets.length < 10) {
       setBullets([...bullets, '']);
@@ -105,8 +98,8 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
     }
   };
 
-  const handleQuantify = async () => {
-    const validBullets = bullets.filter((b) => b.trim());
+  const handleQuantify = async (overrideBullets?: string[]) => {
+    const validBullets = (overrideBullets || bullets).filter((b) => b.trim());
     if (validBullets.length === 0) {
       toast.error('Please enter at least one bullet point');
       return;
@@ -127,6 +120,17 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const importAndQuantify = () => {
+    const selected = Array.from(selectedBulletIndices).map((i) => resumeBullets[i]);
+    if (selected.length === 0) {
+      toast.error('Select at least one bullet point');
+      return;
+    }
+    setBullets(selected);
+    setBulletSource('manual');
+    handleQuantify(selected);
   };
 
   const copyToClipboard = (text: string) => {
@@ -226,10 +230,12 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
                   <Button
                     variant="primary"
                     className="w-full"
-                    onClick={importSelectedBullets}
-                    disabled={selectedBulletIndices.size === 0}
+                    onClick={importAndQuantify}
+                    disabled={selectedBulletIndices.size === 0 || isLoading}
+                    isLoading={isLoading}
                   >
-                    Import {selectedBulletIndices.size} Bullet{selectedBulletIndices.size !== 1 ? 's' : ''} & Quantify
+                    {!isLoading && <TrendingUp className="h-4 w-4 mr-2" />}
+                    Quantify {selectedBulletIndices.size} Bullet{selectedBulletIndices.size !== 1 ? 's' : ''}
                   </Button>
                 </div>
               )}
@@ -287,7 +293,7 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
               <Button
                 variant="primary"
                 className="w-full"
-                onClick={handleQuantify}
+                onClick={() => handleQuantify()}
                 disabled={isLoading}
               >
                 {isLoading ? (

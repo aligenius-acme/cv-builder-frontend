@@ -57,6 +57,7 @@ export default function SkillGapPage() {
   const [experienceLevel, setExperienceLevel] = useState('');
   const [industry, setIndustry] = useState('');
   const [analysis, setAnalysis] = useState<SkillGapAnalysis | null>(null);
+  const [courseRecommendations, setCourseRecommendations] = useState<Array<{title: string; url: string; provider: string}>>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Saved jobs and resumes state
@@ -153,6 +154,9 @@ export default function SkillGapPage() {
 
       if (response.success && response.data) {
         setAnalysis(response.data);
+        if ((response.data as any).courseRecommendations) {
+          setCourseRecommendations((response.data as any).courseRecommendations);
+        }
         toast.success('Skill gap analysis complete');
       }
     } catch (error) {
@@ -623,6 +627,47 @@ export default function SkillGapPage() {
                     </ul>
                   </CardContent>
                 </Card>
+
+                {/* Affiliate Course Recommendations */}
+                {courseRecommendations.length > 0 && (
+                  <Card variant="elevated">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <GraduationCap className="h-5 w-5 text-blue-600" />
+                        Recommended Courses
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-slate-500 mb-4">
+                        Close your skill gaps faster with these curated courses:
+                      </p>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {courseRecommendations.map((course, idx) => (
+                          <a
+                            key={idx}
+                            href={course.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="h-4 w-4 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-slate-800 group-hover:text-blue-700">
+                                  {course.title}
+                                </p>
+                                <p className="text-xs text-slate-500">{course.provider}</p>
+                              </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-blue-600 flex-shrink-0" />
+                          </a>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </>
             )}
           </div>

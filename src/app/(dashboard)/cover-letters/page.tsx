@@ -4,7 +4,7 @@ import { useState } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { FileText, Plus, Sparkles } from 'lucide-react';
+import { FileText, Plus, Sparkles, ExternalLink, X } from 'lucide-react';
 import api, { JobApplication } from '@/lib/api';
 import { CoverLetter, Resume } from '@/types';
 import { downloadBlob, getErrorMessage } from '@/lib/utils';
@@ -71,6 +71,8 @@ export default function CoverLettersPage() {
   const [expandedLetter, setExpandedLetter] = useState<string | null>(null);
   const [showEnhancements, setShowEnhancements] = useState<Record<string, boolean>>({});
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
+  const [showGrammarlyBanner, setShowGrammarlyBanner] = useState(false);
+  const GRAMMARLY_URL = 'https://www.grammarly.com/?utm_source=affiliate&utm_medium=partner';
 
   const handleGenerate = async (data: {
     jobTitle: string;
@@ -95,6 +97,7 @@ export default function CoverLettersPage() {
           return newData;
         });
         setShowGenerator(false);
+        setShowGrammarlyBanner(true);
         toast.success('Cover letter generated!');
       }
     } catch (error: any) {
@@ -165,6 +168,27 @@ export default function CoverLettersPage() {
             </Button>
           }
         />
+
+        {/* Grammarly affiliate CTA — shown after cover letter generation */}
+        {showGrammarlyBanner && (
+          <div className="flex items-center justify-between gap-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-green-700 dark:text-green-400 text-sm font-medium">✨ Polish your writing:</span>
+              <a
+                href={GRAMMARLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-green-700 dark:text-green-400 hover:underline font-semibold"
+              >
+                Try Grammarly for free
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
+            <button onClick={() => setShowGrammarlyBanner(false)} className="text-green-500 hover:text-green-700">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* Generator Form */}
         {showGenerator && (

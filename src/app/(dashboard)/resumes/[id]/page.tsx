@@ -44,6 +44,7 @@ import {
   ExternalLink,
   Edit2,
   Trash2,
+  BookOpen,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
@@ -90,6 +91,9 @@ export default function ResumeDetailPage() {
   const [isLoadingSavedJobs, setIsLoadingSavedJobs] = useState(false);
   const [selectedSavedJobId, setSelectedSavedJobId] = useState<string>('');
   const [showSavedJobsDropdown, setShowSavedJobsDropdown] = useState(false);
+
+  // Course recommendations after tailoring
+  const [courseRecommendations, setCourseRecommendations] = useState<Array<{ title: string; url: string; provider: string }>>([]);
 
   // Selected job info for display
   const [selectedJobInfo, setSelectedJobInfo] = useState<{
@@ -164,6 +168,9 @@ export default function ResumeDetailPage() {
         setJobTitle('');
         setCompanyName('');
         setJobDescription('');
+        if (response.data.courseRecommendations?.length > 0) {
+          setCourseRecommendations(response.data.courseRecommendations);
+        }
         loadResume();
       }
     } catch (error: any) {
@@ -439,39 +446,70 @@ export default function ResumeDetailPage() {
                 {/* Form (shown after job selection or in manual mode) */}
                 {(inputMode === 'manual' || jobTitle) && (
                   <form onSubmit={handleCustomize} className="space-y-5">
-                    {/* Selected Job Info Banner */}
-                    {selectedJobInfo && (selectedJobInfo.location || selectedJobInfo.salary || selectedJobInfo.type || selectedJobInfo.url) && (
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
-                        <div className="flex flex-wrap items-center gap-3">
-                          {selectedJobInfo.location && (
-                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
-                              <MapPin className="h-4 w-4" />
-                              {selectedJobInfo.location}
-                            </span>
-                          )}
-                          {selectedJobInfo.salary && (
-                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
-                              <DollarSign className="h-4 w-4" />
-                              {selectedJobInfo.salary}
-                            </span>
-                          )}
-                          {selectedJobInfo.type && (
-                            <span className="flex items-center gap-1.5 text-sm text-blue-700">
-                              <Clock className="h-4 w-4" />
-                              {selectedJobInfo.type}
-                            </span>
-                          )}
-                        </div>
-                        {selectedJobInfo.url && (
-                          <a
-                            href={selectedJobInfo.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                    {/* Selected Job Details Card */}
+                    {selectedJobInfo && (
+                      <div className="border border-blue-200 rounded-xl overflow-hidden">
+                        {/* Header row */}
+                        <div className="bg-blue-50 px-4 py-3 flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                                <Building className="h-4 w-4 text-blue-600" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-slate-900 truncate">{jobTitle}</p>
+                                <p className="text-sm text-slate-500 truncate">{companyName}</p>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 pl-9">
+                              {selectedJobInfo.location && (
+                                <span className="flex items-center gap-1 text-xs text-slate-500">
+                                  <MapPin className="h-3.5 w-3.5" />
+                                  {selectedJobInfo.location}
+                                </span>
+                              )}
+                              {selectedJobInfo.salary && (
+                                <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                                  <DollarSign className="h-3.5 w-3.5" />
+                                  {selectedJobInfo.salary}
+                                </span>
+                              )}
+                              {selectedJobInfo.type && (
+                                <span className="flex items-center gap-1 text-xs text-slate-500">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  {selectedJobInfo.type}
+                                </span>
+                              )}
+                              {selectedJobInfo.url && (
+                                <a
+                                  href={selectedJobInfo.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                  View Posting
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={resetForm}
+                            className="shrink-0 text-xs text-slate-400 hover:text-slate-600 transition-colors mt-1"
                           >
-                            <ExternalLink className="h-4 w-4" />
-                            View Original
-                          </a>
+                            Change
+                          </button>
+                        </div>
+
+                        {/* Description preview */}
+                        {jobDescription && (
+                          <div className="bg-white border-t border-blue-100 px-4 py-3">
+                            <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Job Description</p>
+                            <div className="max-h-40 overflow-y-auto pr-1">
+                              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{jobDescription}</p>
+                            </div>
+                          </div>
                         )}
                       </div>
                     )}
@@ -998,6 +1036,51 @@ export default function ResumeDetailPage() {
             </Card>
           );
         })()}
+
+        {/* Course Recommendations after tailoring */}
+        {courseRecommendations.length > 0 && (
+          <Card variant="elevated">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  Skill Up for This Role
+                </CardTitle>
+                <button
+                  onClick={() => setCourseRecommendations([])}
+                  className="text-xs text-slate-400 hover:text-slate-600"
+                >
+                  Dismiss
+                </button>
+              </div>
+              <p className="text-sm text-slate-500">Your resume is missing these skills. Close the gap with these courses:</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {courseRecommendations.map((course, idx) => (
+                  <a
+                    key={idx}
+                    href={course.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-800 group-hover:text-blue-700 truncate">{course.title}</p>
+                        <p className="text-xs text-slate-500">{course.provider}</p>
+                      </div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-blue-600 flex-shrink-0 ml-2" />
+                  </a>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Download Modal */}
         {showDownloadModal && (

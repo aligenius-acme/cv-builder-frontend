@@ -37,6 +37,8 @@ interface AdminUser {
   firstName: string | null;
   lastName: string | null;
   role: string;
+  plan: string;
+  stripeSubscriptionId: string | null;
   resumeCount: number;
   coverLetterCount: number;
   createdAt: string;
@@ -55,14 +57,15 @@ export default function AdminUsersPage() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [planFilter, setPlanFilter] = useState('');
   const [page, setPage] = useState(1);
   const [actionUserId, setActionUserId] = useState<string | null>(null);
 
   const { data: usersData, isLoading, setData: setUsersData, refetch: loadUsers } = useFetchData<{ users: AdminUser[], pagination: Pagination }>({
-    fetchFn: () => api.getAdminUsers(page, 20, search || undefined, roleFilter || undefined),
+    fetchFn: () => api.getAdminUsers(page, 20, search || undefined, roleFilter || undefined, planFilter || undefined),
     errorMessage: 'Failed to load users',
     immediate: user?.role === 'ADMIN',
-    deps: [page, roleFilter],
+    deps: [page, roleFilter, planFilter],
   });
 
   const users = usersData?.users || [];
@@ -103,6 +106,17 @@ export default function AdminUsersPage() {
       setActionUserId(null);
     } catch (error) {
       toast.error('Failed to update user role');
+    }
+  };
+
+  const handleTogglePlan = async (userId: string, currentPlan: string) => {
+    const newPlan = currentPlan === 'PRO' ? 'FREE' : 'PRO';
+    try {
+      await api.updateAdminUser(userId, { plan: newPlan });
+      toast.success(`User plan set to ${newPlan}`);
+      loadUsers();
+    } catch (error) {
+      toast.error('Failed to update user plan');
     }
   };
 
@@ -161,9 +175,21 @@ export default function AdminUsersPage() {
                 }}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
-                <option value="" className="text-slate-500">All Roles</option>
+                <option value="">All Roles</option>
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
+              </select>
+              <select
+                value={planFilter}
+                onChange={(e) => {
+                  setPlanFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                <option value="">All Plans</option>
+                <option value="FREE">Free</option>
+                <option value="PRO">Pro</option>
               </select>
               <Button type="submit" variant="primary">
                 Search
@@ -189,6 +215,7 @@ export default function AdminUsersPage() {
                     <tr className="border-b border-slate-200 bg-slate-50">
                       <th className="text-left py-4 px-6 text-sm font-medium text-slate-600">User</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Role</th>
+                      <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Plan</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Content</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Joined</th>
                       <th className="text-left py-4 px-4 text-sm font-medium text-slate-600">Last Login</th>
@@ -236,6 +263,19 @@ export default function AdminUsersPage() {
                               </div>
                             )}
                           </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <button
+                            onClick={() => handleTogglePlan(u.id, u.plan)}
+                            title={u.plan === 'PRO' ? 'Click to revoke Pro' : 'Click to grant Pro'}
+                            className="hover:opacity-80 transition-opacity"
+                          >
+                            {u.plan === 'PRO' ? (
+                              <Badge variant="primary" size="sm">Pro</Badge>
+                            ) : (
+                              <Badge variant="default" size="sm">Free</Badge>
+                            )}
+                          </button>
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3 text-sm text-slate-600">

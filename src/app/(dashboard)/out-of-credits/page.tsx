@@ -1,55 +1,70 @@
 'use client';
 
-import { Zap, BookOpen, Video, Briefcase, ExternalLink, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Zap, BookOpen, Video, Briefcase, ExternalLink, ArrowLeft, Crown, Check, CreditCard, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useAuthStore } from '@/store/auth';
+import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function OutOfCreditsPage() {
   const { user } = useAuthStore();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const handleUpgrade = async () => {
+    setIsCheckingOut(true);
+    try {
+      const res = await api.createCheckoutSession();
+      if (res.data?.url) window.location.href = res.data.url;
+    } catch {
+      toast.error('Failed to start checkout. Please try again.');
+      setIsCheckingOut(false);
+    }
+  };
 
   const affiliateProducts = [
     {
       title: 'Resume Writing Masterclass',
       description: 'Learn to craft ATS-optimized resumes that get you interviews. Step-by-step video course with templates.',
-      price: '$49',
-      category: 'Course',
+      price: 'From $15',
+      category: 'Udemy',
       icon: Video,
-      link: '#', // Replace with actual affiliate link
+      link: 'https://www.udemy.com/course/writing-a-killer-resume/',
       features: [
-        '5+ hours of video content',
-        '15 premium resume templates',
-        'ATS optimization guide',
-        'Cover letter templates'
+        'ATS-optimized resume templates',
+        'Keyword strategy guide',
+        'Cover letter writing',
+        'LinkedIn profile tips'
       ]
     },
     {
-      title: 'Interview Prep Bundle',
-      description: 'Master technical and behavioral interviews with real questions from top companies.',
-      price: '$79',
-      category: 'Course',
+      title: 'Interview Prep & Career Skills',
+      description: 'Master behavioral and technical interviews with proven frameworks used by top candidates.',
+      price: 'From $15',
+      category: 'Udemy',
       icon: BookOpen,
-      link: '#', // Replace with actual affiliate link
+      link: 'https://www.udemy.com/course/master-the-tech-interview/',
       features: [
-        '200+ interview questions',
-        'Answer frameworks',
-        'Mock interview videos',
-        'Salary negotiation guide'
+        'STAR method mastery',
+        'Common interview questions',
+        'Salary negotiation tactics',
+        'Technical interview prep'
       ]
     },
     {
-      title: 'Career Coaching Session',
-      description: 'One-on-one career coaching with industry experts. Get personalized advice for your job search.',
-      price: '$199',
-      category: 'Service',
+      title: 'Google Project Management Certificate',
+      description: 'Earn a professional certificate from Google and become job-ready in project management.',
+      price: 'From $49/mo',
+      category: 'Coursera',
       icon: Briefcase,
-      link: '#', // Replace with actual affiliate link
+      link: 'https://www.coursera.org/professional-certificates/google-project-management',
       features: [
-        '1-hour video session',
-        'Resume review',
-        'LinkedIn optimization',
-        'Job search strategy'
+        'Google-issued certificate',
+        'No experience required',
+        'Self-paced learning',
+        'Job placement support'
       ]
     }
   ];
@@ -76,6 +91,51 @@ export default function OutOfCreditsPage() {
             Check out these recommended resources to continue boosting your job search!
           </p>
         </div>
+
+        {/* Upgrade to Pro CTA */}
+        <Card className="mb-10 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+          <div className="p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="h-5 w-5 text-blue-600" />
+                  <h2 className="text-lg font-bold text-[var(--text)]">Upgrade to Pro — $12/month</h2>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)] mb-3">
+                  Get unlimited AI features and never worry about credits again.
+                </p>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+                  {[
+                    'Unlimited resume tailoring',
+                    'Unlimited cover letters',
+                    'Interview prep & salary tools',
+                    'Cancel anytime',
+                  ].map((f) => (
+                    <div key={f} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                      <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
+                      {f}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 sm:items-end w-full sm:w-auto">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={handleUpgrade}
+                  isLoading={isCheckingOut}
+                  leftIcon={isCheckingOut ? undefined : <CreditCard className="h-5 w-5" />}
+                  className="w-full sm:w-auto"
+                >
+                  Upgrade to Pro
+                </Button>
+                <Link href="/pricing" className="text-xs text-center text-blue-600 hover:underline">
+                  Compare plans →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Affiliate Products Grid */}
         <div className="mb-12">
@@ -151,8 +211,8 @@ export default function OutOfCreditsPage() {
               </h3>
               <p className="text-sm text-[var(--text-secondary)]">
                 Every account gets {user?.aiCredits || 5} lifetime AI credits to try our AI-powered features
-                (resume tailoring, cover letters, ATS analysis, etc.). These credits help us maintain
-                the quality of our AI services while keeping the platform accessible to everyone.
+                (resume tailoring, cover letters, ATS analysis, etc.). Upgrade to Pro for unlimited access
+                to all AI tools with no credit limits.
               </p>
             </div>
           </div>

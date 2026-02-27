@@ -17,6 +17,8 @@ import {
   Heart,
   Edit3,
   Briefcase,
+  BookOpen,
+  ExternalLink,
 } from 'lucide-react';
 import api, {
   JobApplication,
@@ -37,6 +39,7 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
   const [jobDescription, setJobDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<JobMatchResult | null>(null);
+  const [courseRecommendations, setCourseRecommendations] = useState<Array<{ title: string; url: string; provider: string }>>([]);
 
   // Input mode and dropdowns
   const [jobInputMode, setJobInputMode] = useState<'saved' | 'manual'>('saved');
@@ -70,6 +73,7 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
       });
       if (response.success && response.data) {
         setResult(response.data);
+        setCourseRecommendations((response.data as any).courseRecommendations || []);
         toast.success('Analysis complete!');
       }
     } catch (error) {
@@ -242,7 +246,11 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
                 </div>
                 <div className="bg-slate-100 rounded-full h-3 overflow-hidden">
                   <div
-                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      result.overallScore >= 85 ? 'bg-green-500' :
+                      result.overallScore >= 70 ? 'bg-blue-600' :
+                      result.overallScore >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                    }`}
                     style={{ width: `${result.overallScore}%` }}
                   />
                 </div>
@@ -324,6 +332,65 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
                 <p className="text-slate-700">{result.recommendation}</p>
               </CardContent>
             </Card>
+
+            {/* Deal Breakers */}
+            {(result as any).dealBreakers?.length > 0 && (
+              <Card variant="elevated" className="border-red-200 bg-red-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-red-700 flex items-center gap-2 text-base">
+                    <AlertTriangle className="h-5 w-5" />
+                    Deal Breakers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {(result as any).dealBreakers.map((db: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-red-700">
+                        <ChevronRight className="h-4 w-4 mt-0.5 shrink-0" />
+                        {db}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Course Recommendations */}
+            {courseRecommendations.length > 0 && (
+              <Card variant="elevated">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    Close the Skill Gap
+                  </CardTitle>
+                  <p className="text-sm text-slate-500">Courses to fill the missing skills for this role:</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {courseRecommendations.map((course, idx) => (
+                      <a
+                        key={idx}
+                        href={course.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="h-3.5 w-3.5 text-blue-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-slate-800 group-hover:text-blue-700 truncate">{course.title}</p>
+                            <p className="text-xs text-slate-500">{course.provider}</p>
+                          </div>
+                        </div>
+                        <ExternalLink className="h-3.5 w-3.5 text-slate-400 group-hover:text-blue-600 flex-shrink-0 ml-2" />
+                      </a>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
       </div>
