@@ -20,6 +20,7 @@ import {
   Search,
   BookOpen,
   RefreshCw,
+  Zap,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
@@ -32,6 +33,7 @@ interface AffiliateLink {
   url: string;
   provider: string;
   isActive: boolean;
+  showOnCreditsPage: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,7 +48,7 @@ const providerColors: Record<string, string> = {
   Other: 'bg-slate-100 text-slate-600',
 };
 
-const emptyForm = { skill: '', title: '', url: '', provider: 'Udemy', isActive: true };
+const emptyForm = { skill: '', title: '', url: '', provider: 'Udemy', isActive: true, showOnCreditsPage: false };
 
 export default function AdminAffiliatesPage() {
   const { user } = useAuthStore();
@@ -110,7 +112,7 @@ export default function AdminAffiliatesPage() {
 
   const startEdit = (link: AffiliateLink) => {
     setEditingId(link.id);
-    setEditForm({ skill: link.skill, title: link.title, url: link.url, provider: link.provider, isActive: link.isActive });
+    setEditForm({ skill: link.skill, title: link.title, url: link.url, provider: link.provider, isActive: link.isActive, showOnCreditsPage: link.showOnCreditsPage });
   };
 
   const handleUpdate = async () => {
@@ -151,6 +153,16 @@ export default function AdminAffiliatesPage() {
     }
   };
 
+  const toggleCreditsPage = async (link: AffiliateLink) => {
+    try {
+      const res = await api.updateAdminAffiliate(link.id, { showOnCreditsPage: !link.showOnCreditsPage });
+      setLinks((prev) => prev.map((l) => (l.id === link.id ? res.data : l)));
+      toast.success(res.data.showOnCreditsPage ? 'Shown on credits page' : 'Removed from credits page');
+    } catch {
+      toast.error('Failed to update link');
+    }
+  };
+
   const filtered = links.filter(
     (l) =>
       l.skill.toLowerCase().includes(search.toLowerCase()) ||
@@ -183,7 +195,7 @@ export default function AdminAffiliatesPage() {
             <div>
               <h1 className="text-2xl font-bold text-[var(--text)]">Affiliate Links</h1>
               <p className="text-sm text-[var(--text-secondary)]">
-                {links.filter((l) => l.isActive).length} active · {links.length} total ·{' '}
+                {links.filter((l) => l.isActive).length} active · {links.filter((l) => l.showOnCreditsPage).length} on credits page · {links.length} total ·{' '}
                 <span className="text-amber-600 font-medium">Replace placeholder URLs with real tracking links after joining affiliate programs</span>
               </p>
             </div>
@@ -270,7 +282,7 @@ export default function AdminAffiliatesPage() {
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900 font-mono"
                   />
                 </div>
-                <div className="flex items-end pb-1">
+                <div className="flex flex-col gap-3 justify-end pb-1">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -279,6 +291,16 @@ export default function AdminAffiliatesPage() {
                       className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-slate-700">Active</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={addForm.showOnCreditsPage}
+                      onChange={(e) => setAddForm({ ...addForm, showOnCreditsPage: e.target.checked })}
+                      className="w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                    />
+                    <Zap className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="text-sm text-slate-700">Credits Page</span>
                   </label>
                 </div>
               </div>
@@ -359,15 +381,38 @@ export default function AdminAffiliatesPage() {
                               className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-slate-900 font-mono"
                             />
                           </div>
-                          <div className="flex items-end gap-2 pb-0.5">
-                            <Button variant="primary" size="sm" onClick={handleUpdate} disabled={isSavingEdit}>
-                              {isSavingEdit ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Check className="h-3.5 w-3.5 mr-1" />}
-                              Save
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => setEditingId(null)}>
-                              <X className="h-3.5 w-3.5 mr-1" />
-                              Cancel
-                            </Button>
+                          <div className="flex flex-col gap-3 justify-end pb-0.5">
+                            <div className="flex flex-col gap-2">
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.isActive}
+                                  onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
+                                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-slate-700">Active</span>
+                              </label>
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.showOnCreditsPage}
+                                  onChange={(e) => setEditForm({ ...editForm, showOnCreditsPage: e.target.checked })}
+                                  className="w-4 h-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                                />
+                                <Zap className="h-3.5 w-3.5 text-amber-500" />
+                                <span className="text-sm text-slate-700">Credits Page</span>
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button variant="primary" size="sm" onClick={handleUpdate} disabled={isSavingEdit}>
+                                {isSavingEdit ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Check className="h-3.5 w-3.5 mr-1" />}
+                                Save
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => setEditingId(null)}>
+                                <X className="h-3.5 w-3.5 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       ) : (
@@ -393,6 +438,15 @@ export default function AdminAffiliatesPage() {
                             </a>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
+                            {/* Credits Page toggle */}
+                            <button
+                              onClick={() => toggleCreditsPage(link)}
+                              className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors focus:outline-none ${link.showOnCreditsPage ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                              title={link.showOnCreditsPage ? 'Remove from credits page' : 'Show on credits page'}
+                            >
+                              <Zap className="h-3 w-3" />
+                              Credits
+                            </button>
                             {/* Active toggle */}
                             <button
                               onClick={() => toggleActive(link)}

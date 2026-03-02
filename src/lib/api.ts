@@ -34,11 +34,7 @@ class ApiClient {
             window.location.href = '/login';
           }
         }
-        if (error.response?.status === 402) {
-          if (typeof window !== 'undefined') {
-            window.location.href = '/out-of-credits';
-          }
-        }
+        // 402 is handled inline at the component level (OutOfCreditsInline)
         throw error;
       }
     );
@@ -502,18 +498,33 @@ class ApiClient {
     return response.data;
   }
 
-  async createAdminAffiliate(data: { skill: string; title: string; url: string; provider: string; isActive?: boolean }) {
+  async createAdminAffiliate(data: { skill: string; title: string; url: string; provider: string; isActive?: boolean; showOnCreditsPage?: boolean }) {
     const response = await this.client.post<ApiResponse<any>>('/admin/affiliates', data);
     return response.data;
   }
 
-  async updateAdminAffiliate(id: string, data: { skill?: string; title?: string; url?: string; provider?: string; isActive?: boolean }) {
+  async updateAdminAffiliate(id: string, data: { skill?: string; title?: string; url?: string; provider?: string; isActive?: boolean; showOnCreditsPage?: boolean }) {
     const response = await this.client.put<ApiResponse<any>>(`/admin/affiliates/${id}`, data);
     return response.data;
   }
 
   async deleteAdminAffiliate(id: string) {
     const response = await this.client.delete<ApiResponse>(`/admin/affiliates/${id}`);
+    return response.data;
+  }
+
+  // Public affiliate links (no auth required)
+  async getPublicAffiliates(skills: string[]) {
+    const response = await this.client.get<ApiResponse<Record<string, { title: string; url: string; provider: string }>>>(
+      `/affiliates?skills=${skills.map(encodeURIComponent).join(',')}`
+    );
+    return response.data;
+  }
+
+  async getCreditsPageAffiliates() {
+    const response = await this.client.get<ApiResponse<Array<{ skill: string; title: string; url: string; provider: string }>>>(
+      '/affiliates/credits-page'
+    );
     return response.data;
   }
 

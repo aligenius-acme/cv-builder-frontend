@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PageHeader from '@/components/shared/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 import { useFetchMultiple } from '@/hooks/useFetchData';
 import CoverLetterGenerator from '@/components/cover-letters/CoverLetterGenerator';
 import CoverLetterCard from '@/components/cover-letters/CoverLetterCard';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 
 interface EnhancedCoverLetter extends CoverLetter {
   alternativeOpenings?: string[];
@@ -68,11 +70,22 @@ export default function CoverLettersPage() {
 
   const [showGenerator, setShowGenerator] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [expandedLetter, setExpandedLetter] = useState<string | null>(null);
   const [showEnhancements, setShowEnhancements] = useState<Record<string, boolean>>({});
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
   const [showGrammarlyBanner, setShowGrammarlyBanner] = useState(false);
-  const GRAMMARLY_URL = 'https://www.grammarly.com/?utm_source=affiliate&utm_medium=partner';
+  const [grammarlyUrl, setGrammarlyUrl] = useState('');
+
+  useEffect(() => {
+    api.getPublicAffiliates(['grammarly'])
+      .then((res) => {
+        if (res.success && res.data?.grammarly?.url) {
+          setGrammarlyUrl(res.data.grammarly.url);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleGenerate = async (data: {
     jobTitle: string;
@@ -101,6 +114,7 @@ export default function CoverLettersPage() {
         toast.success('Cover letter generated!');
       }
     } catch (error: any) {
+      if (check402(error)) return;
       toast.error(getErrorMessage(error, 'Failed to generate cover letter'));
     } finally {
       setIsGenerating(false);
@@ -170,12 +184,12 @@ export default function CoverLettersPage() {
         />
 
         {/* Grammarly affiliate CTA — shown after cover letter generation */}
-        {showGrammarlyBanner && (
+        {showGrammarlyBanner && grammarlyUrl && (
           <div className="flex items-center justify-between gap-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
             <div className="flex items-center gap-3">
               <span className="text-green-700 dark:text-green-400 text-sm font-medium">✨ Polish your writing:</span>
               <a
-                href={GRAMMARLY_URL}
+                href={grammarlyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-green-700 dark:text-green-400 hover:underline font-semibold"
@@ -200,6 +214,7 @@ export default function CoverLettersPage() {
             onCancel={() => setShowGenerator(false)}
           />
         )}
+        {outOfCredits && <OutOfCreditsInline />}
 
         {/* Content */}
         {isLoading ? (

@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import Link from 'next/link';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import {
   Users,
   Loader2,
@@ -40,6 +42,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
     specificAsk: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<NetworkingMessageResult | null>(null);
   const [selectedResumeId, setSelectedResumeId] = useState('');
 
@@ -98,7 +101,8 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
         setResult(response.data);
         toast.success('Message generated!');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to generate message');
     } finally {
       setIsLoading(false);
@@ -276,7 +280,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
               variant="primary"
               className="w-full"
               onClick={handleGenerate}
-              disabled={isLoading}
+              disabled={isLoading || outOfCredits}
             >
               {isLoading ? (
                 <>
@@ -290,6 +294,7 @@ export default function NetworkingMessageTab({ resumes, isLoadingResumes }: Netw
                 </>
               )}
             </Button>
+            {outOfCredits && <OutOfCreditsInline />}
           </CardContent>
         </Card>
       </div>

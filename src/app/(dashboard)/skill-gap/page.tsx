@@ -35,6 +35,8 @@ import { Resume } from '@/types';
 import toast from 'react-hot-toast';
 import PageHeader from '@/components/shared/PageHeader';
 import { ButtonSpinner } from '@/components/shared/LoadingSpinner';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import { getScoreColor } from '@/lib/colors';
 
 const importanceColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -59,6 +61,7 @@ export default function SkillGapPage() {
   const [analysis, setAnalysis] = useState<SkillGapAnalysis | null>(null);
   const [courseRecommendations, setCourseRecommendations] = useState<Array<{title: string; url: string; provider: string}>>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
 
   // Saved jobs and resumes state
   const [savedJobs, setSavedJobs] = useState<JobApplication[]>([]);
@@ -159,7 +162,8 @@ export default function SkillGapPage() {
         }
         toast.success('Skill gap analysis complete');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to analyze skill gap');
     } finally {
       setIsAnalyzing(false);
@@ -383,7 +387,7 @@ export default function SkillGapPage() {
                   variant="primary"
                   className="w-full"
                   onClick={analyzeGaps}
-                  disabled={isAnalyzing || !targetRole || currentSkills.length === 0}
+                  disabled={isAnalyzing || !targetRole || currentSkills.length === 0 || outOfCredits}
                 >
                   {isAnalyzing ? (
                     <>
@@ -397,6 +401,7 @@ export default function SkillGapPage() {
                     </>
                   )}
                 </Button>
+                {outOfCredits && <OutOfCreditsInline />}
               </CardContent>
             </Card>
           </div>

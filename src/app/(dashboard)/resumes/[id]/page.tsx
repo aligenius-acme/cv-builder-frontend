@@ -51,6 +51,8 @@ import api from '@/lib/api';
 import { Resume, ResumeVersion } from '@/types';
 import { formatDate, getScoreColor, getErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 
 export default function ResumeDetailPage() {
   const params = useParams();
@@ -61,6 +63,7 @@ export default function ResumeDetailPage() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [showCustomizeForm, setShowCustomizeForm] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedVersionForDownload, setSelectedVersionForDownload] = useState<{
@@ -174,6 +177,7 @@ export default function ResumeDetailPage() {
         loadResume();
       }
     } catch (error: any) {
+      if (check402(error)) return;
       toast.error(getErrorMessage(error, 'Failed to customize resume'));
     } finally {
       setIsCustomizing(false);
@@ -445,6 +449,7 @@ export default function ResumeDetailPage() {
 
                 {/* Form (shown after job selection or in manual mode) */}
                 {(inputMode === 'manual' || jobTitle) && (
+                  <>
                   <form onSubmit={handleCustomize} className="space-y-5">
                     {/* Selected Job Details Card */}
                     {selectedJobInfo && (
@@ -579,6 +584,8 @@ export default function ResumeDetailPage() {
                       </Button>
                     </div>
                   </form>
+                  {outOfCredits && <OutOfCreditsInline />}
+                  </>
                 )}
               </CardContent>
             )}

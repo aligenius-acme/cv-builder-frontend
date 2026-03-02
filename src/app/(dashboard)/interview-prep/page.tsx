@@ -38,6 +38,8 @@ import {
   Factory,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -85,9 +87,11 @@ export default function InterviewPrepPage() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const { outOfCredits: outOfCreditsGen, check402: check402Gen } = useOutOfCredits();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const { outOfCredits: outOfCreditsEval, check402: check402Eval } = useOutOfCredits();
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const sampleAnswerModal = useModal();
   const tipsModal = useModal();
@@ -206,7 +210,8 @@ export default function InterviewPrepPage() {
         setQuestions(response.data.questions);
         setPracticeMode(true);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402Gen(error)) return;
       toast.error('Failed to generate questions');
     } finally {
       setIsGenerating(false);
@@ -233,7 +238,8 @@ export default function InterviewPrepPage() {
       if (response.success && response.data) {
         setEvaluation(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402Eval(error)) return;
       toast.error('Failed to evaluate answer');
     } finally {
       setIsEvaluating(false);
@@ -523,12 +529,13 @@ export default function InterviewPrepPage() {
                       variant="primary"
                       size="lg"
                       onClick={handleGenerate}
-                      disabled={isGenerating || !jobTitle.trim()}
+                      disabled={isGenerating || !jobTitle.trim() || outOfCreditsGen}
                       leftIcon={isGenerating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
                       className="w-full"
                     >
                       {isGenerating ? 'Generating Questions...' : 'Generate Practice Questions'}
                     </Button>
+                    {outOfCreditsGen && <OutOfCreditsInline />}
                   </>
                 )}
               </CardContent>
@@ -983,7 +990,7 @@ export default function InterviewPrepPage() {
                     <Button
                       variant="primary"
                       onClick={handleEvaluate}
-                      disabled={isEvaluating || !userAnswer.trim()}
+                      disabled={isEvaluating || !userAnswer.trim() || outOfCreditsEval}
                       leftIcon={isEvaluating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     >
                       {isEvaluating ? 'Evaluating...' : 'Get AI Feedback'}
@@ -998,6 +1005,7 @@ export default function InterviewPrepPage() {
                       </Button>
                     )}
                   </div>
+                  {outOfCreditsEval && <OutOfCreditsInline />}
                 </div>
 
                 {/* Sample Answer */}

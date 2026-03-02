@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { ResumeSelector } from '@/components/ui/ResumeSelector';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import {
   TrendingUp,
   Loader2,
@@ -32,6 +34,7 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
   const [bullets, setBullets] = useState<string[]>(['']);
   const [jobContext, setJobContext] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<AchievementQuantifierResult | null>(null);
 
   // Resume import state
@@ -115,7 +118,8 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
         setResult(response.data);
         toast.success('Achievements quantified!');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to quantify achievements');
     } finally {
       setIsLoading(false);
@@ -294,7 +298,7 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
                 variant="primary"
                 className="w-full"
                 onClick={() => handleQuantify()}
-                disabled={isLoading}
+                disabled={isLoading || outOfCredits}
               >
                 {isLoading ? (
                   <>
@@ -308,6 +312,7 @@ export default function AchievementQuantifierTab({ resumes, isLoadingResumes }: 
                   </>
                 )}
               </Button>
+              {outOfCredits && <OutOfCreditsInline />}
             </>
           )}
         </CardContent>

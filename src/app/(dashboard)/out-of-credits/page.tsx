@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Zap, BookOpen, Video, Briefcase, ExternalLink, ArrowLeft, Crown, Check, CreditCard, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Zap, BookOpen, Video, Briefcase, ExternalLink, ArrowLeft, Crown, Check, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -9,9 +9,37 @@ import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
+interface CreditsAffiliate {
+  skill: string;
+  title: string;
+  url: string;
+  provider: string;
+}
+
+function providerIcon(provider: string) {
+  switch (provider) {
+    case 'Udemy': return Video;
+    case 'LinkedIn Learning': return Briefcase;
+    default: return BookOpen;
+  }
+}
+
 export default function OutOfCreditsPage() {
   const { user } = useAuthStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [affiliates, setAffiliates] = useState<CreditsAffiliate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    api.getCreditsPageAffiliates()
+      .then((res) => {
+        if (res.success && res.data) {
+          setAffiliates(res.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
@@ -23,51 +51,6 @@ export default function OutOfCreditsPage() {
       setIsCheckingOut(false);
     }
   };
-
-  const affiliateProducts = [
-    {
-      title: 'Resume Writing Masterclass',
-      description: 'Learn to craft ATS-optimized resumes that get you interviews. Step-by-step video course with templates.',
-      price: 'From $15',
-      category: 'Udemy',
-      icon: Video,
-      link: 'https://www.udemy.com/course/writing-a-killer-resume/',
-      features: [
-        'ATS-optimized resume templates',
-        'Keyword strategy guide',
-        'Cover letter writing',
-        'LinkedIn profile tips'
-      ]
-    },
-    {
-      title: 'Interview Prep & Career Skills',
-      description: 'Master behavioral and technical interviews with proven frameworks used by top candidates.',
-      price: 'From $15',
-      category: 'Udemy',
-      icon: BookOpen,
-      link: 'https://www.udemy.com/course/master-the-tech-interview/',
-      features: [
-        'STAR method mastery',
-        'Common interview questions',
-        'Salary negotiation tactics',
-        'Technical interview prep'
-      ]
-    },
-    {
-      title: 'Google Project Management Certificate',
-      description: 'Earn a professional certificate from Google and become job-ready in project management.',
-      price: 'From $49/mo',
-      category: 'Coursera',
-      icon: Briefcase,
-      link: 'https://www.coursera.org/professional-certificates/google-project-management',
-      features: [
-        'Google-issued certificate',
-        'No experience required',
-        'Self-paced learning',
-        'Job placement support'
-      ]
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-[var(--bg)] py-8">
@@ -137,67 +120,74 @@ export default function OutOfCreditsPage() {
           </div>
         </Card>
 
-        {/* Affiliate Products Grid */}
-        <div className="mb-12">
-          <h2 className="text-xl font-semibold text-[var(--text)] mb-6">
-            Recommended for You
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {affiliateProducts.map((product, index) => (
-              <Card key={index} className="flex flex-col h-full">
-                <div className="flex-1">
-                  {/* Icon & Category */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                      <product.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        {/* Affiliate Products Grid — only shown when admin has enabled courses */}
+        {!isLoading && affiliates.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-xl font-semibold text-[var(--text)] mb-6">
+              Recommended for You
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {affiliates.map((affiliate) => {
+                const Icon = providerIcon(affiliate.provider);
+                return (
+                  <Card key={affiliate.skill} className="flex flex-col h-full">
+                    <div className="flex-1 p-1">
+                      {/* Icon & Provider */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                          <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--surface-raised)] px-2 py-1 rounded-full">
+                          {affiliate.provider}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-base font-semibold text-[var(--text)] mb-4">
+                        {affiliate.title}
+                      </h3>
                     </div>
-                    <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--surface-raised)] px-2 py-1 rounded-full">
-                      {product.category}
-                    </span>
-                  </div>
 
-                  {/* Title & Description */}
-                  <h3 className="text-lg font-semibold text-[var(--text)] mb-2">
-                    {product.title}
-                  </h3>
-                  <p className="text-sm text-[var(--text-secondary)] mb-4">
-                    {product.description}
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-2 mb-4">
-                    {product.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start text-sm text-[var(--text-secondary)]">
-                        <span className="text-blue-600 mr-2">✓</span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Price & CTA */}
-                <div className="border-t border-[var(--border)] pt-4 mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-[var(--text)]">
-                      {product.price}
-                    </span>
-                    <a
-                      href={product.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex"
-                    >
-                      <Button variant="primary" size="sm">
-                        Learn More
-                        <ExternalLink className="h-3.5 w-3.5 ml-1" />
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                    {/* CTA */}
+                    <div className="border-t border-[var(--border)] pt-4 mt-2">
+                      <a
+                        href={affiliate.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full"
+                      >
+                        <Button variant="primary" size="sm" className="w-full justify-center">
+                          Learn More
+                          <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                        </Button>
+                      </a>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Loading skeleton */}
+        {isLoading && (
+          <div className="mb-12">
+            <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-6" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+                    <div className="w-16 h-5 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
+                  </div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse mt-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Info Box */}
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">

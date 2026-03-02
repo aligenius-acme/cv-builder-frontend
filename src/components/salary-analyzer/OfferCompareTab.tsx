@@ -5,6 +5,8 @@ import Button from '@/components/ui/Button';
 import OfferCard from './OfferCard';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 
 interface Offer {
   id: string;
@@ -62,6 +64,7 @@ export default function OfferCompareTab({ savedJobs, isLoadingSavedJobs }: Offer
   const [offerJobInputModes, setOfferJobInputModes] = useState<Record<string, 'saved' | 'manual'>>({});
   const [selectedOfferJobIds, setSelectedOfferJobIds] = useState<Record<string, string>>({});
   const [isComparing, setIsComparing] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [comparison, setComparison] = useState<any>(null);
 
   const formatCurrency = (amount: number) => {
@@ -131,7 +134,8 @@ export default function OfferCompareTab({ savedJobs, isLoadingSavedJobs }: Offer
       if (response.success && response.data) {
         setComparison(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to compare offers');
     } finally {
       setIsComparing(false);
@@ -177,12 +181,13 @@ export default function OfferCompareTab({ savedJobs, isLoadingSavedJobs }: Offer
             <Button
               variant="primary"
               onClick={handleCompare}
-              disabled={isComparing}
+              disabled={isComparing || outOfCredits}
               leftIcon={isComparing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Scale className="h-4 w-4" />}
             >
               {isComparing ? 'Comparing...' : 'Compare Offers'}
             </Button>
           </div>
+          {outOfCredits && <OutOfCreditsInline />}
         </CardContent>
       </Card>
 

@@ -6,3 +6,4 @@
 
 export { useFetchData, useFetchMultiple } from './useFetchData';
 export { useModal } from './useModal';
+export { useOutOfCredits } from './useOutOfCredits';

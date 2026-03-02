@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { SavedJobsDropdown } from '@/components/ui/SavedJobsDropdown';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import { ResumeSelector } from '@/components/ui/ResumeSelector';
 import {
   Shield,
@@ -41,6 +43,7 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<WeaknessDetectorResult | null>(null);
   const [expandedWeakness, setExpandedWeakness] = useState<number | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -77,7 +80,8 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
         setResult(response.data);
         toast.success('Analysis complete!');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to analyze resume');
     } finally {
       setIsLoading(false);
@@ -177,7 +181,7 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
             variant="primary"
             className="w-full"
             onClick={handleDetect}
-            disabled={isLoading || !selectedResumeId}
+            disabled={isLoading || !selectedResumeId || outOfCredits}
           >
             {isLoading ? (
               <>
@@ -191,6 +195,7 @@ export default function WeaknessDetectorTab({ resumes, savedJobs, isLoadingResum
               </>
             )}
           </Button>
+          {outOfCredits && <OutOfCreditsInline />}
         </CardContent>
       </Card>
 

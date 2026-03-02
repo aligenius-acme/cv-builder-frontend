@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import { SavedJobsDropdown } from '@/components/ui/SavedJobsDropdown';
 import { ResumeSelector } from '@/components/ui/ResumeSelector';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import {
   Target,
   Loader2,
@@ -38,6 +40,7 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<JobMatchResult | null>(null);
   const [courseRecommendations, setCourseRecommendations] = useState<Array<{ title: string; url: string; provider: string }>>([]);
 
@@ -76,7 +79,8 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
         setCourseRecommendations((response.data as any).courseRecommendations || []);
         toast.success('Analysis complete!');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to analyze job match');
     } finally {
       setIsLoading(false);
@@ -191,7 +195,7 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
                 variant="primary"
                 className="w-full"
                 onClick={handleAnalyze}
-                disabled={isLoading || !selectedResumeId}
+                disabled={isLoading || !selectedResumeId || outOfCredits}
               >
                 {isLoading ? (
                   <>
@@ -205,6 +209,7 @@ export default function JobMatchTab({ resumes, savedJobs, isLoadingResumes, isLo
                   </>
                 )}
               </Button>
+              {outOfCredits && <OutOfCreditsInline />}
             </>
           )}
         </CardContent>

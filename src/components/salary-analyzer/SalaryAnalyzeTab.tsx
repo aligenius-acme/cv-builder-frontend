@@ -7,6 +7,8 @@ import SavedJobSelector from './SavedJobSelector';
 import SalaryResultsDisplay from './SalaryResultsDisplay';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 
 interface SalaryAnalysis {
   salaryRange: { min: number; median: number; max: number; currency: string };
@@ -44,6 +46,7 @@ export default function SalaryAnalyzeTab({ savedJobs, isLoadingSavedJobs }: Sala
   const [skillInput, setSkillInput] = useState('');
   const [currentOffer, setCurrentOffer] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [analysis, setAnalysis] = useState<SalaryAnalysis | null>(null);
 
   const handleSelectAnalyzeJob = (jobId: string) => {
@@ -100,7 +103,8 @@ export default function SalaryAnalyzeTab({ savedJobs, isLoadingSavedJobs }: Sala
       if (response.success && response.data) {
         setAnalysis(response.data.analysis);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to analyze salary');
     } finally {
       setIsAnalyzing(false);
@@ -246,12 +250,13 @@ export default function SalaryAnalyzeTab({ savedJobs, isLoadingSavedJobs }: Sala
             variant="primary"
             size="lg"
             onClick={handleAnalyze}
-            disabled={isAnalyzing}
+            disabled={isAnalyzing || outOfCredits}
             leftIcon={isAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <TrendingUp className="h-5 w-5" />}
             className="w-full"
           >
             {isAnalyzing ? 'Analyzing...' : 'Analyze Salary'}
           </Button>
+          {outOfCredits && <OutOfCreditsInline />}
         </CardContent>
       </Card>
 

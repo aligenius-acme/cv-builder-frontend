@@ -23,6 +23,8 @@ import Button from '@/components/ui/Button';
 import SavedJobSelector from './SavedJobSelector';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 
 interface SavedJob {
   id: string;
@@ -46,6 +48,7 @@ export default function NegotiationScriptTab({ savedJobs, isLoadingSavedJobs }: 
   const [negotiateCompany, setNegotiateCompany] = useState('');
   const [reasons, setReasons] = useState<string[]>(['Market research', 'Relevant experience', 'Specialized skills']);
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [script, setScript] = useState<any>(null);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['opening', 'keyPoints']));
@@ -93,7 +96,8 @@ export default function NegotiationScriptTab({ savedJobs, isLoadingSavedJobs }: 
       if (response.success && response.data) {
         setScript(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to generate script');
     } finally {
       setIsGeneratingScript(false);
@@ -202,12 +206,13 @@ export default function NegotiationScriptTab({ savedJobs, isLoadingSavedJobs }: 
             variant="primary"
             size="lg"
             onClick={handleGenerateScript}
-            disabled={isGeneratingScript}
+            disabled={isGeneratingScript || outOfCredits}
             leftIcon={isGeneratingScript ? <Loader2 className="h-5 w-5 animate-spin" /> : <MessageSquare className="h-5 w-5" />}
             className="w-full"
           >
             {isGeneratingScript ? 'Generating...' : 'Generate Negotiation Toolkit'}
           </Button>
+          {outOfCredits && <OutOfCreditsInline />}
         </CardContent>
       </Card>
 

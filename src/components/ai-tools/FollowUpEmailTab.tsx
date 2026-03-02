@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SegmentedControl from '@/components/ui/SegmentedControl';
+import OutOfCreditsInline from '@/components/shared/OutOfCreditsInline';
+import { useOutOfCredits } from '@/hooks';
 import Link from 'next/link';
 import {
   Mail,
@@ -53,6 +55,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
     keyPoints: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<FollowUpEmailResult | null>(null);
 
   // Resume selection
@@ -118,7 +121,8 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
         setResult(response.data);
         toast.success('Email generated!');
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (check402(error)) return;
       toast.error('Failed to generate email');
     } finally {
       setIsLoading(false);
@@ -356,7 +360,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
                   variant="primary"
                   className="w-full"
                   onClick={handleGenerate}
-                  disabled={isLoading}
+                  disabled={isLoading || outOfCredits}
                 >
                   {isLoading ? (
                     <>
@@ -370,6 +374,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
                     </>
                   )}
                 </Button>
+                {outOfCredits && <OutOfCreditsInline />}
               </>
             )}
           </CardContent>
