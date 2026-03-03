@@ -126,6 +126,7 @@ export interface ResumeVersion extends ResumeVersionSummary {
   missingKeywords: string[];
   atsDetails?: ATSAnalysis;
   truthGuardWarnings?: TruthGuardWarning[];
+  courseRecommendations?: Array<{ title: string; url: string; provider: string }>;
 }
 
 // Detailed recommendation types

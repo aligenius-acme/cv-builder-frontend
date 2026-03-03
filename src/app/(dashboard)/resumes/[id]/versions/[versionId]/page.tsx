@@ -29,6 +29,8 @@ import {
   Plus,
   Minus,
   PenLine,
+  Check,
+  Copy,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { ResumeVersion } from '@/types';
@@ -182,6 +184,13 @@ export default function VersionDetailPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   // All sections collapsed by default so the page isn't overwhelming
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  // Inline editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<ParsedResumeData | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newSkill, setNewSkill] = useState('');
+  const [checkedWins, setCheckedWins] = useState<Set<number>>(new Set());
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   useEffect(() => { loadVersion(); }, [resumeId, versionId]);
 
@@ -201,6 +210,105 @@ export default function VersionDetailPage() {
     const s = new Set(expandedSections);
     s.has(section) ? s.delete(section) : s.add(section);
     setExpandedSections(s);
+  };
+
+  const handleStartEdit = () => {
+    if (!version?.tailoredData) return;
+    setEditData(JSON.parse(JSON.stringify(version.tailoredData)));
+    setCheckedWins(new Set());
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditData(null);
+    setNewSkill('');
+    setCheckedWins(new Set());
+  };
+
+  const handleSave = async () => {
+    if (!editData) return;
+    setIsSaving(true);
+    try {
+      const res = await api.updateVersionContent(resumeId, versionId, editData as Record<string, unknown>);
+      if (res.success && res.data) {
+        setVersion(prev => prev ? {
+          ...prev,
+          tailoredData: res.data!.tailoredData as unknown as ResumeVersion['tailoredData'],
+          tailoredText: res.data!.tailoredText,
+        } : prev);
+      }
+      setIsEditing(false);
+      setEditData(null);
+      setNewSkill('');
+      toast.success('Changes saved. Run ATS scan to update your score.');
+    } catch {
+      toast.error('Failed to save changes');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    if (!editData) return;
+    setEditData({ ...editData, skills: (editData.skills || []).filter(s => s !== skill) });
+  };
+
+  const addSkill = () => {
+    const trimmed = newSkill.trim();
+    if (!trimmed || !editData) return;
+    setEditData({ ...editData, skills: [...(editData.skills || []), trimmed] });
+    setNewSkill('');
+  };
+
+  const updateBullet = (jobIdx: number, bulletIdx: number, value: string) => {
+    if (!editData?.experience) return;
+    const exp = editData.experience.map((e, i) => {
+      if (i !== jobIdx) return e;
+      const desc = [...(e.description || [])];
+      desc[bulletIdx] = value;
+      return { ...e, description: desc };
+    });
+    setEditData({ ...editData, experience: exp });
+  };
+
+  const addBullet = (jobIdx: number) => {
+    if (!editData?.experience) return;
+    const exp = editData.experience.map((e, i) =>
+      i === jobIdx ? { ...e, description: [...(e.description || []), ''] } : e
+    );
+    setEditData({ ...editData, experience: exp });
+  };
+
+  const removeBullet = (jobIdx: number, bulletIdx: number) => {
+    if (!editData?.experience) return;
+    const exp = editData.experience.map((e, i) => {
+      if (i !== jobIdx) return e;
+      const desc = (e.description || []).filter((_, j) => j !== bulletIdx);
+      return { ...e, description: desc };
+    });
+    setEditData({ ...editData, experience: exp });
+  };
+
+  const addKeywordAsSkill = (keyword: string) => {
+    if (!editData) return;
+    if ((editData.skills || []).includes(keyword)) return;
+    setEditData({ ...editData, skills: [...(editData.skills || []), keyword] });
+  };
+
+  const toggleWin = (idx: number) => {
+    setCheckedWins(prev => {
+      const next = new Set(prev);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
+  };
+
+  const copyToClipboard = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 2000);
+    });
   };
 
   if (isLoading) {
@@ -319,6 +427,14 @@ export default function VersionDetailPage() {
             <Button
               variant="outline"
               size="lg"
+              onClick={handleStartEdit}
+              leftIcon={<PenLine className="h-5 w-5" />}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
               onClick={() => setShowShareModal(true)}
               leftIcon={<Share2 className="h-5 w-5" />}
             >
@@ -375,6 +491,248 @@ export default function VersionDetailPage() {
                 <TrendingUp className="h-3 w-3" />
                 ATS: {version.atsScore}%
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Inline Edit Panel ────────────────────────────────────────────── */}
+        {isEditing && editData && (
+          <div className="rounded-xl bg-[var(--surface)] border border-[var(--border)] border-l-4 border-l-blue-600 overflow-hidden">
+
+            {/* Header */}
+            <div className="flex items-center gap-3 p-5 border-b border-[var(--border)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 flex-shrink-0">
+                <PenLine className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--text)]">Edit Tailored Resume</h3>
+                <p className="text-xs text-[var(--muted)] mt-0.5">Changes are saved to this version only</p>
+              </div>
+              <div className="ml-auto flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleCancelEdit}>Cancel</Button>
+                <Button variant="primary" size="sm" isLoading={isSaving} onClick={handleSave}>Save Changes</Button>
+              </div>
+            </div>
+
+            {/* Two-column body */}
+            <div className="grid lg:grid-cols-[1fr_320px] divide-y lg:divide-y-0 lg:divide-x divide-[var(--border)]">
+
+              {/* ── Left: edit form ── */}
+              <div className="p-5 space-y-6">
+
+                {/* Summary */}
+                {editData.summary !== undefined && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Summary</label>
+                    <textarea
+                      className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm text-[var(--text)] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                      rows={4}
+                      value={editData.summary || ''}
+                      onChange={e => setEditData({ ...editData, summary: e.target.value })}
+                    />
+                  </div>
+                )}
+
+                {/* Skills */}
+                {editData.skills !== undefined && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Skills</label>
+                    <div className="flex flex-wrap gap-2">
+                      {(editData.skills || []).map((skill, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-xs font-medium text-blue-700 dark:text-blue-300"
+                        >
+                          {skill}
+                          <button onClick={() => removeSkill(skill)} className="ml-1 text-blue-400 hover:text-blue-600 leading-none">×</button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--text)] focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Add skill..."
+                        value={newSkill}
+                        onChange={e => setNewSkill(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }}
+                      />
+                      <Button variant="outline" size="sm" onClick={addSkill}>Add</Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Experience bullets */}
+                {editData.experience && editData.experience.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Experience</label>
+                    <div className="space-y-4">
+                      {editData.experience.map((job, jobIdx) => (
+                        <div key={jobIdx} className="rounded-lg border border-[var(--border)] overflow-hidden">
+                          <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border-b border-[var(--border)]">
+                            <span className="text-sm font-semibold text-[var(--text)]">{job.title}</span>
+                            {job.company && <span className="text-sm text-blue-600 font-medium ml-2">at {job.company}</span>}
+                          </div>
+                          <div className="p-3 space-y-2">
+                            {(job.description || []).map((bullet, bulletIdx) => (
+                              <div key={bulletIdx} className="flex items-start gap-2">
+                                <textarea
+                                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                                  rows={2}
+                                  value={bullet}
+                                  onChange={e => updateBullet(jobIdx, bulletIdx, e.target.value)}
+                                />
+                                <Button variant="ghost" size="icon" onClick={() => removeBullet(jobIdx, bulletIdx)} className="flex-shrink-0 mt-1">
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                            <Button variant="ghost" size="sm" leftIcon={<Plus className="h-3 w-3" />} onClick={() => addBullet(jobIdx)}>
+                              Add bullet
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Right: ATS hints ── */}
+              <div className="p-5 space-y-5 bg-slate-50/60 dark:bg-slate-900/20">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500 flex-shrink-0">
+                    <Zap className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="text-sm font-semibold text-[var(--text)]">ATS Suggestions</span>
+                </div>
+
+                {version.atsDetails ? (
+                  <>
+                    {/* Section scores */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Section Scores</label>
+                      {Object.entries(version.atsDetails.sectionScores).map(([section, score]) => (
+                        <div key={section} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-[var(--text)] capitalize">{section}</span>
+                            <span className={`font-semibold ${score < 50 ? 'text-red-500' : score < 70 ? 'text-amber-500' : 'text-emerald-600'}`}>{score}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${score < 50 ? 'bg-red-500' : score < 70 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                              style={{ width: `${score}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Missing keywords */}
+                    {version.atsDetails.missingKeywords?.length > 0 && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Missing Keywords</label>
+                        <p className="text-xs text-[var(--muted)]">Click to add directly to skills</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {version.atsDetails.missingKeywords.slice(0, 20).map((kw, i) => {
+                            const added = (editData.skills || []).includes(kw);
+                            return (
+                              <button
+                                key={i}
+                                onClick={() => addKeywordAsSkill(kw)}
+                                disabled={added}
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                                  added
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 cursor-default'
+                                    : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 hover:bg-red-100 cursor-pointer'
+                                }`}
+                              >
+                                {added ? <Check className="h-2.5 w-2.5" /> : <Plus className="h-2.5 w-2.5" />}
+                                {kw}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick wins */}
+                    {version.atsDetails.quickWins && version.atsDetails.quickWins.length > 0 && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Quick Wins</label>
+                        <div className="space-y-2">
+                          {version.atsDetails.quickWins.map((win, i) => (
+                            <button
+                              key={i}
+                              onClick={() => toggleWin(i)}
+                              className="flex items-start gap-2.5 w-full text-left group"
+                            >
+                              <div className={`mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+                                checkedWins.has(i) ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600 group-hover:border-emerald-400'
+                              }`}>
+                                {checkedWins.has(i) && <Check className="h-2.5 w-2.5 text-white" />}
+                              </div>
+                              <span className={`text-xs leading-relaxed transition-colors ${
+                                checkedWins.has(i) ? 'line-through text-[var(--muted)]' : 'text-[var(--text)]'
+                              }`}>{win}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Critical recommendations */}
+                    {version.atsDetails.detailedRecommendations?.criticalIssues && version.atsDetails.detailedRecommendations.criticalIssues.length > 0 && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Suggestions</label>
+                        <div className="space-y-2">
+                          {version.atsDetails.detailedRecommendations.criticalIssues.slice(0, 5).map((rec, i) => (
+                            <div key={i} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 space-y-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
+                                  rec.priority === 'CRITICAL' ? 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400'
+                                  : rec.priority === 'HIGH' ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                                  : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400'
+                                }`}>{rec.priority}</span>
+                                {rec.location && <span className="text-xs text-[var(--muted)] truncate">{rec.location}</span>}
+                              </div>
+                              <p className="text-xs text-[var(--text)] leading-relaxed">{rec.issue}</p>
+                              {rec.suggestedText && (
+                                <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-2.5">
+                                  <p className="text-xs text-emerald-800 dark:text-emerald-300 italic leading-relaxed">&ldquo;{rec.suggestedText}&rdquo;</p>
+                                  <button
+                                    onClick={() => copyToClipboard(rec.suggestedText, i)}
+                                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 transition-colors"
+                                  >
+                                    {copiedIdx === i
+                                      ? <><Check className="h-3 w-3" /> Copied!</>
+                                      : <><Copy className="h-3 w-3" /> Copy suggestion</>
+                                    }
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fallback if ATS ran but no extra data */}
+                    {!version.atsDetails.quickWins?.length && !version.atsDetails.detailedRecommendations?.criticalIssues?.length && !version.atsDetails.missingKeywords?.length && (
+                      <p className="text-xs text-[var(--muted)] text-center py-4">No specific suggestions — your resume looks well-optimised for this role.</p>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 py-10 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                      <Zap className="h-6 w-6 text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text)]">No ATS scan yet</p>
+                      <p className="text-xs text-[var(--muted)] mt-1">Run the ATS scan below to get AI-powered suggestions here</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

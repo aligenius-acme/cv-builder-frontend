@@ -332,6 +332,14 @@ class ApiClient {
     return response.data;
   }
 
+  async updateVersionContent(resumeId: string, versionId: string, tailoredData: Record<string, unknown>) {
+    const response = await this.client.put<ApiResponse<{ tailoredData: Record<string, unknown>; tailoredText: string; updatedAt: string }>>(
+      `/resumes/${resumeId}/versions/${versionId}/content`,
+      { tailoredData }
+    );
+    return response.data;
+  }
+
   // Scrape job posting from URL
   async scrapeJobUrl(url: string) {
     const response = await this.client.post<ApiResponse<{

@@ -171,7 +171,7 @@ export default function ResumeDetailPage() {
         setJobTitle('');
         setCompanyName('');
         setJobDescription('');
-        if (response.data.courseRecommendations?.length > 0) {
+        if (response.data.courseRecommendations && response.data.courseRecommendations.length > 0) {
           setCourseRecommendations(response.data.courseRecommendations);
         }
         loadResume();
