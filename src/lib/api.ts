@@ -6,6 +6,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 class ApiClient {
   private client: AxiosInstance;
   private token: string | null = null;
+  private creditSyncCallback: ((aiCredits: number, aiCreditsUsed: number) => void) | null = null;
+
+  registerCreditSync(cb: (aiCredits: number, aiCreditsUsed: number) => void) {
+    this.creditSyncCallback = cb;
+  }
 
   constructor() {
     this.client = axios.create({
@@ -23,9 +28,15 @@ class ApiClient {
       return config;
     });
 
-    // Response interceptor for error handling
+    // Response interceptor for error handling + credit sync
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        const creditsInfo = response.data?.creditsInfo;
+        if (creditsInfo && this.creditSyncCallback) {
+          this.creditSyncCallback(creditsInfo.aiCredits, creditsInfo.aiCreditsUsed);
+        }
+        return response;
+      },
       (error: AxiosError<ApiResponse>) => {
         if (error.response?.status === 401) {
           this.token = null;

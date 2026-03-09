@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -57,6 +57,14 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
   const [isLoading, setIsLoading] = useState(false);
   const { outOfCredits, check402 } = useOutOfCredits();
   const [result, setResult] = useState<FollowUpEmailResult | null>(null);
+  const [grammarlyUrl, setGrammarlyUrl] = useState('');
+  const [showGrammarlyBanner, setShowGrammarlyBanner] = useState(false);
+
+  useEffect(() => {
+    api.getPublicAffiliates(['grammarly'])
+      .then((res) => { if (res.success && res.data?.grammarly?.url) setGrammarlyUrl(res.data.grammarly.url); })
+      .catch(() => {});
+  }, []);
 
   // Resume selection
   const [selectedResumeId, setSelectedResumeId] = useState('');
@@ -119,6 +127,7 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
       });
       if (response.success && response.data) {
         setResult(response.data);
+        setShowGrammarlyBanner(true);
         toast.success('Email generated!');
       }
     } catch (error: any) {
@@ -451,6 +460,19 @@ export default function FollowUpEmailTab({ resumes, savedJobs, isLoadingResumes,
               </CardContent>
             </Card>
           </>
+        )}
+
+        {/* Grammarly CTA — shown after email is generated */}
+        {showGrammarlyBanner && grammarlyUrl && (
+          <div className="flex items-center justify-between gap-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-green-700 dark:text-green-300 text-sm">✍️ Polish your email before sending —</span>
+              <a href={grammarlyUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-green-700 dark:text-green-300 underline underline-offset-2 hover:text-green-900">
+                Try Grammarly for free
+              </a>
+            </div>
+            <button onClick={() => setShowGrammarlyBanner(false)} className="text-green-500 hover:text-green-700 text-lg leading-none">×</button>
+          </div>
         )}
       </div>
     </div>

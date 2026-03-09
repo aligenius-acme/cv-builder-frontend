@@ -34,12 +34,22 @@ import {
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import CreditBadge from '@/components/shared/CreditBadge';
+import api from '@/lib/api';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
+
+  // Keep credit count in sync after any AI action without requiring a page refresh
+  useEffect(() => {
+    api.registerCreditSync((aiCredits, aiCreditsUsed) => {
+      useAuthStore.setState(state => ({
+        user: state.user ? { ...state.user, aiCredits, aiCreditsUsed } : null,
+      }));
+    });
+  }, []);
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
 

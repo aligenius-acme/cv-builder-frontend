@@ -191,13 +191,30 @@ export default function VersionDetailPage() {
   const [newSkill, setNewSkill] = useState('');
   const [checkedWins, setCheckedWins] = useState<Set<number>>(new Set());
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [courseRecommendations, setCourseRecommendations] = useState<Array<{ title: string; url: string; provider: string }>>([]);
+  const [grammarlyUrl, setGrammarlyUrl] = useState('');
+  const [showGrammarlyBanner, setShowGrammarlyBanner] = useState(false);
 
   useEffect(() => { loadVersion(); }, [resumeId, versionId]);
 
   const loadVersion = async () => {
     try {
       const response = await api.getResumeVersion(resumeId, versionId);
-      if (response.success && response.data) setVersion(response.data);
+      if (response.success && response.data) {
+        setVersion(response.data);
+        // Fetch affiliate courses for missing keywords + Grammarly URL
+        const keywords = response.data.missingKeywords;
+        const skillsToFetch = ['grammarly', ...(keywords ? keywords.slice(0, 10) : [])];
+        api.getPublicAffiliates(skillsToFetch)
+          .then(res => {
+            if (res.success && res.data) {
+              if (res.data.grammarly?.url) setGrammarlyUrl(res.data.grammarly.url);
+              const courses = Object.values(res.data).filter((c: any) => c.provider !== 'Grammarly');
+              if (courses.length > 0) setCourseRecommendations(courses as Array<{ title: string; url: string; provider: string }>);
+            }
+          })
+          .catch(() => {});
+      }
     } catch {
       toast.error('Failed to load version');
       router.push(`/resumes/${resumeId}`);
@@ -241,6 +258,7 @@ export default function VersionDetailPage() {
       setIsEditing(false);
       setEditData(null);
       setNewSkill('');
+      setShowGrammarlyBanner(true);
       toast.success('Changes saved. Run ATS scan to update your score.');
     } catch {
       toast.error('Failed to save changes');
@@ -737,6 +755,19 @@ export default function VersionDetailPage() {
           </div>
         )}
 
+        {/* ── Grammarly CTA — shown after saving edits ─────────────────────── */}
+        {showGrammarlyBanner && grammarlyUrl && (
+          <div className="flex items-center justify-between gap-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-green-700 dark:text-green-300 text-sm">✍️ Polish your resume text before downloading —</span>
+              <a href={grammarlyUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-green-700 dark:text-green-300 underline underline-offset-2 hover:text-green-900">
+                Try Grammarly for free
+              </a>
+            </div>
+            <button onClick={() => setShowGrammarlyBanner(false)} className="text-green-500 hover:text-green-700 text-lg leading-none">×</button>
+          </div>
+        )}
+
         {/* ── ATS Simulator ────────────────────────────────────────────────── */}
         <ATSSimulator
           resumeId={resumeId}
@@ -764,6 +795,7 @@ export default function VersionDetailPage() {
             competitorComparison: version.atsDetails.competitorComparison,
             detailedRecommendations: version.atsDetails.detailedRecommendations,
           } : undefined}
+          initialCourseRecommendations={courseRecommendations.length > 0 ? courseRecommendations : undefined}
         />
 
         {/* ── What Changed (AI explanation — structured) ───────────────────── */}

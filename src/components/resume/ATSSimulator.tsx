@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import {
@@ -77,6 +77,12 @@ export default function ATSSimulator({
   const [courseRecommendations, setCourseRecommendations] = useState<CourseRecommendation[]>(
     initialCourseRecommendations || []
   );
+
+  useEffect(() => {
+    if (initialCourseRecommendations && initialCourseRecommendations.length > 0) {
+      setCourseRecommendations(initialCourseRecommendations);
+    }
+  }, [initialCourseRecommendations]);
   const [isLoading, setIsLoading] = useState(false);
   const [showExtractedView, setShowExtractedView] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
