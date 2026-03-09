@@ -8,8 +8,8 @@ import {
   Mail,
   ArrowLeft,
   CheckCircle,
-  Sparkles,
 } from 'lucide-react';
+import Logo from '@/components/ui/Logo';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -45,14 +45,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="bg-blue-600 p-2.5 rounded-xl">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-slate-900">
-              JobTools AI
-            </span>
-          </Link>
+          <Link href="/"><Logo size="md" /></Link>
         </div>
 
         <Card variant="elevated">

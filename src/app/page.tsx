@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Target, Zap, Shield, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
+import Logo from '@/components/ui/Logo';
 import { useAuthStore } from '@/store/auth';
 
 export default function Home() {
@@ -238,10 +239,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-6 md:mb-0">
-              <div className="bg-blue-600 p-2.5 rounded-lg">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <span className="ml-3 text-xl font-bold text-white">JobTools AI</span>
+              <Logo size="sm" />
             </div>
             <div className="text-sm text-center md:text-right max-w-md">
               <p className="mb-2">

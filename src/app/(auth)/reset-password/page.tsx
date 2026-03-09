@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
 import {
   Lock,
@@ -11,7 +12,6 @@ import {
   EyeOff,
   CheckCircle,
   XCircle,
-  Sparkles,
   Loader2,
 } from 'lucide-react';
 import api from '@/lib/api';
@@ -198,14 +198,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="bg-blue-600 p-2.5 rounded-xl">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-slate-900">
-              JobTools AI
-            </span>
-          </Link>
+          <Link href="/"><Logo size="md" /></Link>
         </div>
 
         <Suspense fallback={

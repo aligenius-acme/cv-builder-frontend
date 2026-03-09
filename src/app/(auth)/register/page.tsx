@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, User, Eye, EyeOff, Sparkles, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import Logo from '@/components/ui/Logo';
 import { useAuthStore } from '@/store/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -175,14 +176,7 @@ export default function RegisterPage() {
         <div className="max-w-md w-full space-y-8">
           {/* Logo */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-3">
-              <div className="bg-blue-600 p-2.5 rounded-xl">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                JobTools AI
-              </span>
-            </Link>
+            <Link href="/"><Logo size="md" /></Link>
           </div>
 
           {/* Header */}

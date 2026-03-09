@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useTheme } from '@/lib/theme';
+import Logo from '@/components/ui/Logo';
 import {
   Menu,
   X,
@@ -95,13 +96,8 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           {/* Logo & Navigation */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white">
-                JobTools AI
-              </span>
+            <Link href="/" className="flex items-center">
+              <Logo size="sm" />
             </Link>
 
             {isAuthenticated && (
