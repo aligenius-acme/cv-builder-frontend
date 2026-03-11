@@ -207,7 +207,7 @@ export default function DashboardPage() {
                   </div>
                 ) : resumes.length === 0 ? (
                   <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-slate-100 dark:bg-[var(--surface-raised)] rounded-xl flex items-center justify-center mx-auto mb-6">
+                    <div className="w-20 h-20 bg-[var(--surface-raised)] rounded-xl flex items-center justify-center mx-auto mb-6">
                       <FileText className="h-10 w-10 text-[var(--text-muted)]" />
                     </div>
                     <h3 className="text-xl font-semibold text-[var(--text)] mb-2">No resumes yet</h3>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                           style={{ animationDelay: `${index * 50}ms` }}
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-slate-100 dark:bg-[var(--surface-raised)] rounded-xl flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-950/50 transition-colors">
+                            <div className="w-12 h-12 bg-[var(--surface-raised)] rounded-xl flex items-center justify-center group-hover:bg-[var(--accent-subtle)] transition-colors">
                               <FileText className="h-6 w-6 text-[var(--text-muted)] group-hover:text-blue-600 transition-colors" />
                             </div>
                             <div>

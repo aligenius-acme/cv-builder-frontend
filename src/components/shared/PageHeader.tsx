@@ -18,11 +18,11 @@ export default function PageHeader({
   return (
     <div
       className="rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-xs)] pl-6 pr-6 py-5"
-      style={{ borderLeftWidth: '4px', borderLeftColor: '#2563eb' }}
+      style={{ borderLeftWidth: '4px', borderLeftColor: 'var(--accent)' }}
     >
       <div className="flex items-start justify-between gap-6">
         <div className="flex items-start gap-4 min-w-0">
-          <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0 text-blue-600 mt-0.5">
+          <div className="w-10 h-10 bg-[var(--accent-subtle)] rounded-lg flex items-center justify-center flex-shrink-0 text-[var(--accent-text)] mt-0.5">
             {icon}
           </div>
           <div className="min-w-0">

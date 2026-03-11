@@ -218,11 +218,11 @@ export default function OutOfCreditsPage() {
         {isLoading && (
           <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-5 h-5 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-              <div className="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="w-5 h-5 bg-[var(--border)] rounded animate-pulse" />
+              <div className="h-5 w-48 bg-[var(--border)] rounded animate-pulse" />
             </div>
-            <div className="h-4 w-64 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
-            <div className="h-10 w-40 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+            <div className="h-4 w-64 bg-[var(--border)] rounded animate-pulse mb-4" />
+            <div className="h-10 w-40 bg-[var(--border)] rounded-lg animate-pulse" />
           </div>
         )}
 

@@ -24,23 +24,23 @@ export default function SegmentedControl<T extends string>({
   className = '',
 }: SegmentedControlProps<T>) {
   return (
-    <div className={`flex flex-wrap items-center gap-2 p-2 bg-white rounded-xl border border-slate-100 shadow-sm w-fit ${className}`}>
+    <div className={`flex flex-wrap items-center gap-1.5 p-1.5 bg-[var(--surface-raised)] rounded-xl border border-[var(--border)] w-fit ${className}`}>
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           onClick={() => !option.disabled && onChange(option.value)}
           disabled={option.disabled}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             value === option.value
               ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-100'
+              : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text)]'
           } ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {option.icon}
           {option.label}
           {option.count !== undefined && option.count > 0 && (
-            <span className={`${value === option.value ? 'text-blue-200' : 'text-slate-400'}`}>
+            <span className={`text-xs ${value === option.value ? 'text-blue-200' : 'text-[var(--text-muted)]'}`}>
               ({option.count})
             </span>
           )}

@@ -224,13 +224,13 @@ export default function CoverLettersPage() {
                 <CardContent className="py-6">
                   <div className="animate-pulse flex flex-col space-y-4">
                     <div className="flex items-center space-x-4">
-                      <div className="w-14 h-14 bg-slate-200 rounded-xl" />
+                      <div className="w-14 h-14 bg-[var(--border)] rounded-xl" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-slate-200 rounded w-3/4" />
-                        <div className="h-3 bg-slate-200 rounded w-1/2" />
+                        <div className="h-4 bg-[var(--border)] rounded w-3/4" />
+                        <div className="h-3 bg-[var(--border)] rounded w-1/2" />
                       </div>
                     </div>
-                    <div className="h-20 bg-slate-200 rounded" />
+                    <div className="h-20 bg-[var(--border)] rounded" />
                   </div>
                 </CardContent>
               </Card>
@@ -240,11 +240,11 @@ export default function CoverLettersPage() {
           <Card variant="elevated">
             <CardContent className="py-16">
               <div className="text-center">
-                <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6">
-                  <FileText className="h-10 w-10 text-purple-600" />
+                <div className="w-20 h-20 bg-[var(--surface-raised)] rounded-xl flex items-center justify-center mx-auto mb-6">
+                  <FileText className="h-10 w-10 text-purple-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">No cover letters yet</h3>
-                <p className="text-slate-500 mb-6 max-w-sm mx-auto">
+                <h3 className="text-xl font-semibold text-[var(--text)] mb-2">No cover letters yet</h3>
+                <p className="text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">
                   Generate your first AI-powered cover letter for a job application
                 </p>
                 <Button
@@ -280,17 +280,17 @@ export default function CoverLettersPage() {
 
         {/* Stats Footer */}
         {coverLetters.length > 0 && (
-          <div className="flex items-center justify-center gap-8 py-6 border-t border-slate-200/60">
+          <div className="flex items-center justify-center gap-8 py-6 border-t border-[var(--border)]">
             <div className="text-center">
-              <p className="text-2xl font-bold text-slate-900">{coverLetters.length}</p>
-              <p className="text-sm text-slate-500">Cover Letters</p>
+              <p className="text-2xl font-bold text-[var(--text)]">{coverLetters.length}</p>
+              <p className="text-sm text-[var(--text-secondary)]">Cover Letters</p>
             </div>
-            <div className="w-px h-10 bg-slate-200" />
+            <div className="w-px h-10 bg-[var(--border)]" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-2xl font-bold text-purple-500">
                 {new Set(coverLetters.map(cl => cl.companyName)).size}
               </p>
-              <p className="text-sm text-slate-500">Companies</p>
+              <p className="text-sm text-[var(--text-secondary)]">Companies</p>
             </div>
           </div>
         )}

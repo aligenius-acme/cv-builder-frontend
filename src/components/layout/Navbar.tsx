@@ -111,12 +111,12 @@ export default function Navbar() {
                       'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                       isActive(item.href)
                         ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)]'
                     )}
                   >
                     <item.icon className={cn(
                       'h-4 w-4 mr-1.5',
-                      isActive(item.href) ? 'text-blue-600' : 'text-slate-400 dark:text-zinc-500'
+                      isActive(item.href) ? 'text-blue-600' : 'text-[var(--text-muted)]'
                     )} />
                     {item.name}
                   </Link>
@@ -130,7 +130,7 @@ export default function Navbar() {
                       'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                       isMoreActive
                         ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-raised)]'
                     )}
                   >
                     <MoreHorizontal className={cn(

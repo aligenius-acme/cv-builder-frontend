@@ -17,7 +17,7 @@ export default function CreditBadge({
   showLabel = true
 }: CreditBadgeProps) {
   const remaining = total - used;
-  const percentage = (remaining / total) * 100;
+  const percentage = total > 0 ? (remaining / total) * 100 : 0;
 
   // Determine color based on remaining credits
   const getColorClasses = () => {

@@ -25,7 +25,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     };
 
     const hoverStyles = hover
-      ? 'transition-all duration-200 hover:shadow-[var(--shadow-md)] hover:border-blue-200 hover:-translate-y-0.5 cursor-pointer'
+      ? 'transition-all duration-200 hover:shadow-[var(--shadow-md)] hover:border-[var(--accent-border)] hover:-translate-y-0.5 cursor-pointer'
       : '';
 
     return (

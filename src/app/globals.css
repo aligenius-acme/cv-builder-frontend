@@ -10,19 +10,19 @@
    ============================================================ */
 :root {
   /* Surfaces */
-  --bg: #f3f4f6;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-raised: #f9fafb;
+  --surface-raised: #f1f5f9;
   --surface-overlay: #ffffff;
 
   /* Borders */
-  --border: #e5e7eb;
-  --border-subtle: #f3f4f6;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
 
-  /* Text */
-  --text: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  /* Text — all pass WCAG AA on white/--bg */
+  --text: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
   --text-inverse: #ffffff;
 
   /* Accent (blue) */
@@ -34,7 +34,7 @@
 
   /* Status */
   --success-bg: #f0fdf4;
-  --success-text: #16a34a;
+  --success-text: #15803d;
   --success-border: #bbf7d0;
   --warning-bg: #fffbeb;
   --warning-text: #b45309;
@@ -46,11 +46,11 @@
   --info-text: #2563eb;
   --info-border: #bfdbfe;
 
-  /* Shadows — slightly more visible in light mode */
-  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.06);
-  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06);
-  --shadow-md: 0 4px 8px rgb(0 0 0 / 0.08), 0 2px 4px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 12px 20px rgb(0 0 0 / 0.10), 0 4px 8px rgb(0 0 0 / 0.06);
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-md: 0 4px 8px rgb(15 23 42 / 0.08), 0 2px 4px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 12px 24px rgb(15 23 42 / 0.10), 0 4px 8px rgb(15 23 42 / 0.06);
 
   /* Radius */
   --radius-sm: 6px;
@@ -62,35 +62,48 @@
 }
 
 .dark {
+  /* Surfaces — zinc scale with slight cool tint for depth */
   --bg: #09090b;
   --surface: #18181b;
   --surface-raised: #27272a;
   --surface-overlay: #3f3f46;
+
+  /* Borders */
   --border: #3f3f46;
   --border-subtle: #27272a;
-  --text: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+
+  /* Text — all pass WCAG AA on dark surfaces */
+  --text: #f4f4f5;
+  --text-secondary: #d4d4d8;
+  --text-muted: #a1a1aa;
   --text-inverse: #18181b;
-  --accent-subtle: #172554;
+
+  /* Accent */
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-subtle: #1e3a5f;
   --accent-text: #93c5fd;
-  --accent-border: #1e3a8a;
+  --accent-border: #1e40af;
+
+  /* Status */
   --success-bg: #052e16;
   --success-text: #4ade80;
   --success-border: #166534;
-  --warning-bg: #451a03;
+  --warning-bg: #431407;
   --warning-text: #fbbf24;
   --warning-border: #92400e;
   --error-bg: #450a0a;
   --error-text: #f87171;
   --error-border: #991b1b;
-  --info-bg: #172554;
+  --info-bg: #1e3a5f;
   --info-text: #93c5fd;
-  --info-border: #1e3a8a;
-  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 8px rgb(0 0 0 / 0.5), 0 2px 4px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 12px 20px rgb(0 0 0 / 0.6), 0 4px 8px rgb(0 0 0 / 0.4);
+  --info-border: #1e40af;
+
+  /* Shadows — more pronounced in dark for depth */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.40);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.50), 0 1px 2px rgb(0 0 0 / 0.40);
+  --shadow-md: 0 4px 8px rgb(0 0 0 / 0.50), 0 2px 4px rgb(0 0 0 / 0.30);
+  --shadow-lg: 0 12px 24px rgb(0 0 0 / 0.60), 0 4px 8px rgb(0 0 0 / 0.40);
 }
 
 /* ============================================================
@@ -119,73 +132,144 @@ body {
 
 /* ============================================================
    Global dark mode overrides for hardcoded Tailwind colors
-   These catch any component still using static slate/gray classes
+   Catches components still using static slate/gray/zinc classes
    ============================================================ */
+
+/* Text overrides */
+.dark .text-slate-950,
 .dark .text-slate-900,
 .dark .text-slate-800,
+.dark .text-gray-950,
 .dark .text-gray-900,
-.dark .text-gray-800 {
+.dark .text-gray-800,
+.dark .text-zinc-900,
+.dark .text-zinc-800 {
   color: var(--text);
 }
 
 .dark .text-slate-700,
-.dark .text-gray-700 {
-  color: var(--text-secondary);
-}
-
 .dark .text-slate-600,
-.dark .text-slate-500,
+.dark .text-gray-700,
 .dark .text-gray-600,
-.dark .text-gray-500 {
+.dark .text-zinc-700,
+.dark .text-zinc-600 {
   color: var(--text-secondary);
 }
 
+.dark .text-slate-500,
 .dark .text-slate-400,
-.dark .text-gray-400 {
+.dark .text-gray-500,
+.dark .text-gray-400,
+.dark .text-zinc-500,
+.dark .text-zinc-400 {
   color: var(--text-muted);
 }
 
+.dark .text-slate-300,
+.dark .text-gray-300,
+.dark .text-zinc-300 {
+  color: var(--text-secondary);
+}
+
+/* Background overrides */
 .dark .bg-white {
   background-color: var(--surface);
 }
 
 .dark .bg-slate-50,
-.dark .bg-gray-50 {
+.dark .bg-gray-50,
+.dark .bg-zinc-50 {
   background-color: var(--surface-raised);
 }
 
 .dark .bg-slate-100,
-.dark .bg-gray-100 {
+.dark .bg-gray-100,
+.dark .bg-zinc-100 {
   background-color: var(--surface-raised);
 }
 
-.dark .border-slate-200,
+.dark .bg-slate-200,
+.dark .bg-gray-200,
+.dark .bg-zinc-200 {
+  background-color: var(--surface-overlay);
+}
+
+/* Border overrides */
 .dark .border-slate-100,
+.dark .border-gray-100,
+.dark .border-zinc-100 {
+  border-color: var(--border-subtle);
+}
+
+.dark .border-slate-200,
 .dark .border-gray-200,
-.dark .border-gray-100 {
+.dark .border-zinc-200,
+.dark .border-slate-300,
+.dark .border-gray-300,
+.dark .border-zinc-300 {
   border-color: var(--border);
+}
+
+/* Divide overrides */
+.dark .divide-slate-200 > * + *,
+.dark .divide-gray-200 > * + *,
+.dark .divide-zinc-200 > * + * {
+  border-color: var(--border);
+}
+
+/* Ring/outline overrides */
+.dark .ring-slate-200,
+.dark .ring-gray-200 {
+  --tw-ring-color: var(--border);
+}
+
+/* ============================================================
+   Form inputs — ensure consistent dark mode appearance
+   ============================================================ */
+input,
+textarea,
+select {
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.dark input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+.dark textarea,
+.dark select {
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.dark input:not([type="radio"]):not([type="checkbox"])::placeholder,
+.dark textarea::placeholder {
+  color: var(--text-muted);
 }
 
 /* ============================================================
    Custom scrollbar
    ============================================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--border-subtle);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 4px;
+  background: var(--border);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: var(--text-muted);
 }
 
 /* Hide scrollbar utility */
@@ -239,10 +323,10 @@ body {
   100% { background-position: 200% 0; }
 }
 
-.animate-fade-in  { animation: fadeIn  0.3s ease-out; }
-.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-fade-in    { animation: fadeIn    0.3s ease-out; }
+.animate-slide-up   { animation: slideUp   0.4s ease-out; }
 .animate-slide-down { animation: slideDown 0.4s ease-out; }
-.animate-scale-in { animation: scaleIn 0.3s ease-out; }
+.animate-scale-in   { animation: scaleIn   0.3s ease-out; }
 
 /* ============================================================
    Utilities
@@ -259,31 +343,31 @@ body {
   text-wrap: balance;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
 /* ============================================================
-   Form inputs
+   Input — reusable themed class
    ============================================================ */
-input,
-textarea,
-select {
+.input-modern {
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-muted);
-  opacity: 1;
+.input-modern:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  outline: none;
 }
 
 /* ============================================================
    Skeleton loading
    ============================================================ */
 .skeleton {
-  background: linear-gradient(90deg, var(--border-subtle) 25%, var(--border) 50%, var(--border-subtle) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 25%,
+    var(--border) 50%,
+    var(--surface-raised) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -315,19 +399,4 @@ textarea::placeholder {
 
 @media (min-width: 1024px) {
   .container-app { padding: 0 2rem; }
-}
-
-/* ============================================================
-   Input focus ring
-   ============================================================ */
-.input-modern {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.input-modern:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
-  outline: none;
 }

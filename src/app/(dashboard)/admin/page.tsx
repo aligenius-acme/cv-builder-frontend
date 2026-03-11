@@ -27,6 +27,17 @@ import {
   BarChart3,
   Crown,
   Settings,
+  Sparkles,
+  Target,
+  PenLine,
+  GraduationCap,
+  Mic,
+  Send,
+  Search,
+  Layout,
+  Kanban,
+  FlaskConical,
+  Share2,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
@@ -81,6 +92,15 @@ interface RecentUser {
   createdAt: string;
 }
 
+interface ModuleUsageItem {
+  module: string;
+  type: 'ai' | 'non-ai';
+  actions30d: number;
+  uniqueUsers30d: number;
+  cost30d: number;
+  trend: number;
+}
+
 export default function AdminDashboardPage() {
   const { user } = useAuthStore();
   const router = useRouter();
@@ -88,6 +108,7 @@ export default function AdminDashboardPage() {
   const [topAIUsers, setTopAIUsers] = useState<TopAIUser[]>([]);
   const [aiOperations, setAIOperations] = useState<AIOperation[]>([]);
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [moduleUsage, setModuleUsage] = useState<ModuleUsageItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -106,6 +127,7 @@ export default function AdminDashboardPage() {
         setTopAIUsers(response.data.topAIUsers || []);
         setAIOperations(response.data.aiOperations || []);
         setRecentUsers(response.data.recentUsers);
+        setModuleUsage(response.data.moduleUsage || []);
       }
     } catch (error) {
       toast.error('Failed to load admin dashboard');
@@ -227,6 +249,24 @@ export default function AdminDashboardPage() {
       subtext: `${stats?.recentErrors24h || 0} recent errors`,
     },
   ];
+
+  const MODULE_ICONS: Record<string, React.ReactNode> = {
+    'Resume Tailoring':   <Sparkles className="h-4 w-4" />,
+    'ATS Analysis':       <Target className="h-4 w-4" />,
+    'Cover Letters':      <FileText className="h-4 w-4" />,
+    'Job Match Score':    <TrendingUp className="h-4 w-4" />,
+    'AI Writing':         <PenLine className="h-4 w-4" />,
+    'Career Performance': <BarChart3 className="h-4 w-4" />,
+    'Skill Gap':          <GraduationCap className="h-4 w-4" />,
+    'Salary Analyzer':    <DollarSign className="h-4 w-4" />,
+    'Interview Prep':     <Mic className="h-4 w-4" />,
+    'Networking':         <Send className="h-4 w-4" />,
+    'Job Board':          <Search className="h-4 w-4" />,
+    'Resume Builder':     <Layout className="h-4 w-4" />,
+    'Job Tracker':        <Kanban className="h-4 w-4" />,
+    'A/B Testing':        <FlaskConical className="h-4 w-4" />,
+    'Resume Sharing':     <Share2 className="h-4 w-4" />,
+  };
 
   const adminLinks = [
     { title: 'User Management', description: 'View and manage all users', href: '/admin/users', icon: Users },
@@ -411,6 +451,81 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Module Usage */}
+        {moduleUsage.length > 0 && (
+          <Card variant="elevated">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
+                Module Usage
+                <span className="text-sm font-normal text-[var(--text-muted)] ml-1">Last 30 days</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-[var(--border)]">
+                {moduleUsage.map((mod, idx) => {
+                  const maxActions = moduleUsage[0].actions30d || 1;
+                  const pct = (mod.actions30d / maxActions) * 100;
+                  return (
+                    <div key={mod.module} className="flex items-center gap-4 px-6 py-3 hover:bg-[var(--surface-raised)] transition-colors">
+                      {/* Rank */}
+                      <span className="w-6 text-sm font-bold text-[var(--text-muted)] text-right flex-shrink-0">
+                        {idx + 1}
+                      </span>
+                      {/* Icon */}
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
+                        {MODULE_ICONS[mod.module]}
+                      </div>
+                      {/* Name + type badge */}
+                      <div className="w-44 flex-shrink-0">
+                        <p className="text-sm font-medium text-[var(--text)]">{mod.module}</p>
+                        <Badge variant={mod.type === 'ai' ? 'primary' : 'default'} size="sm">
+                          {mod.type === 'ai' ? 'AI' : 'Tracker'}
+                        </Badge>
+                      </div>
+                      {/* Usage bar */}
+                      <div className="flex-1 flex items-center gap-3">
+                        <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-sm font-semibold text-[var(--text)] w-14 text-right flex-shrink-0">
+                          {mod.actions30d.toLocaleString()}
+                        </span>
+                      </div>
+                      {/* Unique users (AI only) */}
+                      <div className="w-24 text-right flex-shrink-0 hidden lg:block">
+                        <p className="text-sm text-[var(--text)]">
+                          {mod.type === 'ai' ? mod.uniqueUsers30d : '—'}
+                        </p>
+                        <p className="text-xs text-slate-400">users</p>
+                      </div>
+                      {/* Cost (AI only) */}
+                      <div className="w-20 text-right flex-shrink-0 hidden xl:block">
+                        <p className="text-sm text-[var(--text)]">
+                          {mod.cost30d > 0 ? `$${mod.cost30d.toFixed(3)}` : '—'}
+                        </p>
+                        <p className="text-xs text-slate-400">cost</p>
+                      </div>
+                      {/* Trend */}
+                      <div className="w-20 flex-shrink-0 text-right">
+                        {mod.actions30d === 0 ? (
+                          <Badge variant="default" size="sm">Unused</Badge>
+                        ) : mod.trend >= 10 ? (
+                          <Badge variant="success" size="sm">+{mod.trend.toFixed(0)}%</Badge>
+                        ) : mod.trend <= -10 ? (
+                          <Badge variant="error" size="sm">{mod.trend.toFixed(0)}%</Badge>
+                        ) : (
+                          <Badge variant="default" size="sm">Stable</Badge>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

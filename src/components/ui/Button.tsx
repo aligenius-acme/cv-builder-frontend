@@ -17,7 +17,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = `
       inline-flex items-center justify-center font-semibold rounded-xl
       transition-all duration-200 ease-out
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
       active:scale-[0.98]
     `;
@@ -26,25 +26,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: `
         bg-blue-600 text-white shadow-sm
         hover:bg-blue-700 hover:shadow-md
-        focus-visible:ring-blue-500
       `,
       secondary: `
-        bg-slate-100 text-slate-900
-        hover:bg-slate-200
-        focus-visible:ring-slate-500
-        dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700
+        bg-[var(--surface-raised)] text-[var(--text)] border border-[var(--border)]
+        hover:bg-[var(--border)] hover:border-[var(--text-muted)]
       `,
       outline: `
-        border border-slate-200 text-slate-700 bg-white
-        hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50
-        focus-visible:ring-blue-500
-        dark:border-zinc-700 dark:text-zinc-300 dark:bg-transparent dark:hover:border-blue-500 dark:hover:text-blue-400 dark:hover:bg-blue-950/30
+        border border-[var(--border)] text-[var(--text-secondary)] bg-[var(--surface)]
+        hover:border-blue-500 hover:text-blue-600 hover:bg-[var(--accent-subtle)]
       `,
       ghost: `
-        text-slate-600
-        hover:bg-slate-100 hover:text-slate-900
-        focus-visible:ring-slate-500
-        dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100
+        text-[var(--text-secondary)] bg-transparent
+        hover:bg-[var(--surface-raised)] hover:text-[var(--text)]
       `,
       danger: `
         bg-red-600 text-white shadow-sm
@@ -54,7 +47,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       dark: `
         bg-slate-900 text-white shadow-sm
         hover:bg-slate-800 hover:shadow-md
-        focus-visible:ring-slate-700
+        dark:bg-[var(--surface-overlay)] dark:text-[var(--text)] dark:hover:bg-[var(--border)]
       `,
     };
 

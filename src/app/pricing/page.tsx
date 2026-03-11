@@ -10,7 +10,7 @@ import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
 const FREE_FEATURES = [
-  '5 lifetime AI credits',
+  'AI credits included to start',
   'Resume tailoring (uses credits)',
   'Cover letter generation (uses credits)',
   'ATS analysis (uses credits)',
@@ -104,7 +104,7 @@ export default function PricingPage() {
                   <span className="text-[var(--text-secondary)]">forever</span>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mt-2">
-                  Try AI features with 5 lifetime credits
+                  Try AI features with free credits included
                 </p>
               </div>
 
@@ -181,7 +181,7 @@ export default function PricingPage() {
             {[
               {
                 q: 'What counts as an AI credit?',
-                a: 'Each time you use an AI feature (resume tailoring, cover letter, ATS analysis, etc.), one credit is used. Free users get 5 lifetime credits total.',
+                a: 'Each time you use an AI feature (resume tailoring, cover letter, ATS analysis, etc.), one credit is used. Free users start with credits included and can claim more each month.',
               },
               {
                 q: 'Can I cancel my Pro subscription?',
@@ -193,7 +193,7 @@ export default function PricingPage() {
               },
               {
                 q: 'Do unused credits roll over?',
-                a: 'Free credits are lifetime credits and never expire. Pro users have unlimited credits (no rollover needed).',
+                a: 'Yes — unused free credits never expire and carry over month to month. Pro users have unlimited credits with no limits.',
               },
             ].map(({ q, a }) => (
               <div key={q} className="border-b border-[var(--border)] pb-6">

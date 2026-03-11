@@ -162,64 +162,72 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-6">
               {/* Credit Display */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[var(--text-secondary)] mb-1">Remaining Credits</p>
-                  <p className="text-4xl font-bold text-[var(--text)]">
-                    {user?.aiCredits ?? 0}
-                    <span className="text-lg text-[var(--text-muted)] ml-2">/ 5</span>
-                  </p>
-                </div>
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                  <Zap className="h-12 w-12 text-white" />
-                </div>
-              </div>
+              {(() => {
+                const totalGranted = user?.aiCredits ?? 0;
+                const used = user?.aiCreditsUsed ?? 0;
+                const remaining = totalGranted - used;
+                const usedPct = totalGranted > 0 ? (used / totalGranted) * 100 : 0;
+                return (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-[var(--text-secondary)] mb-1">Remaining Credits</p>
+                        <p className="text-4xl font-bold text-[var(--text)]">
+                          {remaining}
+                        </p>
+                        <p className="text-sm text-[var(--text-muted)] mt-1">{used} used of {totalGranted} total</p>
+                      </div>
+                      <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
+                        <Zap className="h-12 w-12 text-white" />
+                      </div>
+                    </div>
 
-              {/* Progress Bar */}
-              <div>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-[var(--text-secondary)]">Usage</span>
-                  <span className="text-[var(--text)] font-medium">
-                    {user?.aiCreditsUsed ?? 0} used
-                  </span>
-                </div>
-                <div className="h-3 bg-[var(--border-subtle)] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
-                    style={{
-                      width: `${((user?.aiCreditsUsed ?? 0) / 5) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
+                    {/* Progress Bar */}
+                    <div>
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-[var(--text-secondary)]">Usage</span>
+                        <span className="text-[var(--text)] font-medium">
+                          {used} used
+                        </span>
+                      </div>
+                      <div className="h-3 bg-[var(--border-subtle)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-600 transition-all duration-500"
+                          style={{ width: `${usedPct}%` }}
+                        />
+                      </div>
+                    </div>
 
-              {/* Info */}
-              <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 border border-blue-100 dark:border-blue-900">
-                <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  What are AI Credits?
-                </h4>
-                <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
-                  AI Credits are used when you access AI-powered features like resume tailoring,
-                  ATS analysis, cover letter generation, interview preparation, and more.
-                  Each user receives 5 lifetime credits to explore these premium features.
-                </p>
-              </div>
+                    {/* Info */}
+                    <div className="bg-[var(--accent-subtle)] rounded-xl p-4 border border-[var(--accent-border)]">
+                      <h4 className="font-medium text-[var(--accent-text)] mb-2 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        What are AI Credits?
+                      </h4>
+                      <p className="text-sm text-[var(--accent-text)] leading-relaxed opacity-90">
+                        AI Credits are used when you access AI-powered features like resume tailoring,
+                        ATS analysis, cover letter generation, interview preparation, and more.
+                        New accounts start with free credits, and you can claim additional credits each month.
+                      </p>
+                    </div>
 
-              {/* Credit Status Badge */}
-              <div className="flex items-center justify-between pt-2">
-                {(user?.aiCredits ?? 0) > 0 ? (
-                  <Badge variant="success" size="lg">
-                    <Zap className="h-4 w-4 mr-1" />
-                    {user?.aiCredits} Credit{(user?.aiCredits ?? 0) !== 1 ? 's' : ''} Available
-                  </Badge>
-                ) : (
-                  <Badge variant="warning" size="lg">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    No Credits Remaining
-                  </Badge>
-                )}
-              </div>
+                    {/* Credit Status Badge */}
+                    <div className="flex items-center justify-between pt-2">
+                      {remaining > 0 ? (
+                        <Badge variant="success" size="lg">
+                          <Zap className="h-4 w-4 mr-1" />
+                          {remaining} Credit{remaining !== 1 ? 's' : ''} Available
+                        </Badge>
+                      ) : (
+                        <Badge variant="warning" size="lg">
+                          <AlertCircle className="h-4 w-4 mr-1" />
+                          No Credits Remaining
+                        </Badge>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </CardContent>
         </Card>
@@ -228,7 +236,7 @@ export default function SettingsPage() {
         <Card variant="elevated">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-slate-400" />
+              <User className="h-5 w-5 text-[var(--text-muted)]" />
               Profile Information
             </CardTitle>
             <CardDescription>
@@ -298,7 +306,7 @@ export default function SettingsPage() {
         <Card variant="elevated">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-slate-400" />
+              <Lock className="h-5 w-5 text-[var(--text-muted)]" />
               Change Password
             </CardTitle>
             <CardDescription>
@@ -388,7 +396,7 @@ export default function SettingsPage() {
         <Card variant="elevated">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-slate-400" />
+              <Bell className="h-5 w-5 text-[var(--text-muted)]" />
               Notification Preferences
             </CardTitle>
             <CardDescription>

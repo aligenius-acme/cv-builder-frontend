@@ -17,7 +17,7 @@ export default function EmptyState({
   return (
     <Card variant="elevated">
       <CardContent className="py-16 text-center">
-        <div className="w-20 h-20 bg-slate-100 dark:bg-[var(--surface-raised)] rounded-xl flex items-center justify-center mx-auto mb-6 text-[var(--text-secondary)]">
+        <div className="w-20 h-20 bg-[var(--surface-raised)] rounded-xl flex items-center justify-center mx-auto mb-6 text-[var(--text-secondary)]">
           {icon}
         </div>
         <h3 className="text-xl font-semibold text-[var(--text)] mb-2">{title}</h3>

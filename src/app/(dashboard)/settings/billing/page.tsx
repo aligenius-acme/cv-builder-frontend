@@ -128,11 +128,11 @@ export default function BillingPage() {
               <CardContent className="py-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isPro ? 'bg-blue-600' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isPro ? 'bg-blue-600' : 'bg-[var(--surface-raised)]'}`}>
                       {isPro ? (
                         <Crown className="h-6 w-6 text-white" />
                       ) : (
-                        <Zap className="h-6 w-6 text-slate-500" />
+                        <Zap className="h-6 w-6 text-[var(--text-muted)]" />
                       )}
                     </div>
                     <div>
