@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   BarChart3,
   Crown,
+  Settings,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api from '@/lib/api';
@@ -234,6 +235,7 @@ export default function AdminDashboardPage() {
     { title: 'Templates', description: 'Manage resume templates', href: '/admin/templates', icon: FileText },
     { title: 'Affiliate Links', description: 'Manage course recommendation URLs', href: '/admin/affiliates', icon: TrendingUp },
     { title: 'System Logs', description: 'View parsing errors and audit logs', href: '/admin/logs', icon: Activity },
+    { title: 'App Settings', description: 'Monetization, Pro subscription, monthly credits', href: '/admin/settings', icon: Settings },
   ];
 
   return (

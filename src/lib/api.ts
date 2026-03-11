@@ -430,6 +430,11 @@ class ApiClient {
     return response.data;
   }
 
+  async claimMonthlyCredits() {
+    const response = await this.client.post<ApiResponse<{ credits: number; used: number; remaining: number; nextRefillDate: string }>>('/billing/claim-credits');
+    return response.data;
+  }
+
   async createPortalSession() {
     const response = await this.client.post<ApiResponse<{ url: string }>>('/billing/portal');
     return response.data;
@@ -529,6 +534,16 @@ class ApiClient {
 
   async deleteAdminAffiliate(id: string) {
     const response = await this.client.delete<ApiResponse>(`/admin/affiliates/${id}`);
+    return response.data;
+  }
+
+  async getAdminSettings() {
+    const response = await this.client.get<ApiResponse<{ settings: Record<string, string>; defaults: Record<string, string> }>>('/admin/settings');
+    return response.data;
+  }
+
+  async updateAdminSetting(key: string, value: string) {
+    const response = await this.client.put<ApiResponse<{ key: string; value: string }>>(`/admin/settings/${key}`, { value });
     return response.data;
   }
 

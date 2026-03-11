@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Crown, Zap, Check, ArrowLeft, Loader2, ExternalLink, CreditCard } from 'lucide-react';
+import { Crown, Zap, Check, ArrowLeft, Loader2, ExternalLink, CreditCard, Gift, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -15,6 +15,14 @@ interface BillingStatus {
   remainingCredits: number;
   stripeCustomerId: string | null;
   hasSubscription: boolean;
+  proSubscriptionEnabled: boolean;
+  canClaimMonthlyCredits: boolean;
+  nextRefillDate: string | null;
+  monthlyCreditsAmount: number;
+}
+
+function formatRefillDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 }
 
 export default function BillingPage() {
@@ -25,6 +33,7 @@ export default function BillingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isOpeningPortal, setIsOpeningPortal] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   useEffect(() => {
     loadStatus();
@@ -52,9 +61,7 @@ export default function BillingPage() {
     setIsCheckingOut(true);
     try {
       const res = await api.createCheckoutSession();
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      }
+      if (res.data?.url) window.location.href = res.data.url;
     } catch {
       toast.error('Failed to start checkout. Please try again.');
       setIsCheckingOut(false);
@@ -65,12 +72,30 @@ export default function BillingPage() {
     setIsOpeningPortal(true);
     try {
       const res = await api.createPortalSession();
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      }
+      if (res.data?.url) window.location.href = res.data.url;
     } catch {
       toast.error('Failed to open billing portal. Please try again.');
       setIsOpeningPortal(false);
+    }
+  };
+
+  const handleClaimCredits = async () => {
+    setIsClaiming(true);
+    try {
+      const res = await api.claimMonthlyCredits();
+      if (res.success && res.data) {
+        toast.success(`${status?.monthlyCreditsAmount ?? 10} credits added to your account!`);
+        setStatus((prev) => prev ? {
+          ...prev,
+          canClaimMonthlyCredits: false,
+          remainingCredits: res.data!.remaining,
+          nextRefillDate: res.data!.nextRefillDate,
+        } : prev);
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || 'Failed to claim credits. Please try again.');
+    } finally {
+      setIsClaiming(false);
     }
   };
 
@@ -88,7 +113,7 @@ export default function BillingPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-[var(--text)]">Billing & Plan</h1>
-            <p className="text-sm text-[var(--text-secondary)]">Manage your subscription and credits</p>
+            <p className="text-sm text-[var(--muted)]">Manage your subscription and credits</p>
           </div>
         </div>
 
@@ -119,10 +144,10 @@ export default function BillingPage() {
                           {isPro ? 'Active' : 'Current'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-[var(--text-secondary)] mt-1">
+                      <p className="text-sm text-[var(--muted)] mt-1">
                         {isPro
                           ? 'Unlimited AI features · Up to 200 AI calls/day'
-                          : `${status?.remainingCredits ?? 0} of 5 AI credits remaining`}
+                          : `${status?.remainingCredits ?? 0} AI credits remaining`}
                       </p>
                     </div>
                   </div>
@@ -130,7 +155,7 @@ export default function BillingPage() {
                     <p className="text-2xl font-bold text-[var(--text)]">
                       {isPro ? '$12' : '$0'}
                     </p>
-                    <p className="text-xs text-[var(--text-secondary)]">
+                    <p className="text-xs text-[var(--muted)]">
                       {isPro ? '/month' : 'forever'}
                     </p>
                   </div>
@@ -138,14 +163,15 @@ export default function BillingPage() {
               </CardContent>
             </Card>
 
-            {/* Action Buttons */}
+            {/* Action section */}
             {isPro ? (
+              /* Pro: manage subscription */
               <Card variant="elevated">
                 <CardContent className="py-5">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-[var(--text)]">Manage Subscription</h3>
-                      <p className="text-sm text-[var(--text-secondary)]">
+                      <p className="text-sm text-[var(--muted)]">
                         Update payment method, view invoices, or cancel your subscription
                       </p>
                     </div>
@@ -160,13 +186,14 @@ export default function BillingPage() {
                   </div>
                 </CardContent>
               </Card>
-            ) : (
+            ) : status?.proSubscriptionEnabled ? (
+              /* Free + Pro enabled: show upgrade CTA */
               <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
                 <CardContent className="py-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                       <h3 className="font-bold text-[var(--text)] text-lg mb-1">Upgrade to Pro</h3>
-                      <p className="text-sm text-[var(--text-secondary)] mb-3">
+                      <p className="text-sm text-[var(--muted)] mb-3">
                         Get unlimited AI features for $12/month
                       </p>
                       <ul className="space-y-1">
@@ -176,7 +203,7 @@ export default function BillingPage() {
                           'All AI tools (interview prep, salary analysis, etc.)',
                           'Cancel anytime',
                         ].map((f) => (
-                          <li key={f} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                          <li key={f} className="flex items-center gap-2 text-sm text-[var(--muted)]">
                             <Check className="h-4 w-4 text-blue-600 flex-shrink-0" />
                             {f}
                           </li>
@@ -195,10 +222,51 @@ export default function BillingPage() {
                   </div>
                 </CardContent>
               </Card>
+            ) : (
+              /* Free + Pro disabled: show monthly credits claim */
+              <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20">
+                <CardContent className="py-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Gift className="h-5 w-5 text-green-600" />
+                        <h3 className="font-bold text-[var(--text)] text-lg">
+                          Monthly Free Credits
+                        </h3>
+                      </div>
+                      {status?.canClaimMonthlyCredits ? (
+                        <p className="text-sm text-[var(--muted)]">
+                          Your {status.monthlyCreditsAmount} monthly credits are ready to claim.
+                        </p>
+                      ) : (
+                        <div className="flex items-center gap-2 text-sm text-[var(--muted)]">
+                          <Calendar className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span>
+                            Already claimed.{' '}
+                            {status?.nextRefillDate && (
+                              <>Next refill on <span className="font-semibold text-[var(--text)]">{formatRefillDate(status.nextRefillDate)}</span></>
+                            )}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      onClick={handleClaimCredits}
+                      isLoading={isClaiming}
+                      disabled={!status?.canClaimMonthlyCredits}
+                      leftIcon={isClaiming ? undefined : <Gift className="h-5 w-5" />}
+                    >
+                      {status?.canClaimMonthlyCredits ? 'Claim Credits' : 'Already Claimed'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
-            {/* Pro Features List */}
-            {!isPro && (
+            {/* Pro features list — only shown when Pro is enabled and user is on free plan */}
+            {!isPro && status?.proSubscriptionEnabled && (
               <Card variant="elevated">
                 <CardHeader>
                   <CardTitle className="text-base">Pro Plan Includes</CardTitle>
@@ -219,7 +287,7 @@ export default function BillingPage() {
                       'Priority support',
                       'Cancel anytime',
                     ].map((feature) => (
-                      <div key={feature} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                      <div key={feature} className="flex items-center gap-2 text-sm text-[var(--muted)]">
                         <Check className="h-4 w-4 text-blue-600 flex-shrink-0" />
                         {feature}
                       </div>
