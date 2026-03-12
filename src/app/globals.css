@@ -152,7 +152,9 @@ body {
 .dark .text-gray-700,
 .dark .text-gray-600,
 .dark .text-zinc-700,
-.dark .text-zinc-600 {
+.dark .text-zinc-600,
+.dark .text-neutral-700,
+.dark .text-neutral-600 {
   color: var(--text-secondary);
 }
 
@@ -222,6 +224,40 @@ body {
 .dark .ring-gray-200 {
   --tw-ring-color: var(--border);
 }
+
+/* ============================================================
+   Dark mode: neutralize neutral (slate/gray/zinc) hover backgrounds
+   Prevents light slate/gray surfaces washing out text on hover
+   ============================================================ */
+.dark .hover\:bg-white:hover { background-color: var(--surface); }
+
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-zinc-50:hover,
+.dark .hover\:bg-zinc-100:hover { background-color: var(--surface-raised); }
+
+.dark .hover\:bg-slate-200:hover,
+.dark .hover\:bg-slate-300:hover,
+.dark .hover\:bg-gray-200:hover,
+.dark .hover\:bg-gray-300:hover,
+.dark .hover\:bg-zinc-200:hover,
+.dark .hover\:bg-zinc-300:hover { background-color: var(--surface-overlay); }
+
+/* group-hover neutral backgrounds */
+.dark .group:hover .group-hover\:bg-white { background-color: var(--surface); }
+
+.dark .group:hover .group-hover\:bg-slate-50,
+.dark .group:hover .group-hover\:bg-slate-100,
+.dark .group:hover .group-hover\:bg-gray-50,
+.dark .group:hover .group-hover\:bg-gray-100,
+.dark .group:hover .group-hover\:bg-zinc-50,
+.dark .group:hover .group-hover\:bg-zinc-100 { background-color: var(--surface-raised); }
+
+.dark .group:hover .group-hover\:bg-slate-200,
+.dark .group:hover .group-hover\:bg-gray-200,
+.dark .group:hover .group-hover\:bg-zinc-200 { background-color: var(--surface-overlay); }
 
 /* ============================================================
    Dark mode: neutralize colored -50/-100 hover backgrounds

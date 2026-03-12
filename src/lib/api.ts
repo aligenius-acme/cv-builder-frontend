@@ -499,6 +499,11 @@ class ApiClient {
     return response.data;
   }
 
+  async createAdminPrompt(data: { name: string; promptText: string }) {
+    const response = await this.client.post<ApiResponse<any>>('/admin/prompts', data);
+    return response.data;
+  }
+
   async getAdminTemplates() {
     const response = await this.client.get<ApiResponse<any>>('/admin/templates');
     return response.data;

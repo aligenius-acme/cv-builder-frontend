@@ -378,13 +378,13 @@ export default function ATSSimulator({
                   "rounded-xl border-2 overflow-hidden transition-all duration-200",
                   isExpanded
                     ? score >= 80 ? "border-emerald-300 shadow-sm" : score >= 60 ? "border-amber-300 shadow-sm" : "border-red-300 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300"
+                    : "border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600"
                 )}
               >
                 {/* Section row — always visible */}
                 <button
                   onClick={() => setExpandedSection(isExpanded ? null : section)}
-                  className="w-full flex items-center gap-3 p-4 text-left hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 p-4 text-left hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                 >
                   {/* Icon */}
                   <div className={cn(
@@ -398,7 +398,7 @@ export default function ATSSimulator({
                   </div>
 
                   {/* Section label */}
-                  <span className="font-semibold text-slate-800 w-24 flex-shrink-0 text-sm">{label}</span>
+                  <span className="font-semibold text-slate-800 dark:text-zinc-100 w-24 flex-shrink-0 text-sm">{label}</span>
 
                   {/* Progress bar */}
                   <div className="flex-1 flex items-center gap-3 min-w-0">
@@ -414,28 +414,28 @@ export default function ATSSimulator({
                   <div className="flex items-center gap-2.5 flex-shrink-0">
                     <div className="flex items-baseline gap-0.5">
                       <span className={cn("text-xl font-black", status.color)}>{score}</span>
-                      <span className="text-slate-400 text-sm">/100</span>
+                      <span className="text-slate-400 dark:text-zinc-500 text-sm">/100</span>
                     </div>
                     <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full hidden sm:inline", status.badgeBg)}>
                       {status.label}
                     </span>
                     {issueCount > 0 && !isExpanded && (
-                      <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full hidden md:inline">
+                      <span className="text-xs bg-slate-100 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded-full hidden md:inline">
                         {issueCount} issue{issueCount !== 1 ? 's' : ''}
                       </span>
                     )}
                     <div className={cn(
-                      "w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center transition-transform duration-200",
-                      isExpanded && "rotate-90 bg-blue-100"
+                      "w-7 h-7 rounded-lg bg-slate-100 dark:bg-zinc-700 flex items-center justify-center transition-transform duration-200",
+                      isExpanded && "rotate-90 !bg-blue-100 dark:!bg-blue-900/40"
                     )}>
-                      <ChevronRight className={cn("h-4 w-4", isExpanded ? "text-blue-600" : "text-slate-400")} />
+                      <ChevronRight className={cn("h-4 w-4", isExpanded ? "text-blue-600" : "text-slate-400 dark:text-zinc-400")} />
                     </div>
                   </div>
                 </button>
 
                 {/* Expanded content */}
                 {isExpanded && (
-                  <div className="border-t border-slate-200 bg-slate-50 p-5 space-y-5">
+                  <div className="border-t border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/60 p-5 space-y-5">
 
                     {/* FORMATTING section */}
                     {section === 'formatting' && (
