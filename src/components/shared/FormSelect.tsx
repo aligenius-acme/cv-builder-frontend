@@ -23,7 +23,7 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
     return (
       <div className="space-y-1.5">
         {label && (
-          <label htmlFor={selectId} className="block text-sm font-medium text-slate-700">
+          <label htmlFor={selectId} className="block text-sm font-medium text-[var(--text-secondary)]">
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -33,12 +33,12 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
           id={selectId}
           value={value}
           className={cn(
-            'w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white',
+            'w-full px-4 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)]',
             'transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
             error && 'border-red-300 focus:ring-red-500/20 focus:border-red-500',
-            props.disabled && 'bg-slate-50 cursor-not-allowed',
-            isPlaceholderSelected ? 'text-slate-500' : 'text-slate-900',
+            props.disabled && 'bg-[var(--surface-raised)] cursor-not-allowed',
+            isPlaceholderSelected ? 'text-[var(--text-muted)]' : 'text-[var(--text)]',
             className
           )}
           {...props}
@@ -49,13 +49,13 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
             </option>
           )}
           {options.map((option) => (
-            <option key={option.value} value={option.value} disabled={option.disabled} className="text-slate-900">
+            <option key={option.value} value={option.value} disabled={option.disabled} className="text-[var(--text)] bg-[var(--surface)]">
               {option.label}
             </option>
           ))}
         </select>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {hint && !error && <p className="text-sm text-slate-500">{hint}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {hint && !error && <p className="text-sm text-[var(--text-muted)]">{hint}</p>}
       </div>
     );
   }

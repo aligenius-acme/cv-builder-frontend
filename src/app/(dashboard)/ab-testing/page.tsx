@@ -25,6 +25,7 @@ import {
   Loader2,
   Trash2,
   ExternalLink,
+  FileText,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import api, { ABTest, ABTestVariant, ABTestAnalytics } from '@/lib/api';
@@ -33,6 +34,7 @@ import { formatDate } from '@/lib/utils';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 import { AB_TEST_STATUS_CONFIG } from '@/lib/colors';
+import type { Resume, ResumeVersionSummary } from '@/types';
 
 export default function ABTestingPage() {
   const { data: tests, isLoading, setData: setTests, refetch: loadTests } = useFetchData<ABTest[]>({
@@ -44,6 +46,10 @@ export default function ABTestingPage() {
   const createModal = useModal();
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
+  // Resume picker state
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [resumeVersionsMap, setResumeVersionsMap] = useState<Record<string, ResumeVersionSummary[]>>({});
+
   // Create form state
   const [newTest, setNewTest] = useState({
     name: '',
@@ -51,8 +57,20 @@ export default function ABTestingPage() {
     targetJobTitle: '',
     targetCompany: '',
     goal: 'response_rate',
-    variants: [{ name: 'Version A' }, { name: 'Version B' }],
+    variants: [
+      { name: 'Version A', resumeId: '', resumeVersionId: '' },
+      { name: 'Version B', resumeId: '', resumeVersionId: '' },
+    ],
   });
+
+  // Load resumes when create modal opens
+  useEffect(() => {
+    if (createModal.isOpen && resumes.length === 0) {
+      api.getResumes().then((r) => {
+        if (r.success && r.data) setResumes(r.data);
+      });
+    }
+  }, [createModal.isOpen]);
 
   useEffect(() => {
     if (selectedTest) {
@@ -70,6 +88,29 @@ export default function ABTestingPage() {
     }
   };
 
+  const handleVariantResumeChange = async (idx: number, resumeId: string) => {
+    const selectedResume = resumes.find((r) => r.id === resumeId);
+    const variants = [...newTest.variants];
+    variants[idx] = {
+      ...variants[idx],
+      resumeId,
+      name: selectedResume?.title || variants[idx].name,
+      resumeVersionId: '',
+    };
+    setNewTest({ ...newTest, variants });
+
+    // Lazy-load versions for this resume
+    if (resumeId && !resumeVersionsMap[resumeId]) {
+      const r = await api.getResume(resumeId);
+      if (r.success && r.data) {
+        setResumeVersionsMap((prev) => ({
+          ...prev,
+          [resumeId]: r.data!.versions || [],
+        }));
+      }
+    }
+  };
+
   const createTest = async () => {
     if (!newTest.name || newTest.variants.length < 2) {
       toast.error('Please provide a name and at least 2 variants');
@@ -83,7 +124,10 @@ export default function ABTestingPage() {
         targetJobTitle: newTest.targetJobTitle || undefined,
         targetCompany: newTest.targetCompany || undefined,
         goal: newTest.goal,
-        variants: newTest.variants,
+        variants: newTest.variants.map((v) => ({
+          name: v.name,
+          resumeVersionId: v.resumeVersionId || undefined,
+        })),
       });
 
       if (response.success && response.data) {
@@ -95,7 +139,10 @@ export default function ABTestingPage() {
           targetJobTitle: '',
           targetCompany: '',
           goal: 'response_rate',
-          variants: [{ name: 'Version A' }, { name: 'Version B' }],
+          variants: [
+            { name: 'Version A', resumeId: '', resumeVersionId: '' },
+            { name: 'Version B', resumeId: '', resumeVersionId: '' },
+          ],
         });
         toast.success('A/B test created');
       }
@@ -495,8 +542,8 @@ export default function ABTestingPage() {
         {/* Create Test Modal */}
         {createModal.isOpen && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl">
-              <div className="p-6 border-b border-slate-200">
+            <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-slate-200 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-slate-900">Create A/B Test</h2>
                   <button onClick={() => createModal.close()}>
@@ -504,7 +551,7 @@ export default function ABTestingPage() {
                   </button>
                 </div>
               </div>
-              <div className="p-6 space-y-4">
+              <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Test Name *</label>
                   <input
@@ -560,36 +607,77 @@ export default function ABTestingPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Variants</label>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Variants
+                    <span className="ml-1 text-xs font-normal text-slate-400">— each variant is a resume you want to compare</span>
+                  </label>
+                  <div className="space-y-3">
                     {newTest.variants.map((variant, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold ${
-                          idx === 0 ? 'bg-blue-500' : idx === 1 ? 'bg-purple-500' : 'bg-amber-500'
-                        }`}>
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <input
-                          type="text"
-                          value={variant.name}
-                          onChange={(e) => {
-                            const variants = [...newTest.variants];
-                            variants[idx].name = e.target.value;
-                            setNewTest({ ...newTest, variants });
-                          }}
-                          className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {newTest.variants.length > 2 && (
-                          <button
-                            onClick={() => {
-                              const variants = newTest.variants.filter((_, i) => i !== idx);
+                      <div key={idx} className="border border-slate-200 rounded-lg p-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                            idx === 0 ? 'bg-blue-500' : idx === 1 ? 'bg-purple-500' : 'bg-amber-500'
+                          }`}>
+                            {String.fromCharCode(65 + idx)}
+                          </span>
+                          {/* Resume picker */}
+                          <select
+                            value={variant.resumeId}
+                            onChange={(e) => handleVariantResumeChange(idx, e.target.value)}
+                            className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-700"
+                          >
+                            <option value="">— Select a resume (optional) —</option>
+                            {resumes.map((r) => (
+                              <option key={r.id} value={r.id}>{r.title}</option>
+                            ))}
+                          </select>
+                          {newTest.variants.length > 2 && (
+                            <button
+                              onClick={() => {
+                                const variants = newTest.variants.filter((_, i) => i !== idx);
+                                setNewTest({ ...newTest, variants });
+                              }}
+                              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg flex-shrink-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                        {/* Version picker — shown when selected resume has tailored versions */}
+                        {variant.resumeId && (resumeVersionsMap[variant.resumeId]?.length ?? 0) > 0 && (
+                          <div className="pl-9">
+                            <select
+                              value={variant.resumeVersionId}
+                              onChange={(e) => {
+                                const variants = [...newTest.variants];
+                                variants[idx].resumeVersionId = e.target.value;
+                                setNewTest({ ...newTest, variants });
+                              }}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-700"
+                            >
+                              <option value="">Base version</option>
+                              {resumeVersionsMap[variant.resumeId].map((v) => (
+                                <option key={v.id} value={v.id}>
+                                  v{v.versionNumber} — {v.jobTitle} @ {v.companyName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+                        {/* Variant label */}
+                        <div className="pl-9">
+                          <input
+                            type="text"
+                            value={variant.name}
+                            onChange={(e) => {
+                              const variants = [...newTest.variants];
+                              variants[idx].name = e.target.value;
                               setNewTest({ ...newTest, variants });
                             }}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        )}
+                            placeholder="Variant label (e.g., Version A)"
+                            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
+                          />
+                        </div>
                       </div>
                     ))}
                     {newTest.variants.length < 4 && (
@@ -601,7 +689,7 @@ export default function ABTestingPage() {
                             ...newTest,
                             variants: [
                               ...newTest.variants,
-                              { name: `Version ${String.fromCharCode(65 + newTest.variants.length)}` },
+                              { name: `Version ${String.fromCharCode(65 + newTest.variants.length)}`, resumeId: '', resumeVersionId: '' },
                             ],
                           });
                         }}
@@ -613,7 +701,7 @@ export default function ABTestingPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-6 border-t border-slate-200 flex justify-end gap-3">
+              <div className="p-6 border-t border-slate-200 flex justify-end gap-3 flex-shrink-0">
                 <Button variant="ghost" onClick={() => createModal.close()}>
                   Cancel
                 </Button>

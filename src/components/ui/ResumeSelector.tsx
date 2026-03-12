@@ -45,39 +45,39 @@ export function ResumeSelector({
     dropdown.close();
   };
 
-  // Color theme classes
+  // Color theme classes — all include dark: variants to prevent hover blending in dark mode
   const themeClasses = {
     blue: {
-      icon: 'text-blue-600',
-      iconBg: 'bg-blue-50',
+      icon: 'text-blue-600 dark:text-blue-400',
+      iconBg: 'bg-blue-50 dark:bg-blue-950/40',
       focus: 'focus:ring-blue-500/20 focus:border-blue-500',
-      hover: 'hover:border-blue-300',
-      hoverBg: 'hover:bg-blue-50',
-      selectedBg: 'bg-blue-50',
+      hover: 'hover:border-blue-300 dark:hover:border-blue-600',
+      hoverBg: 'hover:bg-blue-50 dark:hover:bg-blue-950/40',
+      selectedBg: 'bg-blue-50 dark:bg-blue-950/40',
     },
     amber: {
-      icon: 'text-amber-600',
-      iconBg: 'bg-amber-50',
+      icon: 'text-amber-600 dark:text-amber-400',
+      iconBg: 'bg-amber-50 dark:bg-amber-950/40',
       focus: 'focus:ring-amber-500/20 focus:border-amber-500',
-      hover: 'hover:border-amber-300',
-      hoverBg: 'hover:bg-amber-50',
-      selectedBg: 'bg-amber-50',
+      hover: 'hover:border-amber-300 dark:hover:border-amber-600',
+      hoverBg: 'hover:bg-amber-50 dark:hover:bg-amber-950/40',
+      selectedBg: 'bg-amber-50 dark:bg-amber-950/40',
     },
     green: {
-      icon: 'text-green-600',
-      iconBg: 'bg-green-50',
+      icon: 'text-green-600 dark:text-green-400',
+      iconBg: 'bg-green-50 dark:bg-green-950/40',
       focus: 'focus:ring-green-500/20 focus:border-green-500',
-      hover: 'hover:border-green-300',
-      hoverBg: 'hover:bg-green-50',
-      selectedBg: 'bg-green-50',
+      hover: 'hover:border-green-300 dark:hover:border-green-600',
+      hoverBg: 'hover:bg-green-50 dark:hover:bg-green-950/40',
+      selectedBg: 'bg-green-50 dark:bg-green-950/40',
     },
     purple: {
-      icon: 'text-purple-600',
-      iconBg: 'bg-purple-50',
+      icon: 'text-purple-600 dark:text-purple-400',
+      iconBg: 'bg-purple-50 dark:bg-purple-950/40',
       focus: 'focus:ring-purple-500/20 focus:border-purple-500',
-      hover: 'hover:border-purple-300',
-      hoverBg: 'hover:bg-purple-50',
-      selectedBg: 'bg-purple-50',
+      hover: 'hover:border-purple-300 dark:hover:border-purple-600',
+      hoverBg: 'hover:bg-purple-50 dark:hover:bg-purple-950/40',
+      selectedBg: 'bg-purple-50 dark:bg-purple-950/40',
     },
   };
 
@@ -87,10 +87,10 @@ export function ResumeSelector({
   if (isLoading) {
     return (
       <div>
-        {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
-        <div className="flex items-center gap-2 p-3 border border-slate-200 rounded-xl">
+        {label && <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">{label}</label>}
+        <div className="flex items-center gap-2 p-3 border border-[var(--border)] rounded-xl bg-[var(--surface)]">
           <Loader2 className={`h-5 w-5 ${theme.icon} animate-spin`} />
-          <span className="text-slate-500">Loading resumes...</span>
+          <span className="text-[var(--text-muted)]">Loading resumes...</span>
         </div>
       </div>
     );
@@ -100,11 +100,11 @@ export function ResumeSelector({
   if (resumes.length === 0) {
     return (
       <div>
-        {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
-        <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center">
-          <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-          <p className="text-slate-600 font-medium text-sm">No resumes yet</p>
-          <p className="text-xs text-slate-500 mt-1">Upload a resume to get started</p>
+        {label && <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">{label}</label>}
+        <div className="p-4 border border-dashed border-[var(--border)] rounded-xl text-center bg-[var(--surface)]">
+          <Upload className="h-8 w-8 text-[var(--text-muted)] mx-auto mb-2" />
+          <p className="text-[var(--text-secondary)] font-medium text-sm">No resumes yet</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">Upload a resume to get started</p>
           <Link href="/resumes">
             <Button variant="primary" size="sm" className="mt-3" leftIcon={<Upload className="h-4 w-4" />}>
               Upload Resume
@@ -118,36 +118,36 @@ export function ResumeSelector({
   // Dropdown with resumes
   return (
     <div>
-      {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">{label}</label>}
       <div className="relative">
         <button
           type="button"
           onClick={dropdown.toggle}
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 ${theme.hover} focus:outline-none focus:ring-2 ${theme.focus} transition-all`}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] ${theme.hover} focus:outline-none focus:ring-2 ${theme.focus} transition-all`}
         >
           {selectedResume ? (
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 ${theme.iconBg} rounded-lg flex items-center justify-center`}>
                 <FileText className={`h-4 w-4 ${theme.icon}`} />
               </div>
-              <span className="font-medium">{selectedResume.title || selectedResume.fileName}</span>
+              <span className="font-medium text-[var(--text)]">{selectedResume.title || selectedResume.fileName}</span>
             </div>
           ) : (
-            <span className="text-slate-500">{placeholder}</span>
+            <span className="text-[var(--text-muted)]">{placeholder}</span>
           )}
           <ChevronDown
-            className={`h-5 w-5 text-slate-400 transition-transform ${dropdown.isOpen ? 'rotate-180' : ''}`}
+            className={`h-5 w-5 text-[var(--text-muted)] transition-transform ${dropdown.isOpen ? 'rotate-180' : ''}`}
           />
         </button>
 
         {dropdown.isOpen && (
-          <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg max-h-60 overflow-y-auto">
             {resumes.map((resume) => (
               <button
                 key={resume.id}
                 type="button"
                 onClick={() => handleSelectResume(resume.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 ${theme.hoverBg} transition-colors text-left border-b border-slate-100 last:border-0 ${
+                className={`w-full flex items-center gap-3 px-4 py-3 ${theme.hoverBg} transition-colors text-left border-b border-[var(--border)] last:border-0 ${
                   selectedResumeId === resume.id ? theme.selectedBg : ''
                 }`}
               >
@@ -155,8 +155,8 @@ export function ResumeSelector({
                   <FileText className={`h-4 w-4 ${theme.icon}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 truncate">{resume.title || resume.fileName}</p>
-                  <p className="text-xs text-slate-500 truncate">{resume.fileName}</p>
+                  <p className="font-medium text-[var(--text)] truncate">{resume.title || resume.fileName}</p>
+                  <p className="text-xs text-[var(--text-muted)] truncate">{resume.fileName}</p>
                 </div>
               </button>
             ))}

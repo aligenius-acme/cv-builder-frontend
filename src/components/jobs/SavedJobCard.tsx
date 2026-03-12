@@ -56,10 +56,10 @@ export default function SavedJobCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-slate-900 group-hover:text-pink-600 transition-colors line-clamp-1">
+                <h3 className="font-semibold text-[var(--text)] group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors line-clamp-1">
                   {job.title}
                 </h3>
-                <p className="text-sm text-slate-600 flex items-center gap-1 mt-0.5">
+                <p className="text-sm text-[var(--text-secondary)] flex items-center gap-1 mt-0.5">
                   <Building2 className="h-3.5 w-3.5" />
                   {job.company}
                 </p>
@@ -67,7 +67,7 @@ export default function SavedJobCard({
               <div className="flex items-center gap-1">
                 {isTracked ? (
                   <Link href="/job-tracker">
-                    <Badge variant="info" size="sm" className="cursor-pointer hover:bg-blue-200">
+                    <Badge variant="info" size="sm" className="cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800">
                       <ListChecks className="h-3 w-3 mr-1" />
                       In Tracker
                     </Badge>
@@ -75,7 +75,7 @@ export default function SavedJobCard({
                 ) : (
                   <button
                     onClick={onAddToTracker}
-                    className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600"
+                    className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-[var(--text-muted)] hover:text-emerald-600 dark:hover:text-emerald-400"
                     title="Add to Job Tracker"
                   >
                     <Target className="h-4 w-4" />
@@ -83,7 +83,7 @@ export default function SavedJobCard({
                 )}
                 <button
                   onClick={onRemove}
-                  className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-red-50 text-red-600 hover:text-red-700"
+                  className="p-2 rounded-lg transition-all duration-200 flex-shrink-0 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                   title="Remove from saved"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -91,12 +91,12 @@ export default function SavedJobCard({
               </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-2 text-sm text-slate-500">
+            <div className="flex items-center gap-3 mt-2 text-sm text-[var(--text-muted)]">
               <span className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" />
                 <span className="truncate max-w-[120px]">{job.location}</span>
               </span>
-              <span className="flex items-center gap-1 text-pink-600">
+              <span className="flex items-center gap-1 text-pink-600 dark:text-pink-400">
                 <Calendar className="h-3.5 w-3.5" />
                 Saved {formattedDate}
               </span>

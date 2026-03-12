@@ -32,21 +32,21 @@ export default function TemplateCard({
 
   const getCategoryColor = (category?: string) => {
     const colors: Record<string, string> = {
-      'ats-professional': 'bg-blue-100 text-blue-700',
-      'tech-startup': 'bg-emerald-100 text-emerald-700',
-      'creative-design': 'bg-purple-100 text-purple-700',
-      'academic-research': 'bg-amber-100 text-amber-700',
-      'entry-student': 'bg-pink-100 text-pink-700',
-      'executive-leadership': 'bg-blue-100 text-blue-700',
+      'ats-professional': 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
+      'tech-startup': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300',
+      'creative-design': 'bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300',
+      'academic-research': 'bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300',
+      'entry-student': 'bg-pink-100 text-pink-700 dark:bg-pink-950/50 dark:text-pink-300',
+      'executive-leadership': 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
       // Legacy support for old format
-      'ATS-Professional': 'bg-blue-100 text-blue-700',
-      'Tech-Startup': 'bg-emerald-100 text-emerald-700',
-      'Creative-Design': 'bg-purple-100 text-purple-700',
-      'Academic-Research': 'bg-amber-100 text-amber-700',
-      'Entry-Student': 'bg-pink-100 text-pink-700',
-      'Executive-Leadership': 'bg-blue-100 text-blue-700',
+      'ATS-Professional': 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
+      'Tech-Startup': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300',
+      'Creative-Design': 'bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300',
+      'Academic-Research': 'bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300',
+      'Entry-Student': 'bg-pink-100 text-pink-700 dark:bg-pink-950/50 dark:text-pink-300',
+      'Executive-Leadership': 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
     };
-    return colors[category || ''] || 'bg-gray-100 text-gray-700';
+    return colors[category || ''] || 'bg-[var(--surface-raised)] text-[var(--text-secondary)]';
   };
 
   if (variant === 'compact') {
@@ -54,10 +54,10 @@ export default function TemplateCard({
       <button
         onClick={onClick}
         className={cn(
-          'group relative aspect-square rounded-lg border-2 transition-all duration-300 overflow-hidden bg-gray-50 hover:scale-105',
+          'group relative aspect-square rounded-lg border-2 transition-all duration-300 overflow-hidden bg-[var(--surface-raised)] hover:scale-105',
           selected
-            ? 'border-blue-500 ring-2 ring-blue-200 shadow-lg shadow-blue-200/50'
-            : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+            ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg shadow-blue-200/50'
+            : 'border-[var(--border)] hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md'
         )}
         title={template.name}
       >
@@ -194,12 +194,12 @@ export default function TemplateCard({
         className={cn(
           'group relative p-3 rounded-xl border-2 transition-all duration-300 text-left hover:shadow-xl hover:-translate-y-1 h-full flex flex-col',
           selected
-            ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50 shadow-sm'
-            : 'border-gray-200 hover:border-blue-300 bg-white'
+            ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 bg-blue-50 dark:bg-blue-950/30 shadow-sm'
+            : 'border-[var(--border)] hover:border-blue-300 dark:hover:border-blue-600 bg-[var(--surface)]'
         )}
       >
         {/* Large Preview Thumbnail */}
-        <div className="relative mb-3 rounded-lg overflow-hidden bg-gray-100">
+        <div className="relative mb-3 rounded-lg overflow-hidden bg-[var(--surface-raised)]">
           {template.preview ? (
             <img
               src={template.preview}
@@ -277,11 +277,11 @@ export default function TemplateCard({
 
         {/* Template Info */}
         <div className="flex-1">
-          <h4 className="font-bold text-sm text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+          <h4 className="font-bold text-sm text-[var(--text)] mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 leading-tight">
             {template.name}
           </h4>
           {template.colorName && template.colorName !== template.name && (
-            <p className="text-[10px] text-gray-500 mb-2">{template.colorName}</p>
+            <p className="text-[10px] text-[var(--text-muted)] mb-2">{template.colorName}</p>
           )}
         </div>
 
@@ -298,7 +298,7 @@ export default function TemplateCard({
             </span>
           )}
           {template.designStyle && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">
               {template.designStyle}
             </span>
           )}
@@ -311,7 +311,7 @@ export default function TemplateCard({
 
         {/* Description */}
         {template.description && (
-          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">
             {template.description}
           </p>
         )}
@@ -326,8 +326,8 @@ export default function TemplateCard({
       className={cn(
         'group w-full p-3 rounded-lg border-2 transition-all duration-300 text-left hover:shadow-lg hover:scale-[1.02]',
         selected
-          ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50 shadow-sm'
-          : 'border-gray-200 hover:border-blue-300 bg-white'
+          ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 bg-blue-50 dark:bg-blue-950/30 shadow-sm'
+          : 'border-[var(--border)] hover:border-blue-300 dark:hover:border-blue-600 bg-[var(--surface)]'
       )}
     >
       <div className="flex items-center gap-3">
@@ -338,11 +338,11 @@ export default function TemplateCard({
             alt={template.name}
             loading="lazy"
             decoding="async"
-            className="w-10 h-10 rounded-md flex-shrink-0 shadow-md object-cover ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300"
+            className="w-10 h-10 rounded-md flex-shrink-0 shadow-md object-cover ring-2 ring-[var(--border)] group-hover:ring-blue-200 dark:group-hover:ring-blue-700 transition-all duration-300"
           />
         ) : (
           <div
-            className="w-10 h-10 rounded-md flex-shrink-0 shadow-md ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300 relative overflow-hidden"
+            className="w-10 h-10 rounded-md flex-shrink-0 shadow-md ring-2 ring-[var(--border)] group-hover:ring-blue-200 dark:group-hover:ring-blue-700 transition-all duration-300 relative overflow-hidden"
             style={{
               background: `linear-gradient(135deg, ${template.colorHex || '#1e3a5f'} 0%, ${template.colorHex || '#1e3a5f'}dd 100%)`
             }}
@@ -361,7 +361,7 @@ export default function TemplateCard({
         {/* Template info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-medium text-sm text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-300">
+            <h4 className="font-medium text-sm text-[var(--text)] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
               {template.name}
             </h4>
             {selected && (
