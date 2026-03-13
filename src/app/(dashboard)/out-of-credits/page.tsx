@@ -65,7 +65,15 @@ export default function OutOfCreditsPage() {
     setIsCheckingOut(true);
     try {
       const res = await api.createCheckoutSession();
-      if (res.data?.url) window.location.href = res.data.url;
+      const url = res.data?.url;
+      if (url) {
+        try {
+          const { hostname } = new URL(url);
+          if (hostname === 'checkout.stripe.com' || hostname === 'billing.stripe.com') {
+            window.location.href = url;
+          }
+        } catch { /* invalid url */ }
+      }
     } catch {
       toast.error('Failed to start checkout. Please try again.');
       setIsCheckingOut(false);

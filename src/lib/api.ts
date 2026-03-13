@@ -61,8 +61,12 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       if (token) {
         localStorage.setItem('token', token);
+        // Write a presence flag cookie so Next.js middleware can guard routes
+        const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `auth_present=1; path=/; SameSite=Lax; Max-Age=604800${secure}`;
       } else {
         localStorage.removeItem('token');
+        document.cookie = 'auth_present=; path=/; Max-Age=0';
       }
     }
   }

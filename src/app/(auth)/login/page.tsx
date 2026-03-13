@@ -77,6 +77,18 @@ export default function LoginPage() {
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     const url = oauthProviders.urls[provider];
     if (url) {
+      // Validate URL is a legitimate OAuth provider before redirecting
+      try {
+        const { hostname } = new URL(url);
+        const allowed = ['accounts.google.com', 'github.com'];
+        if (!allowed.includes(hostname)) {
+          toast.error('Invalid OAuth provider URL.');
+          return;
+        }
+      } catch {
+        toast.error('Invalid OAuth URL.');
+        return;
+      }
       setOAuthLoading(provider);
       window.location.href = url;
     } else {

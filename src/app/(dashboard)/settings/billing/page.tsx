@@ -57,11 +57,18 @@ export default function BillingPage() {
     }
   };
 
+  const isValidStripeUrl = (url: string) => {
+    try {
+      const { hostname } = new URL(url);
+      return hostname === 'checkout.stripe.com' || hostname === 'billing.stripe.com';
+    } catch { return false; }
+  };
+
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
     try {
       const res = await api.createCheckoutSession();
-      if (res.data?.url) window.location.href = res.data.url;
+      if (res.data?.url && isValidStripeUrl(res.data.url)) window.location.href = res.data.url;
     } catch {
       toast.error('Failed to start checkout. Please try again.');
       setIsCheckingOut(false);
@@ -72,7 +79,7 @@ export default function BillingPage() {
     setIsOpeningPortal(true);
     try {
       const res = await api.createPortalSession();
-      if (res.data?.url) window.location.href = res.data.url;
+      if (res.data?.url && isValidStripeUrl(res.data.url)) window.location.href = res.data.url;
     } catch {
       toast.error('Failed to open billing portal. Please try again.');
       setIsOpeningPortal(false);
