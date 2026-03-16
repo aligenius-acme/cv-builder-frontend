@@ -14,7 +14,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://www.google-analytics.com",
+      "connect-src 'self' https://*.koyeb.app https://www.google-analytics.com https://www.googletagmanager.com",
       "frame-src 'none'",
       "object-src 'none'",
     ].join('; '),
