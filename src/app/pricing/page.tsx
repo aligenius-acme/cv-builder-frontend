@@ -74,7 +74,7 @@ export default function PricingPage() {
       <nav className="border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold text-blue-600">
-            CV Builder
+            Job Tools
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">

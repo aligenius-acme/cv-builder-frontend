@@ -484,7 +484,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="text"
             value={data.name}
             onChange={(e) => onChange({ ...data, name: e.target.value })}
-            placeholder="John Doe"
+            placeholder="Ali Yousaf"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -497,7 +497,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="email"
             value={data.email}
             onChange={(e) => onChange({ ...data, email: e.target.value })}
-            placeholder="john@example.com"
+            placeholder="you@example.com"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -510,7 +510,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="tel"
             value={data.phone}
             onChange={(e) => onChange({ ...data, phone: e.target.value })}
-            placeholder="+1 (555) 123-4567"
+            placeholder="+44 7700 900000"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -523,7 +523,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="text"
             value={data.location}
             onChange={(e) => onChange({ ...data, location: e.target.value })}
-            placeholder="San Francisco, CA"
+            placeholder="London, UK"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -536,7 +536,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="url"
             value={data.linkedin}
             onChange={(e) => onChange({ ...data, linkedin: e.target.value })}
-            placeholder="linkedin.com/in/johndoe"
+            placeholder="linkedin.com/in/yourname"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -549,7 +549,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="url"
             value={data.github}
             onChange={(e) => onChange({ ...data, github: e.target.value })}
-            placeholder="github.com/johndoe"
+            placeholder="github.com/yourname"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -562,7 +562,7 @@ function ContactEditor({ data, onChange }: { data: Contact; onChange: (data: Con
             type="url"
             value={data.website}
             onChange={(e) => onChange({ ...data, website: e.target.value })}
-            placeholder="johndoe.com"
+            placeholder="yourname.com"
             className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
           />
         </div>
@@ -718,7 +718,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                     type="text"
                     value={exp.location}
                     onChange={(e) => updateExperience(index, { location: e.target.value })}
-                    placeholder="San Francisco, CA"
+                    placeholder="London, UK"
                     className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>
@@ -1354,7 +1354,7 @@ function VolunteerWorkEditor({ data, onChange }: { data: VolunteerWork[]; onChan
                     type="text"
                     value={vol.location}
                     onChange={(e) => updateVolunteerWork(index, { location: e.target.value })}
-                    placeholder="San Francisco, CA"
+                    placeholder="London, UK"
                     className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                   />
                 </div>

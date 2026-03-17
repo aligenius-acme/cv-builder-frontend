@@ -623,7 +623,7 @@ function ApplicationModal({
                 value={formData.location || ''}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400"
-                placeholder="San Francisco, CA"
+                placeholder="London, UK"
               />
             </div>
             <div>

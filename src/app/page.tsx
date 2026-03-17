@@ -189,10 +189,11 @@ export default function Home() {
             <div className="mt-10 lg:mt-0">
               <div className="bg-slate-100 dark:bg-[var(--surface)] rounded-xl p-8 border border-slate-200 dark:border-[var(--border)]">
                 <div className="bg-white dark:bg-[var(--surface-raised)] rounded-xl shadow-sm border border-slate-200 dark:border-[var(--border)] p-8">
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-lg font-semibold text-slate-900 dark:text-white">ATS Score</span>
                     <span className="text-4xl font-bold text-emerald-600">92%</span>
                   </div>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">Example output</p>
                   <div className="h-2 bg-slate-100 dark:bg-[var(--border)] rounded-full overflow-hidden mb-6">
                     <div className="h-full bg-emerald-500 rounded-full" style={{ width: '92%' }} />
                   </div>
@@ -222,8 +223,8 @@ export default function Home() {
             Ready to Land More Interviews?
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Join thousands of job seekers who have improved their interview rates with
-            AI-optimized resumes.
+            Tailor your resume to every job in seconds — AI-powered ATS optimisation,
+            cover letters, interview prep, and salary analysis in one place.
           </p>
           <Link
             href="/register"
@@ -249,7 +250,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-slate-800 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} AI Resume & CV Customizer. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Job Tools. All rights reserved.</p>
           </div>
         </div>
       </footer>

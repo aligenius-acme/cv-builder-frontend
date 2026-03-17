@@ -159,7 +159,7 @@ export default function SalaryAnalyzeTab({ savedJobs, isLoadingSavedJobs }: Sala
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. San Francisco, CA"
+                placeholder="e.g. London, UK"
                 className="w-full px-4 py-2.5 bg-white text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
               />
             </div>

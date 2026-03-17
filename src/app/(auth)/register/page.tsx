@@ -42,21 +42,19 @@ export default function RegisterPage() {
     google: boolean;
     github: boolean;
     urls: { google?: string; github?: string };
-  }>({ google: true, github: true, urls: {} }); // Always show for demo
+  }>({ google: true, github: true, urls: {} });
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load OAuth providers
     api.getOAuthProviders().then((res) => {
       if (res.success && res.data) {
         setOAuthProviders({
-          google: res.data.providers.google || true, // Fallback to true for demo
-          github: res.data.providers.github || true, // Fallback to true for demo
+          google: res.data.providers.google || true,
+          github: res.data.providers.github || true,
           urls: res.data.urls,
         });
       }
     }).catch(() => {
-      // OAuth not configured, but show buttons anyway for demo
       setOAuthProviders({
         google: true,
         github: true,
@@ -142,16 +140,16 @@ export default function RegisterPage() {
               Create resumes that get you hired
             </h2>
             <p className="text-white/80 text-lg mb-8">
-              Join thousands of job seekers who have landed their dream jobs using our AI-powered resume builder.
+              AI-powered tools to tailor your resume for every job application — ATS optimisation, cover letters, interview prep, and more.
             </p>
 
-            {/* Stats */}
+            {/* Feature highlights */}
             <div className="grid grid-cols-2 gap-6 mb-8">
               {[
-                { value: '50K+', label: 'Resumes Created' },
-                { value: '85%', label: 'Interview Rate' },
-                { value: '6', label: 'Template Styles' },
-                { value: '24/7', label: 'AI Support' },
+                { value: '165', label: 'Professional Templates' },
+                { value: '20', label: 'Layout Styles' },
+                { value: 'GPT-4o', label: 'AI Engine' },
+                { value: '24/7', label: 'AI Available' },
               ].map((stat, i) => (
                 <div key={i} className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
                   <p className="text-3xl font-bold">{stat.value}</p>
@@ -160,20 +158,21 @@ export default function RegisterPage() {
               ))}
             </div>
 
-            {/* Testimonial */}
-            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
-              <p className="text-white/90 italic mb-4">
-                "JobTools AI helped me tailor my resume for each application. I got 3x more interviews!"
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="font-semibold">JD</span>
+            {/* What you get */}
+            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm space-y-3">
+              {[
+                'Tailor your resume to any job in seconds',
+                'ATS keyword optimisation & scoring',
+                'AI cover letter & interview prep',
+                'Job application tracker',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3 text-white/90">
+                  <div className="w-5 h-5 bg-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <span className="text-sm">{item}</span>
                 </div>
-                <div>
-                  <p className="font-semibold">John Doe</p>
-                  <p className="text-white/70 text-sm">Software Engineer</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -219,7 +218,7 @@ export default function RegisterPage() {
                     id="firstName"
                     name="firstName"
                     type="text"
-                    placeholder="John"
+                    placeholder="Ali"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     className="pl-11"
@@ -236,7 +235,7 @@ export default function RegisterPage() {
                     id="lastName"
                     name="lastName"
                     type="text"
-                    placeholder="Doe"
+                    placeholder="Yousaf"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     className="pl-11"
