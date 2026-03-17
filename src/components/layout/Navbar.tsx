@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useTheme } from '@/lib/theme';
 import Logo from '@/components/ui/Logo';
@@ -42,6 +42,7 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
 
   // Keep credit count in sync after any AI action without requiring a page refresh
   useEffect(() => {
@@ -255,6 +256,7 @@ export default function Navbar() {
                             onClick={() => {
                               logout();
                               setShowUserMenu(false);
+                              router.push('/login');
                             }}
                             className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                           >
@@ -391,6 +393,7 @@ export default function Navbar() {
                   onClick={() => {
                     logout();
                     setIsOpen(false);
+                    router.push('/login');
                   }}
                   className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
                 >
