@@ -256,7 +256,7 @@ export default function Navbar() {
                             onClick={() => {
                               logout();
                               setShowUserMenu(false);
-                              router.push('/login');
+                              window.location.href = '/login';
                             }}
                             className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                           >
@@ -393,7 +393,7 @@ export default function Navbar() {
                   onClick={() => {
                     logout();
                     setIsOpen(false);
-                    router.push('/login');
+                    window.location.href = '/login';
                   }}
                   className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
                 >
