@@ -19,8 +19,8 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
   });
 
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-    fetch(`${apiUrl}/api/public/settings`)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+    fetch(`${apiUrl}/public/settings`)
       .then((r) => r.json())
       .then((body) => {
         setSettings({
