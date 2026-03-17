@@ -30,7 +30,7 @@ const GitHubIcon = () => (
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, isLoading, error, clearError } = useAuthStore();
+  useAuthStore();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,6 +38,9 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [oauthProviders, setOAuthProviders] = useState<{
     google: boolean;
     github: boolean;
@@ -65,24 +68,26 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setFormError(null);
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      setFormError('Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      toast.error('Password must be at least 8 characters');
+      setFormError('Password must be at least 8 characters');
       return;
     }
 
+    setSubmitting(true);
     try {
-      await register(email, password, firstName, lastName);
-      toast.success('Account created successfully!');
-      router.push('/dashboard');
-    } catch (err) {
-      // Error is handled by store
+      await api.register(email, password, firstName, lastName);
+      setRegistered(true);
+    } catch (err: any) {
+      setFormError(err.response?.data?.error || err.message || 'Registration failed. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -125,6 +130,31 @@ export default function RegisterPage() {
   };
 
   const passwordStrength = getPasswordStrength();
+
+  if (registered) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white px-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <Link href="/"><Logo size="md" /></Link>
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Check your email</h1>
+            <p className="mt-2 text-slate-600">
+              We sent a verification link to <strong>{email}</strong>. Click the link to verify your account and get started.
+            </p>
+          </div>
+          <p className="text-sm text-slate-500">
+            Already verified?{' '}
+            <Link href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -200,9 +230,9 @@ export default function RegisterPage() {
 
           {/* Form */}
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {error && (
+            {formError && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm animate-slide-down">
-                {error}
+                {formError}
               </div>
             )}
 
@@ -361,8 +391,8 @@ export default function RegisterPage() {
               variant="primary"
               className="w-full"
               size="lg"
-              isLoading={isLoading}
-              rightIcon={!isLoading && <ArrowRight className="h-5 w-5" />}
+              isLoading={submitting}
+              rightIcon={!submitting && <ArrowRight className="h-5 w-5" />}
             >
               Create account
             </Button>
