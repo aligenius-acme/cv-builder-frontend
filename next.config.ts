@@ -12,7 +12,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com",
+      "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://*.koyeb.app",
       "font-src 'self' data:",
       "connect-src 'self' https://*.koyeb.app https://www.google-analytics.com https://www.googletagmanager.com",
       "frame-src 'none'",
@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.koyeb.app',
         pathname: '/**',
       },
     ],
