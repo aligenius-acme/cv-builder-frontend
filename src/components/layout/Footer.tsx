@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { proSubscriptionEnabled } = useAppSettings();
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-auto">
@@ -19,7 +23,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Product</h3>
             <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
-              <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+              {proSubscriptionEnabled && (
+                <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+              )}
               <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
               <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
             </ul>

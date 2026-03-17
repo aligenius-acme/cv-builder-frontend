@@ -55,7 +55,7 @@ export default function TermsPage() {
             <p>
               Features that involve AI generation consume <strong>AI credits</strong>. Free accounts receive
               a starter credit allowance. Pro subscribers receive a monthly credit allocation that resets each
-              billing period. See the <Link href="/pricing">pricing page</Link> for current credit limits.
+              billing period. Current credit limits are shown on the pricing page when available.
             </p>
           </Section>
 
@@ -102,8 +102,7 @@ export default function TermsPage() {
 
           <Section title="6. Subscriptions and Billing">
             <ul>
-              <li>Pro subscriptions are billed monthly in advance. Current pricing is displayed on the{' '}
-                <Link href="/pricing">pricing page</Link>.</li>
+              <li>Pro subscriptions are billed monthly in advance. Current pricing is displayed within the application.</li>
               <li>Payment is processed securely by Stripe. We do not store your card details.</li>
               <li>Subscriptions renew automatically each month unless you cancel.</li>
               <li>You may cancel at any time via Settings → Billing. Your Pro access and credits continue until the end of the current billing period.</li>

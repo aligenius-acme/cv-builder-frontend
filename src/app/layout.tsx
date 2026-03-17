@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
-import { ThemeProvider, ThemeScript } from '@/lib/theme';
+import { ThemeScript } from '@/lib/theme';
+import Providers from '@/components/Providers';
+import CookieBanner from '@/components/CookieBanner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,9 +28,9 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <GoogleAnalytics />
+        <Providers>
           {children}
+          <CookieBanner />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -47,7 +48,7 @@ export default function RootLayout({
               },
             }}
           />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

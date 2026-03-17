@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { Check, Zap, Crown, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -39,6 +41,14 @@ const PRO_FEATURES = [
 
 export default function PricingPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const router = useRouter();
+  const { proSubscriptionEnabled, isLoaded } = useAppSettings();
+
+  // Redirect away if pro is disabled — this page serves no purpose without it
+  if (isLoaded && !proSubscriptionEnabled) {
+    router.replace('/dashboard');
+    return null;
+  }
 
   const handleUpgrade = async () => {
     setIsCheckingOut(true);
