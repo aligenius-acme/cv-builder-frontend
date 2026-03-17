@@ -38,11 +38,15 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const [showUploader, setShowUploader] = useState(false);
 
+  const isAdmin = user?.role === 'ADMIN';
+
   // Use useFetchMultiple for parallel data loading - replaces 25+ lines!
   const { data, isLoading, setData } = useFetchMultiple([
     () => api.getResumes(),
     () => api.getCoverLetters().catch(() => ({ success: true, data: [] })),
-    () => api.getCareerDashboardStats().catch(() => ({ success: false, data: null })),
+    () => isAdmin
+      ? api.getCareerDashboardStats().catch(() => ({ success: false, data: null }))
+      : Promise.resolve({ success: false, data: null }),
   ], {
     showErrorToast: false, // Silent errors for dashboard
   });
