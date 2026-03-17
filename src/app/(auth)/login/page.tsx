@@ -30,9 +30,10 @@ const GitHubIcon = () => (
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, error, clearError, setUser } = useAuthStore();
+  const { login, isLoading, setUser } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [oauthProviders, setOAuthProviders] = useState<{
     google: boolean;
@@ -61,14 +62,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setError(null);
 
     try {
       await login(email, password);
       toast.success('Welcome back!');
       router.push('/dashboard');
-    } catch (err) {
-      // Error is handled by store
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || 'Invalid email or password');
     }
   };
 
