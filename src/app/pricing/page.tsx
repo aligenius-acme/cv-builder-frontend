@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Zap, Crown, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
+import Footer from '@/components/layout/Footer';
 import { Card, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -204,6 +205,7 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

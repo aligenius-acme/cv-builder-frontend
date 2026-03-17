@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 export default function DashboardLayout({
   children,
@@ -44,6 +45,7 @@ export default function DashboardLayout({
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Navbar />
       <main>{children}</main>
+      <Footer />
     </div>
   );
 }
