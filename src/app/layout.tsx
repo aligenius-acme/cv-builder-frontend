@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="impact-site-verification" value="b87ad12d-b12f-4e19-9746-c0d9026edced" />
+        <meta name="impact-site-verification" content="b87ad12d-b12f-4e19-9746-c0d9026edced" />
         <ThemeScript />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
