@@ -13,7 +13,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'JobTools AI - AI-Powered Job Search Platform',
-  description: 'Complete toolkit for your job search. AI-powered resume customization, ATS optimization, interview prep, job tracking, salary analysis, and more.',
+  description: 'AI-powered resume tailoring platform that helps job seekers pass ATS filters, match job description keywords, and land more interviews. Generate cover letters, analyse skill gaps, and track job applications — all in one place.',
   keywords: ['job search', 'resume', 'cv', 'ats', 'interview prep', 'ai', 'career tools', 'job application', 'job tracker', 'salary analyzer'],
 };
 
@@ -25,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="impact-site-verification" value="b87ad12d-b12f-4e19-9746-c0d9026edced" />
         <ThemeScript />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
