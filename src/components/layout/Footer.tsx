@@ -12,29 +12,41 @@ export default function Footer() {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className={`grid grid-cols-1 gap-8 mb-8 ${(!isAuthenticated || proSubscriptionEnabled) ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+
           {/* Brand */}
           <div>
             <span className="text-lg font-bold text-blue-600">Job Tools</span>
             <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
-              AI-powered tools to help you land your next job faster — resume tailoring, ATS analysis, cover letters, and more.
+              {isAuthenticated
+                ? 'Your AI-powered job search toolkit.'
+                : 'AI-powered tools to help you land your next job faster — resume tailoring, ATS analysis, cover letters, and more.'}
             </p>
           </div>
 
-          {/* Product — only shown to guests, or to authenticated users when pricing is enabled */}
-          {(!isAuthenticated || proSubscriptionEnabled) && (
+          {/* Middle column — Quick Links for auth, Product for guests */}
+          {isAuthenticated ? (
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Quick Links</h3>
+              <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+                <li><Link href="/dashboard" className="hover:text-blue-600 transition-colors">Dashboard</Link></li>
+                <li><Link href="/resumes" className="hover:text-blue-600 transition-colors">My Resumes</Link></li>
+                <li><Link href="/job-tracker" className="hover:text-blue-600 transition-colors">Job Tracker</Link></li>
+                <li><Link href="/cover-letters" className="hover:text-blue-600 transition-colors">Cover Letters</Link></li>
+                {proSubscriptionEnabled && (
+                  <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+                )}
+              </ul>
+            </div>
+          ) : (
             <div>
               <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Product</h3>
               <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
                 {proSubscriptionEnabled && (
                   <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
                 )}
-                {!isAuthenticated && (
-                  <>
-                    <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
-                    <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
-                  </>
-                )}
+                <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
+                <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
               </ul>
             </div>
           )}

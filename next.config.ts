@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options',    value: 'nosniff' },
   { key: 'X-Frame-Options',           value: 'SAMEORIGIN' },
@@ -12,10 +14,14 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://*.koyeb.app",
+      isDev
+        ? "img-src 'self' data: blob: http://localhost:3001 https://res.cloudinary.com https://www.google-analytics.com https://*.koyeb.app"
+        : "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://*.koyeb.app",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.koyeb.app https://www.google-analytics.com https://www.googletagmanager.com",
-      "frame-src blob:",
+      isDev
+        ? "connect-src 'self' http://localhost:3001 ws://localhost:3001 https://www.google-analytics.com https://www.googletagmanager.com"
+        : "connect-src 'self' https://*.koyeb.app https://www.google-analytics.com https://www.googletagmanager.com",
+      isDev ? "frame-src blob: http://localhost:3001" : "frame-src blob:",
       "object-src 'none'",
     ].join('; '),
   },
