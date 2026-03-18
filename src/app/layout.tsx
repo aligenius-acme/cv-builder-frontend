@@ -25,7 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="impact-site-verification" content="b87ad12d-b12f-4e19-9746-c0d9026edced" />
+        {/* @ts-expect-error Impact.com verification requires non-standard 'value' attribute */}
+        <meta name="impact-site-verification" value="3ab3e647-1359-474a-9438-50d07b760b58" />
         <ThemeScript />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
