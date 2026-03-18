@@ -12,7 +12,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+        <div className={`grid grid-cols-1 gap-8 mb-8 ${(!isAuthenticated || proSubscriptionEnabled) ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
           {/* Brand */}
           <div>
             <span className="text-lg font-bold text-blue-600">Job Tools</span>
@@ -21,21 +21,23 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Product */}
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Product</h3>
-            <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
-              {proSubscriptionEnabled && (
-                <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
-              )}
-              {!isAuthenticated && (
-                <>
-                  <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
-                  <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
-                </>
-              )}
-            </ul>
-          </div>
+          {/* Product — only shown to guests, or to authenticated users when pricing is enabled */}
+          {(!isAuthenticated || proSubscriptionEnabled) && (
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Product</h3>
+              <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+                {proSubscriptionEnabled && (
+                  <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+                )}
+                {!isAuthenticated && (
+                  <>
+                    <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
+                    <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
+                  </>
+                )}
+              </ul>
+            </div>
+          )}
 
           {/* Legal */}
           <div>
