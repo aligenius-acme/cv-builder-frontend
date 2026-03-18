@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
+import { useAuthStore } from '@/store/auth';
 import { Check, Zap, Crown, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -43,6 +44,7 @@ export default function PricingPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const router = useRouter();
   const { proSubscriptionEnabled, isLoaded } = useAppSettings();
+  const { isAuthenticated } = useAuthStore();
 
   // Redirect away if pro is disabled — this page serves no purpose without it
   if (isLoaded && !proSubscriptionEnabled) {
@@ -77,12 +79,20 @@ export default function PricingPage() {
             Job Tools
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">Sign in</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="primary" size="sm">Get started free</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button variant="primary" size="sm">Go to dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">Sign in</Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="primary" size="sm">Get started free</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -128,9 +138,9 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link href="/register">
+              <Link href={isAuthenticated ? '/dashboard' : '/register'}>
                 <Button variant="outline" className="w-full">
-                  Get started free
+                  {isAuthenticated ? 'Go to dashboard' : 'Get started free'}
                 </Button>
               </Link>
             </CardContent>

@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
+import { useAuthStore } from '@/store/auth';
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const { proSubscriptionEnabled } = useAppSettings();
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface)] mt-auto">
@@ -26,8 +28,12 @@ export default function Footer() {
               {proSubscriptionEnabled && (
                 <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
               )}
-              <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
-              <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
+              {!isAuthenticated && (
+                <>
+                  <li><Link href="/register" className="hover:text-blue-600 transition-colors">Get started free</Link></li>
+                  <li><Link href="/login" className="hover:text-blue-600 transition-colors">Sign in</Link></li>
+                </>
+              )}
             </ul>
           </div>
 
