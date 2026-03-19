@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { ApiResponse, User, Resume, ResumeVersion, CoverLetter, ATSAnalysis, ResumeTemplate } from '@/types';
+import { ApiResponse, User, Resume, ResumeVersion, CoverLetter, ATSAnalysis, ResumeTemplate, ParsedResumeData } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -340,10 +340,21 @@ class ApiClient {
     return response.data;
   }
 
-  async simulateATS(resumeId: string, versionId: string) {
+  async simulateATS(resumeId: string, versionId: string, force = false) {
     const response = await this.client.post<ApiResponse<ATSAnalysis>>(
-      `/resumes/${resumeId}/versions/${versionId}/simulate-ats`
+      `/resumes/${resumeId}/versions/${versionId}/simulate-ats`,
+      undefined,
+      force ? { params: { force: 'true' } } : undefined
     );
+    return response.data;
+  }
+
+  async optimizeVersion(resumeId: string, versionId: string) {
+    const response = await this.client.post<ApiResponse<{
+      tailoredData: ParsedResumeData;
+      tailoredText: string;
+      updatedAt: string;
+    }>>(`/resumes/${resumeId}/versions/${versionId}/optimize`);
     return response.data;
   }
 

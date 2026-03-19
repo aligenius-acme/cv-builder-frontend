@@ -39,7 +39,7 @@ import {
   BookOpen,
   ExternalLink,
 } from 'lucide-react';
-import { ATSAnalysis, SectionAnalysis, SkillsAnalysis, SectionImprovement, BulletImprovement } from '@/types';
+import { ATSAnalysis, SectionAnalysis, SkillsAnalysis, SectionImprovement, BulletImprovement, ParsedResumeData } from '@/types';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
@@ -56,6 +56,8 @@ interface ATSSimulatorProps {
   initialScore?: number;
   initialAnalysis?: ATSAnalysis;
   initialCourseRecommendations?: CourseRecommendation[];
+  initialSkills?: string[];
+  onVersionUpdated?: () => void;
 }
 
 function isSkillsAnalysis(data: SectionAnalysis | SkillsAnalysis): data is SkillsAnalysis {
@@ -72,11 +74,19 @@ export default function ATSSimulator({
   initialScore,
   initialAnalysis,
   initialCourseRecommendations,
+  initialSkills,
+  onVersionUpdated,
 }: ATSSimulatorProps) {
   const [analysis, setAnalysis] = useState<ATSAnalysis | null>(initialAnalysis || null);
   const [courseRecommendations, setCourseRecommendations] = useState<CourseRecommendation[]>(
     initialCourseRecommendations || []
   );
+  const [currentSkills, setCurrentSkills] = useState<string[]>(initialSkills || []);
+  const [addedKeywords, setAddedKeywords] = useState<Set<string>>(new Set());
+  const [savingKeyword, setSavingKeyword] = useState<string | null>(null);
+  const [isSavingAllKeywords, setIsSavingAllKeywords] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [showSkillsAddedInfo, setShowSkillsAddedInfo] = useState(false);
 
   useEffect(() => {
     if (initialCourseRecommendations && initialCourseRecommendations.length > 0) {
@@ -93,9 +103,10 @@ export default function ATSSimulator({
     try {
       const response = await api.simulateATS(resumeId, versionId);
       if (response.success && response.data) {
-        setAnalysis(response.data);
-        if ((response.data as any).courseRecommendations) {
-          setCourseRecommendations((response.data as any).courseRecommendations);
+        const data = response.data as ATSAnalysis & { courseRecommendations?: CourseRecommendation[] };
+        setAnalysis(data);
+        if (data.courseRecommendations) {
+          setCourseRecommendations(data.courseRecommendations);
         }
         toast.success('ATS simulation complete');
       }
@@ -105,6 +116,88 @@ export default function ATSSimulator({
       toast.error(msg);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const moveKeywordsToMatched = (keywords: string[]) => {
+    setAnalysis(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        missingKeywords: prev.missingKeywords.filter(k => !keywords.includes(k)),
+        matchedKeywords: [...prev.matchedKeywords, ...keywords],
+      };
+    });
+  };
+
+  const addKeywordToSkills = async (keyword: string) => {
+    if (addedKeywords.has(keyword) || savingKeyword) return;
+    setSavingKeyword(keyword);
+    try {
+      const updatedSkills = [...currentSkills, keyword];
+      const response = await api.updateVersionContent(resumeId, versionId, { skills: updatedSkills });
+      if (response.success) {
+        setCurrentSkills(updatedSkills);
+        setAddedKeywords(prev => new Set(prev).add(keyword));
+        moveKeywordsToMatched([keyword]);
+        toast.success(`"${keyword}" added to skills`);
+      }
+    } catch {
+      toast.error('Failed to add keyword');
+    } finally {
+      setSavingKeyword(null);
+    }
+  };
+
+  const addAllKeywords = async () => {
+    if (!analysis || isSavingAllKeywords) return;
+    const toAdd = analysis.missingKeywords.filter(k => !addedKeywords.has(k));
+    if (toAdd.length === 0) return;
+    setIsSavingAllKeywords(true);
+    try {
+      const updatedSkills = [...currentSkills, ...toAdd];
+      const response = await api.updateVersionContent(resumeId, versionId, { skills: updatedSkills });
+      if (response.success) {
+        setCurrentSkills(updatedSkills);
+        setAddedKeywords(prev => {
+          const next = new Set(prev);
+          toAdd.forEach(k => next.add(k));
+          return next;
+        });
+        moveKeywordsToMatched(toAdd);
+        setShowSkillsAddedInfo(true);
+        toast.success(`${toAdd.length} keyword${toAdd.length !== 1 ? 's' : ''} added to skills`);
+      }
+    } catch {
+      toast.error('Failed to add keywords');
+    } finally {
+      setIsSavingAllKeywords(false);
+    }
+  };
+
+  const optimizeAll = async () => {
+    if (isOptimizing) return;
+    setIsOptimizing(true);
+    try {
+      const response = await api.optimizeVersion(resumeId, versionId);
+      if (response.success && analysis) {
+        const allMissing = [...analysis.missingKeywords];
+        setCurrentSkills(prev => [...prev, ...allMissing]);
+        setAddedKeywords(prev => {
+          const next = new Set(prev);
+          allMissing.forEach(k => next.add(k));
+          return next;
+        });
+        moveKeywordsToMatched(allMissing);
+        setShowSkillsAddedInfo(true);
+        onVersionUpdated?.();
+        toast.success(`${allMissing.length} keyword${allMissing.length !== 1 ? 's' : ''} added to your skills section`);
+      }
+    } catch (error: unknown) {
+      const axiosErr = error as { response?: { data?: { error?: string } }; message?: string };
+      toast.error(axiosErr?.response?.data?.error || 'Failed to add keywords');
+    } finally {
+      setIsOptimizing(false);
     }
   };
 
@@ -173,7 +266,7 @@ export default function ATSSimulator({
               <Button
                 variant="primary"
                 size="lg"
-                onClick={runSimulation}
+                onClick={() => runSimulation()}
                 isLoading={isLoading}
                 leftIcon={<Zap className="h-5 w-5" />}
                 className="px-8 py-4 text-lg shadow-xl"
@@ -269,16 +362,57 @@ export default function ATSSimulator({
               </div>
             </div>
           </div>
-          <button
-            onClick={runSimulation}
-            disabled={isLoading}
-            className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-white text-sm transition-colors"
-          >
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-            Rescan
-          </button>
         </div>
       </Card>
+
+      {/* Add Missing Keywords Banner */}
+      {analysis.missingKeywords.length > 0 && analysis.score < 85 && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 py-4 rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-800">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+                Add Missing Keywords to Skills
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Adds {analysis.missingKeywords.length} keyword{analysis.missingKeywords.length !== 1 ? 's' : ''} to your skills section. For a higher score, also weave them into your experience bullets.
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={optimizeAll}
+            isLoading={isOptimizing}
+            leftIcon={<Zap className="h-4 w-4" />}
+            className="flex-shrink-0 whitespace-nowrap"
+          >
+            {isOptimizing ? 'Adding…' : 'Add to Skills'}
+          </Button>
+        </div>
+      )}
+
+      {/* Skills Added Info */}
+      {showSkillsAddedInfo && (
+        <div className="flex items-start gap-3 px-5 py-4 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800">
+          <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">Keywords saved to your skills section</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+              Real ATS systems (Workday, Greenhouse, Taleo) will now match these keywords. Our AI simulator also scores <span className="font-medium">contextual usage</span> — to push your score higher, work these keywords into your experience bullet points and summary too.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSkillsAddedInfo(false)}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex-shrink-0 mt-0.5"
+            aria-label="Dismiss"
+          >
+            <XCircle className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Disclaimer */}
       <div className="flex items-start gap-2.5 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
@@ -502,14 +636,29 @@ export default function ATSSimulator({
                         {sectionData.missing.length > 0 && (
                           <div>
                             <p className="text-xs font-bold text-red-600 uppercase tracking-wide mb-2">
-                              Missing critical skills — add these to your resume:
+                              Missing critical skills — click to add:
                             </p>
                             <div className="flex flex-wrap gap-2">
-                              {sectionData.missing.map((s, i) => (
-                                <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
-                                  <XCircle className="h-3 w-3" />{s}
-                                </span>
-                              ))}
+                              {sectionData.missing.map((s, i) => {
+                                const isAdded = addedKeywords.has(s);
+                                const isLoading = savingKeyword === s;
+                                return isAdded ? (
+                                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                                    <CheckCircle className="h-3 w-3" />{s}
+                                  </span>
+                                ) : (
+                                  <button
+                                    key={i}
+                                    onClick={() => addKeywordToSkills(s)}
+                                    disabled={!!savingKeyword || isSavingAllKeywords}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 group"
+                                  >
+                                    {isLoading ? <RefreshCw className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3 group-hover:hidden" />}
+                                    {!isLoading && <CheckCircle className="h-3 w-3 hidden group-hover:inline text-emerald-600" />}
+                                    {s}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -703,16 +852,51 @@ export default function ATSSimulator({
           <CardContent>
             {analysis.missingKeywords.length > 0 ? (
               <>
-                <p className="text-sm text-slate-600 mb-3">
-                  Consider adding these keywords to improve your match rate:
-                </p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-slate-600">
+                    Click a keyword to add it directly to your skills:
+                  </p>
+                  {analysis.missingKeywords.some(k => !addedKeywords.has(k)) && (
+                    <button
+                      onClick={addAllKeywords}
+                      disabled={isSavingAllKeywords}
+                      className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {isSavingAllKeywords ? (
+                        <RefreshCw className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <CheckCheck className="h-3 w-3" />
+                      )}
+                      Add All
+                    </button>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {analysis.missingKeywords.map((keyword, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium">
-                      <XCircle className="h-3.5 w-3.5" />
-                      {keyword}
-                    </span>
-                  ))}
+                  {analysis.missingKeywords.map((keyword, i) => {
+                    const isAdded = addedKeywords.has(keyword);
+                    const isLoading = savingKeyword === keyword;
+                    return isAdded ? (
+                      <span key={i} className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        {keyword}
+                      </span>
+                    ) : (
+                      <button
+                        key={i}
+                        onClick={() => addKeywordToSkills(keyword)}
+                        disabled={!!savingKeyword || isSavingAllKeywords}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 group"
+                      >
+                        {isLoading ? (
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <XCircle className="h-3.5 w-3.5 group-hover:hidden" />
+                        )}
+                        {!isLoading && <CheckCircle className="h-3.5 w-3.5 hidden group-hover:inline text-emerald-600" />}
+                        {keyword}
+                      </button>
+                    );
+                  })}
                 </div>
                 {/* Affiliate course recommendations */}
                 {courseRecommendations.length > 0 && (

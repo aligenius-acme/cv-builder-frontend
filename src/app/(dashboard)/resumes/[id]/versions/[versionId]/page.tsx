@@ -796,6 +796,8 @@ export default function VersionDetailPage() {
             detailedRecommendations: version.atsDetails.detailedRecommendations,
           } : undefined}
           initialCourseRecommendations={courseRecommendations.length > 0 ? courseRecommendations : undefined}
+          initialSkills={Array.isArray(version.tailoredData?.skills) ? version.tailoredData.skills as string[] : []}
+          onVersionUpdated={loadVersion}
         />
 
         {/* ── What Changed (AI explanation — structured) ───────────────────── */}
