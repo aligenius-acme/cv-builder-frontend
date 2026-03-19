@@ -37,27 +37,15 @@ export default function LoginPage() {
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [oauthProviders, setOAuthProviders] = useState<{
-    google: boolean;
-    github: boolean;
-    urls: { google?: string; github?: string };
-    loaded: boolean;
-  }>({ google: true, github: true, urls: {}, loaded: false });
+  const [oauthUrls, setOAuthUrls] = useState<{ google?: string; github?: string }>({});
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
     api.getOAuthProviders().then((res) => {
-      if (res.success && res.data) {
-        setOAuthProviders({
-          google: res.data.providers.google && !!res.data.urls.google,
-          github: res.data.providers.github && !!res.data.urls.github,
-          urls: res.data.urls,
-          loaded: true,
-        });
+      if (res.success && res.data?.urls) {
+        setOAuthUrls(res.data.urls);
       }
-    }).catch(() => {
-      setOAuthProviders(prev => ({ ...prev, loaded: true }));
-    });
+    }).catch(() => {});
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,15 +80,8 @@ export default function LoginPage() {
   };
 
   const handleOAuthLogin = (provider: 'google' | 'github') => {
-    const url = oauthProviders.urls[provider];
+    const url = oauthUrls[provider];
     if (!url) return;
-    try {
-      const { hostname } = new URL(url);
-      const allowed = ['accounts.google.com', 'github.com'];
-      if (!allowed.includes(hostname)) return;
-    } catch {
-      return;
-    }
     setOAuthLoading(provider);
     window.location.href = url;
   };
@@ -219,8 +200,7 @@ export default function LoginPage() {
             </Button>
 
             {/* OAuth Buttons */}
-            {(oauthProviders.google || oauthProviders.github) && (
-              <>
+            <>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200" />
@@ -231,27 +211,24 @@ export default function LoginPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {oauthProviders.google && (
-                    <button
-                      type="button"
-                      onClick={() => handleOAuthLogin('google')}
-                      disabled={!!oauthLoading || !oauthProviders.loaded}
-                      className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
-                    >
-                      {oauthLoading === 'google' ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <GoogleIcon />
-                      )}
-                      <span className="text-sm font-medium text-slate-700">Google</span>
-                    </button>
-                  )}
-                  {oauthProviders.github && (
-                    <button
-                      type="button"
-                      onClick={() => handleOAuthLogin('github')}
-                      disabled={!!oauthLoading || !oauthProviders.loaded}
-                      className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  <button
+                    type="button"
+                    onClick={() => handleOAuthLogin('google')}
+                    disabled={!!oauthLoading}
+                    className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    {oauthLoading === 'google' ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <GoogleIcon />
+                    )}
+                    <span className="text-sm font-medium text-slate-700">Google</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOAuthLogin('github')}
+                    disabled={!!oauthLoading}
+                    className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {oauthLoading === 'github' ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -260,10 +237,8 @@ export default function LoginPage() {
                       )}
                       <span className="text-sm font-medium text-slate-700">GitHub</span>
                     </button>
-                  )}
                 </div>
-              </>
-            )}
+            </>
 
             <p className="text-center text-sm text-slate-600">
               Don't have an account?{' '}
