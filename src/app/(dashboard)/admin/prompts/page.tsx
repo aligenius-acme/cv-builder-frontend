@@ -127,6 +127,15 @@ const PROMPT_META: Record<string, { description: string; category: string; varia
     description: 'Evaluates interview answers on a 1-10 scale with honest feedback, identified issues, and an improved example.',
     category: 'Interview Prep',
   },
+  // Outreach
+  follow_up_email: {
+    description: 'System instructions for writing thank-you, post-interview, no-response, rejection, and networking follow-up emails. Candidate context is injected separately.',
+    category: 'Outreach',
+  },
+  networking_message: {
+    description: 'System instructions for writing LinkedIn, email, and Twitter cold-outreach and networking messages. Sender/recipient context is injected separately.',
+    category: 'Outreach',
+  },
 };
 
 const CATEGORY_CONFIG: Record<string, { icon: React.ElementType; color: string; borderColor: string; bgColor: string }> = {
@@ -136,9 +145,10 @@ const CATEGORY_CONFIG: Record<string, { icon: React.ElementType; color: string; 
   'Writing Assistant': { icon: PenTool,     color: 'text-amber-600',  borderColor: 'border-amber-200 dark:border-amber-900/40',  bgColor: 'bg-amber-50 dark:bg-amber-900/10' },
   'Salary Analyzer':   { icon: DollarSign,  color: 'text-teal-600',   borderColor: 'border-teal-200 dark:border-teal-900/40',    bgColor: 'bg-teal-50 dark:bg-teal-900/10' },
   'Interview Prep':    { icon: BookOpen,    color: 'text-rose-600',   borderColor: 'border-rose-200 dark:border-rose-900/40',    bgColor: 'bg-rose-50 dark:bg-rose-900/10' },
+  'Outreach':          { icon: Mail,        color: 'text-indigo-600', borderColor: 'border-indigo-200 dark:border-indigo-900/40', bgColor: 'bg-indigo-50 dark:bg-indigo-900/10' },
 };
 
-const CATEGORY_ORDER = ['Resume Pipeline', 'Cover Letters', 'Career Tools', 'Writing Assistant', 'Salary Analyzer', 'Interview Prep'];
+const CATEGORY_ORDER = ['Resume Pipeline', 'Cover Letters', 'Career Tools', 'Writing Assistant', 'Salary Analyzer', 'Interview Prep', 'Outreach'];
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function AdminPromptsPage() {
