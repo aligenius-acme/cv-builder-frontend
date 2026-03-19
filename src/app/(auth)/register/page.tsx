@@ -41,15 +41,29 @@ export default function RegisterPage() {
   const [registered, setRegistered] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [oauthUrls, setOAuthUrls] = useState<{ google?: string; github?: string }>({});
+  const [oauthProviders, setOAuthProviders] = useState<{
+    google: boolean;
+    github: boolean;
+    urls: { google?: string; github?: string };
+  }>({ google: true, github: true, urls: {} });
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
     api.getOAuthProviders().then((res) => {
-      if (res.success && res.data?.urls) {
-        setOAuthUrls(res.data.urls);
+      if (res.success && res.data) {
+        setOAuthProviders({
+          google: res.data.providers.google || true,
+          github: res.data.providers.github || true,
+          urls: res.data.urls,
+        });
       }
-    }).catch(() => {});
+    }).catch(() => {
+      setOAuthProviders({
+        google: true,
+        github: true,
+        urls: {},
+      });
+    });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,10 +92,26 @@ export default function RegisterPage() {
   };
 
   const handleOAuthLogin = (provider: 'google' | 'github') => {
-    const url = oauthUrls[provider];
-    if (!url) return;
-    setOAuthLoading(provider);
-    window.location.href = url;
+    const url = oauthProviders.urls[provider];
+    if (url) {
+      // Validate URL is a legitimate OAuth provider before redirecting
+      try {
+        const { hostname } = new URL(url);
+        const allowed = ['accounts.google.com', 'github.com'];
+        if (!allowed.includes(hostname)) {
+          toast.error('Invalid OAuth provider URL.');
+          return;
+        }
+      } catch {
+        toast.error('Invalid OAuth URL.');
+        return;
+      }
+      setOAuthLoading(provider);
+      window.location.href = url;
+    } else {
+      // OAuth not configured in backend
+      toast.error(`${provider === 'google' ? 'Google' : 'GitHub'} OAuth is not configured. Please add credentials to backend .env file.`);
+    }
   };
 
   // Password strength indicator
@@ -368,7 +398,8 @@ export default function RegisterPage() {
             </Button>
 
             {/* OAuth Buttons */}
-            <>
+            {(oauthProviders.google || oauthProviders.github) && (
+              <>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200" />
@@ -379,34 +410,39 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthLogin('google')}
-                    disabled={!!oauthLoading}
-                    className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
-                  >
-                    {oauthLoading === 'google' ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <GoogleIcon />
-                    )}
-                    <span className="text-sm font-medium text-slate-700">Google</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOAuthLogin('github')}
-                    disabled={!!oauthLoading}
-                    className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
-                  >
-                    {oauthLoading === 'github' ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <GitHubIcon />
-                    )}
-                    <span className="text-sm font-medium text-slate-700">GitHub</span>
-                  </button>
+                  {oauthProviders.google && (
+                    <button
+                      type="button"
+                      onClick={() => handleOAuthLogin('google')}
+                      disabled={!!oauthLoading}
+                      className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    >
+                      {oauthLoading === 'google' ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <GoogleIcon />
+                      )}
+                      <span className="text-sm font-medium text-slate-700">Google</span>
+                    </button>
+                  )}
+                  {oauthProviders.github && (
+                    <button
+                      type="button"
+                      onClick={() => handleOAuthLogin('github')}
+                      disabled={!!oauthLoading}
+                      className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    >
+                      {oauthLoading === 'github' ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <GitHubIcon />
+                      )}
+                      <span className="text-sm font-medium text-slate-700">GitHub</span>
+                    </button>
+                  )}
                 </div>
-            </>
+              </>
+            )}
 
             <p className="text-center text-sm text-slate-600">
               Already have an account?{' '}
