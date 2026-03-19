@@ -41,24 +41,20 @@ export default function LoginPage() {
     google: boolean;
     github: boolean;
     urls: { google?: string; github?: string };
-  }>({ google: true, github: true, urls: {} });
+  }>({ google: false, github: false, urls: {} });
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
     api.getOAuthProviders().then((res) => {
       if (res.success && res.data) {
         setOAuthProviders({
-          google: res.data.providers.google || true,
-          github: res.data.providers.github || true,
+          google: res.data.providers.google && !!res.data.urls.google,
+          github: res.data.providers.github && !!res.data.urls.github,
           urls: res.data.urls,
         });
       }
     }).catch(() => {
-      setOAuthProviders({
-        google: true,
-        github: true,
-        urls: {},
-      });
+      // OAuth not available
     });
   }, []);
 
