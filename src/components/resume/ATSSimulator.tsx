@@ -280,6 +280,15 @@ export default function ATSSimulator({
         </div>
       </Card>
 
+      {/* Disclaimer */}
+      <div className="flex items-start gap-2.5 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <AlertCircle className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          <span className="font-semibold text-slate-600 dark:text-slate-300">AI-estimated scores — </span>
+          this analysis simulates ATS behaviour based on keyword matching and resume structure. Actual ATS results vary by system (Workday, Greenhouse, Taleo, etc.). Use this as directional guidance, not a guarantee.
+        </p>
+      </div>
+
       {/* Apply Verdict */}
       {analysis.applyVerdict && (() => {
         const verdict = analysis.applyVerdict;
