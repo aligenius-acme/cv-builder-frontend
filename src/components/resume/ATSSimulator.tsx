@@ -280,6 +280,28 @@ export default function ATSSimulator({
         </div>
       </Card>
 
+      {/* Apply Verdict */}
+      {analysis.applyVerdict && (() => {
+        const verdict = analysis.applyVerdict;
+        const isApplyNow = verdict.startsWith('Apply Now');
+        const isDontApply = verdict.startsWith("Don't Apply");
+        const bgColor = isApplyNow ? 'bg-emerald-900' : isDontApply ? 'bg-red-900' : 'bg-amber-900';
+        const borderColor = isApplyNow ? 'border-emerald-700' : isDontApply ? 'border-red-700' : 'border-amber-700';
+        const iconColor = isApplyNow ? 'text-emerald-300' : isDontApply ? 'text-red-300' : 'text-amber-300';
+        const textColor = isApplyNow ? 'text-emerald-200' : isDontApply ? 'text-red-200' : 'text-amber-200';
+        return (
+          <div className={`flex items-start gap-4 p-5 ${bgColor} rounded-xl border ${borderColor} shadow-sm`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 bg-white/10`}>
+              <CheckCircle className={`h-5 w-5 ${iconColor}`} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1.5">Apply Verdict</p>
+              <p className={`${textColor} leading-relaxed text-sm font-medium`}>{verdict}</p>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Honest Assessment */}
       {analysis.honestAssessment && (
         <div className="flex items-start gap-4 p-5 bg-slate-900 rounded-xl border border-slate-700 shadow-sm">
@@ -1007,7 +1029,18 @@ export default function ATSSimulator({
               </div>
             </div>
             <div className="bg-white rounded-xl p-5 border border-amber-200">
-              <p className="text-slate-700 leading-relaxed">{analysis.competitorComparison}</p>
+              {Array.isArray(analysis.competitorComparison) ? (
+                <ul className="space-y-2">
+                  {(analysis.competitorComparison as string[]).map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-700 text-sm">
+                      <span className="text-amber-500 font-bold mt-0.5 flex-shrink-0">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-slate-700 leading-relaxed">{analysis.competitorComparison as string}</p>
+              )}
             </div>
           </div>
         </div>

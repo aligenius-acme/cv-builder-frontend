@@ -197,7 +197,8 @@ export interface ATSAnalysis {
   atsExtractedView: string;
   riskyElements: string[];
   honestAssessment?: string;
-  competitorComparison?: string;
+  competitorComparison?: string | string[];
+  applyVerdict?: string;
   detailedRecommendations?: {
     criticalIssues: DetailedRecommendation[];
     missingKeywordDetails: MissingKeywordDetail[];
