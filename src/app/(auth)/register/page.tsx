@@ -45,7 +45,8 @@ export default function RegisterPage() {
     google: boolean;
     github: boolean;
     urls: { google?: string; github?: string };
-  }>({ google: false, github: false, urls: {} });
+    loaded: boolean;
+  }>({ google: true, github: true, urls: {}, loaded: false });
   const [oauthLoading, setOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,14 +56,11 @@ export default function RegisterPage() {
           google: res.data.providers.google && !!res.data.urls.google,
           github: res.data.providers.github && !!res.data.urls.github,
           urls: res.data.urls,
+          loaded: true,
         });
       }
     }).catch(() => {
-      setOAuthProviders({
-        google: false,
-        github: false,
-        urls: {},
-      });
+      setOAuthProviders(prev => ({ ...prev, loaded: true }));
     });
   }, []);
 
@@ -93,25 +91,16 @@ export default function RegisterPage() {
 
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     const url = oauthProviders.urls[provider];
-    if (url) {
-      // Validate URL is a legitimate OAuth provider before redirecting
-      try {
-        const { hostname } = new URL(url);
-        const allowed = ['accounts.google.com', 'github.com'];
-        if (!allowed.includes(hostname)) {
-          toast.error('Invalid OAuth provider URL.');
-          return;
-        }
-      } catch {
-        toast.error('Invalid OAuth URL.');
-        return;
-      }
-      setOAuthLoading(provider);
-      window.location.href = url;
-    } else {
-      // OAuth not configured in backend
-      toast.error(`${provider === 'google' ? 'Google' : 'GitHub'} OAuth is not configured. Please add credentials to backend .env file.`);
+    if (!url) return;
+    try {
+      const { hostname } = new URL(url);
+      const allowed = ['accounts.google.com', 'github.com'];
+      if (!allowed.includes(hostname)) return;
+    } catch {
+      return;
     }
+    setOAuthLoading(provider);
+    window.location.href = url;
   };
 
   // Password strength indicator
@@ -414,7 +403,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => handleOAuthLogin('google')}
-                      disabled={!!oauthLoading}
+                      disabled={!!oauthLoading || !oauthProviders.loaded}
                       className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {oauthLoading === 'google' ? (
@@ -429,7 +418,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => handleOAuthLogin('github')}
-                      disabled={!!oauthLoading}
+                      disabled={!!oauthLoading || !oauthProviders.loaded}
                       className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {oauthLoading === 'github' ? (
