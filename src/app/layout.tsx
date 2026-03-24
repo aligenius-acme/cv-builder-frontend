@@ -12,9 +12,40 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'JobTools AI - AI-Powered Job Search Platform',
-  description: 'AI-powered resume tailoring platform that helps job seekers pass ATS filters, match job description keywords, and land more interviews. Generate cover letters, analyse skill gaps, and track job applications — all in one place.',
-  keywords: ['job search', 'resume', 'cv', 'ats', 'interview prep', 'ai', 'career tools', 'job application', 'job tracker', 'salary analyzer'],
+  metadataBase: new URL('https://jobtools.io'),
+  title: {
+    default: 'JobTools AI — AI-Powered Resume & Job Search Platform',
+    template: '%s | JobTools AI',
+  },
+  description: 'AI-powered resume tailoring that helps you pass ATS filters, match job description keywords, and land more interviews. Generate cover letters, analyse skill gaps, and track applications — all in one place.',
+  keywords: ['resume builder', 'AI resume', 'ATS resume', 'job search', 'cover letter generator', 'skill gap analysis', 'job tracker', 'interview prep', 'salary analyzer', 'CV builder'],
+  authors: [{ name: 'JobTools AI', url: 'https://jobtools.io' }],
+  creator: 'JobTools AI',
+  publisher: 'JobTools AI',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large', 'max-video-preview': -1 },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://jobtools.io',
+    siteName: 'JobTools AI',
+    title: 'JobTools AI — AI-Powered Resume & Job Search Platform',
+    description: 'AI-powered resume tailoring that helps you pass ATS filters, match job description keywords, and land more interviews.',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'JobTools AI — AI-Powered Resume & Job Search Platform' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'JobTools AI — AI-Powered Resume & Job Search Platform',
+    description: 'AI-powered resume tailoring that helps you pass ATS filters, match job description keywords, and land more interviews.',
+    images: ['/opengraph-image'],
+    creator: '@jobtoolsai',
+  },
+  alternates: {
+    canonical: 'https://jobtools.io',
+  },
 };
 
 export default function RootLayout({

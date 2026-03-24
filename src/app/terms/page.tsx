@@ -3,8 +3,14 @@ import Link from 'next/link';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — Job Tools',
-  description: 'Terms of Service for Job Tools. Please read before using the platform.',
+  title: 'Terms of Service',
+  description: 'Terms of Service for JobTools AI. Please read before using the platform.',
+  alternates: { canonical: 'https://jobtools.io/terms' },
+  openGraph: {
+    title: 'Terms of Service — JobTools AI',
+    description: 'Terms of Service for JobTools AI. Please read before using the platform.',
+    url: 'https://jobtools.io/terms',
+  },
 };
 
 const EFFECTIVE_DATE = 'March 17, 2026';

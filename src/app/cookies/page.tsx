@@ -3,8 +3,14 @@ import Link from 'next/link';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy — Job Tools',
-  description: 'Cookie Policy for Job Tools. Learn exactly how and why we use cookies.',
+  title: 'Cookie Policy',
+  description: 'Cookie Policy for JobTools AI. Learn exactly how and why we use cookies.',
+  alternates: { canonical: 'https://jobtools.io/cookies' },
+  openGraph: {
+    title: 'Cookie Policy — JobTools AI',
+    description: 'Learn exactly how and why we use cookies on JobTools AI.',
+    url: 'https://jobtools.io/cookies',
+  },
 };
 
 const EFFECTIVE_DATE = 'March 17, 2026';

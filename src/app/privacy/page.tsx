@@ -3,8 +3,14 @@ import Link from 'next/link';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Job Tools',
-  description: 'Privacy Policy for Job Tools. Learn exactly what data we collect, how we use it, and your rights.',
+  title: 'Privacy Policy',
+  description: 'Privacy Policy for JobTools AI. Learn exactly what data we collect, how we use it, and your rights.',
+  alternates: { canonical: 'https://jobtools.io/privacy' },
+  openGraph: {
+    title: 'Privacy Policy — JobTools AI',
+    description: 'Learn exactly what data we collect, how we use it, and your rights.',
+    url: 'https://jobtools.io/privacy',
+  },
 };
 
 const EFFECTIVE_DATE = 'March 17, 2026';

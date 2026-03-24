@@ -7,6 +7,46 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import { useAuthStore } from '@/store/auth';
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://jobtools.io/#app',
+      name: 'JobTools AI',
+      url: 'https://jobtools.io',
+      description: 'AI-powered resume tailoring platform that helps job seekers pass ATS filters, match job description keywords, and land more interviews.',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        description: 'Free tier available',
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://jobtools.io/#org',
+      name: 'JobTools AI',
+      url: 'https://jobtools.io',
+      logo: 'https://jobtools.io/opengraph-image',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://jobtools.io/#website',
+      url: 'https://jobtools.io',
+      name: 'JobTools AI',
+      publisher: { '@id': 'https://jobtools.io/#org' },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: 'https://jobtools.io/?q={search_term_string}' },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+};
+
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -23,6 +63,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
 
       {/* ── Hero ───────────────────────────────────────────────── */}
