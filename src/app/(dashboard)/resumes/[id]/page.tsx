@@ -665,9 +665,34 @@ export default function ResumeDetailPage() {
         {/* Resume Content — always prefers structured parsedData, falls back to rawText */}
         {(() => {
           const pd = resume.parsedData;
+
+          // ── Defensive helpers (handle legacy DB data & AI shape variations) ──────────
+          // Converts string | string[] → string[], splitting on newlines if needed
+          const toDescArr = (val: any): string[] => {
+            if (!val) return [];
+            if (Array.isArray(val)) return val.map(String).map((s: string) => s.trim()).filter(Boolean);
+            if (typeof val === 'string') return val.split('\n').map((s: string) => s.trim()).filter(Boolean);
+            return [];
+          };
+          // Flattens flat string[] or SkillCategory[] ({ category, items[] }) to string[]
+          const flatSkills = (skills: any): string[] => {
+            if (!Array.isArray(skills)) return [];
+            return skills.flatMap((s: any) => {
+              if (typeof s === 'string') return s.trim() ? [s] : [];
+              if (s?.items && Array.isArray(s.items)) return s.items.filter((i: any) => typeof i === 'string' && i.trim());
+              return [];
+            });
+          };
+          // SkillCategory[] check
+          const isGroupedSkills = (skills: any): boolean =>
+            Array.isArray(skills) && skills.length > 0 && typeof skills[0] === 'object' && 'items' in skills[0];
+          // Safe array accessor
+          const safeArr = (val: any): any[] => (Array.isArray(val) ? val : []);
+          // ─────────────────────────────────────────────────────────────────────────────
+
           const hasStructuredContent = pd && (
             pd.contact?.name || pd.contact?.email || pd.summary ||
-            (pd.experience?.length > 0) || (pd.education?.length > 0) || (pd.skills?.length > 0)
+            (safeArr(pd.experience).length > 0) || (safeArr(pd.education).length > 0) || (safeArr(pd.skills).length > 0)
           );
 
           if (hasStructuredContent) {
@@ -781,50 +806,53 @@ export default function ResumeDetailPage() {
                     )}
 
                     {/* ── EXPERIENCE ── */}
-                    {pd.experience && pd.experience.length > 0 && (
+                    {safeArr(pd.experience).length > 0 && (
                       <div>
                         <SectionHeader icon={<Briefcase className="h-4 w-4 text-white" />} title="Experience" color="bg-blue-600" />
                         <div className="mt-3 space-y-5">
-                          {pd.experience.map((exp: any, i: number) => (
-                            <div key={i} className="relative pl-5 border-l-2 border-blue-200 hover:border-blue-400 transition-colors group">
-                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-400 group-hover:bg-blue-600 transition-colors ring-2 ring-white" />
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                  <p className="font-semibold text-slate-900 text-sm">{exp.title}</p>
-                                  <p className="text-sm font-medium text-blue-600">
-                                    {exp.company}
-                                    {exp.location && <span className="text-slate-400 font-normal"> · {exp.location}</span>}
-                                  </p>
+                          {safeArr(pd.experience).map((exp: any, i: number) => {
+                            const bullets = toDescArr(exp.description);
+                            return (
+                              <div key={i} className="relative pl-5 border-l-2 border-blue-200 hover:border-blue-400 transition-colors group">
+                                <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-400 group-hover:bg-blue-600 transition-colors ring-2 ring-white" />
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                  <div>
+                                    <p className="font-semibold text-slate-900 text-sm">{exp.title || exp.position}</p>
+                                    <p className="text-sm font-medium text-blue-600">
+                                      {exp.company}
+                                      {exp.location && <span className="text-slate-400 font-normal"> · {exp.location}</span>}
+                                    </p>
+                                  </div>
+                                  {exp.startDate && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 flex-shrink-0">
+                                      <Clock className="h-3 w-3" />
+                                      {exp.startDate} – {exp.current ? 'Present' : (exp.endDate || '')}
+                                    </span>
+                                  )}
                                 </div>
-                                {exp.startDate && (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 flex-shrink-0">
-                                    <Clock className="h-3 w-3" />
-                                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                                  </span>
+                                {bullets.length > 0 && (
+                                  <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
+                                    {bullets.map((desc: string, j: number) => (
+                                      <li key={j} className="flex items-start gap-2">
+                                        <ChevronRight className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                                        <span className="leading-relaxed">{desc.replace(/^[•\-*▪◦›]\s*/, '')}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 )}
                               </div>
-                              {exp.description && exp.description.length > 0 && (
-                                <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
-                                  {exp.description.map((desc: string, j: number) => (
-                                    <li key={j} className="flex items-start gap-2">
-                                      <ChevronRight className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
-                                      <span className="leading-relaxed">{desc}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
 
                     {/* ── EDUCATION ── */}
-                    {pd.education && pd.education.length > 0 && (
+                    {safeArr(pd.education).length > 0 && (
                       <div>
                         <SectionHeader icon={<GraduationCap className="h-4 w-4 text-white" />} title="Education" color="bg-blue-600" />
                         <div className="mt-3 space-y-3">
-                          {pd.education.map((edu: any, i: number) => (
+                          {safeArr(pd.education).map((edu: any, i: number) => (
                             <div key={i} className="flex gap-3 p-4 rounded-xl bg-violet-50 border border-violet-100 hover:border-violet-300 transition-colors">
                               <div className="w-9 h-9 bg-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <GraduationCap className="h-4 w-4 text-white" />
@@ -861,28 +889,49 @@ export default function ResumeDetailPage() {
                     )}
 
                     {/* ── SKILLS ── */}
-                    {pd.skills && pd.skills.length > 0 && (
+                    {safeArr(pd.skills).length > 0 && (
                       <div>
                         <SectionHeader icon={<Sparkles className="h-4 w-4 text-white" />} title="Skills" color="bg-blue-600" />
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {pd.skills.map((skill: string, i: number) => (
-                            <span
-                              key={i}
-                              className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium border ${skillColors[i % skillColors.length]}`}
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
+                        {isGroupedSkills(pd.skills) ? (
+                          // Grouped display: SkillCategory[] → labelled sub-sections
+                          <div className="mt-3 space-y-3">
+                            {safeArr(pd.skills).map((cat: any, catIdx: number) => (
+                              <div key={catIdx}>
+                                {cat.category && (
+                                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{cat.category}</p>
+                                )}
+                                <div className="flex flex-wrap gap-2">
+                                  {safeArr(cat.items).filter((s: any) => typeof s === 'string').map((skill: string, i: number) => {
+                                    const globalIdx = catIdx * 20 + i;
+                                    return (
+                                      <span key={i} className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium border ${skillColors[globalIdx % skillColors.length]}`}>
+                                        {skill}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // Flat display: plain string[]
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {flatSkills(pd.skills).map((skill: string, i: number) => (
+                              <span key={i} className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium border ${skillColors[i % skillColors.length]}`}>
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 
                     {/* ── CERTIFICATIONS ── */}
-                    {pd.certifications && pd.certifications.length > 0 && (
+                    {safeArr(pd.certifications).length > 0 && (
                       <div>
                         <SectionHeader icon={<Award className="h-4 w-4 text-white" />} title="Certifications" color="from-amber-500 to-orange-500" />
                         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {pd.certifications.map((cert: any, i: number) => (
+                          {safeArr(pd.certifications).map((cert: any, i: number) => (
                             <div key={i} className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
                               <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <Award className="h-3.5 w-3.5 text-white" />
@@ -906,11 +955,11 @@ export default function ResumeDetailPage() {
                     )}
 
                     {/* ── PROJECTS ── */}
-                    {pd.projects && pd.projects.length > 0 && (
+                    {safeArr(pd.projects).length > 0 && (
                       <div>
                         <SectionHeader icon={<FolderKanban className="h-4 w-4 text-white" />} title="Projects" color="bg-blue-600" />
                         <div className="mt-3 space-y-3">
-                          {pd.projects.map((project: any, i: number) => {
+                          {safeArr(pd.projects).map((project: any, i: number) => {
                             const projectUrl = project.url || project.link;
                             // description may be a string (possibly multiline) or an array (from AI)
                             const descLines: string[] = Array.isArray(project.description)
@@ -976,50 +1025,56 @@ export default function ResumeDetailPage() {
                     )}
 
                     {/* ── VOLUNTEER WORK ── */}
-                    {pd.volunteerWork && pd.volunteerWork.length > 0 && (
+                    {safeArr(pd.volunteerWork).length > 0 && (
                       <div>
                         <SectionHeader icon={<Heart className="h-4 w-4 text-white" />} title="Volunteer Work" color="from-rose-500 to-pink-600" />
                         <div className="mt-3 space-y-5">
-                          {pd.volunteerWork.map((vol: any, i: number) => (
-                            <div key={i} className="relative pl-5 border-l-2 border-rose-200 hover:border-rose-400 transition-colors group">
-                              <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-rose-400 group-hover:bg-rose-600 transition-colors ring-2 ring-white" />
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                  <p className="font-semibold text-slate-900 text-sm">{vol.role}</p>
-                                  <p className="text-sm font-medium text-rose-600">
-                                    {vol.organization}
-                                    {vol.location && <span className="text-slate-400 font-normal"> · {vol.location}</span>}
-                                  </p>
+                          {safeArr(pd.volunteerWork).map((vol: any, i: number) => {
+                            const volBullets = toDescArr(vol.description);
+                            const dateLabel = vol.startDate
+                              ? `${vol.startDate} – ${vol.current ? 'Present' : (vol.endDate || '')}`
+                              : (vol.period || '');
+                            return (
+                              <div key={i} className="relative pl-5 border-l-2 border-rose-200 hover:border-rose-400 transition-colors group">
+                                <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-rose-400 group-hover:bg-rose-600 transition-colors ring-2 ring-white" />
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                  <div>
+                                    <p className="font-semibold text-slate-900 text-sm">{vol.role || vol.title}</p>
+                                    <p className="text-sm font-medium text-rose-600">
+                                      {vol.organization}
+                                      {vol.location && <span className="text-slate-400 font-normal"> · {vol.location}</span>}
+                                    </p>
+                                  </div>
+                                  {dateLabel && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100 flex-shrink-0">
+                                      <Clock className="h-3 w-3" />
+                                      {dateLabel}
+                                    </span>
+                                  )}
                                 </div>
-                                {vol.startDate && (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100 flex-shrink-0">
-                                    <Clock className="h-3 w-3" />
-                                    {vol.startDate} – {vol.current ? 'Present' : vol.endDate}
-                                  </span>
+                                {volBullets.length > 0 && (
+                                  <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
+                                    {volBullets.map((desc: string, j: number) => (
+                                      <li key={j} className="flex items-start gap-2">
+                                        <Heart className="h-3 w-3 text-rose-400 mt-1 flex-shrink-0" />
+                                        <span className="leading-relaxed">{desc.replace(/^[•\-*▪◦›]\s*/, '')}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 )}
                               </div>
-                              {vol.description && vol.description.length > 0 && (
-                                <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
-                                  {vol.description.map((desc: string, j: number) => (
-                                    <li key={j} className="flex items-start gap-2">
-                                      <Heart className="h-3 w-3 text-rose-400 mt-1 flex-shrink-0" />
-                                      <span className="leading-relaxed">{desc}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
 
                     {/* ── AWARDS ── */}
-                    {pd.awards && pd.awards.length > 0 && (
+                    {safeArr(pd.awards).length > 0 && (
                       <div>
                         <SectionHeader icon={<Trophy className="h-4 w-4 text-white" />} title="Awards & Honors" color="from-yellow-500 to-amber-500" />
                         <div className="mt-3 space-y-2">
-                          {pd.awards.map((award, i: number) => (
+                          {safeArr(pd.awards).map((award: any, i: number) => (
                             <div key={i} className="flex items-start gap-3 p-3.5 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
                               <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Trophy className="h-4 w-4 text-white" />
@@ -1035,11 +1090,11 @@ export default function ResumeDetailPage() {
                     )}
 
                     {/* ── LANGUAGES ── */}
-                    {pd.languages && pd.languages.length > 0 && (
+                    {safeArr(pd.languages).filter((l: any) => typeof l === 'string').length > 0 && (
                       <div>
                         <SectionHeader icon={<Globe className="h-4 w-4 text-white" />} title="Languages" color="from-cyan-500 to-blue-600" />
                         <div className="flex flex-wrap gap-2 mt-3">
-                          {pd.languages.map((lang: string, i: number) => (
+                          {safeArr(pd.languages).filter((l: any) => typeof l === 'string').map((lang: string, i: number) => (
                             <div key={i} className="flex items-center gap-2 px-3.5 py-2 bg-cyan-50 border border-cyan-200 rounded-full text-sm text-cyan-800 font-medium hover:border-cyan-400 transition-colors">
                               <Globe className="h-3.5 w-3.5 text-cyan-500" />
                               {lang}
