@@ -763,9 +763,20 @@ export default function ResumeDetailPage() {
                     {pd.summary && (
                       <div>
                         <SectionHeader icon={<User className="h-4 w-4 text-white" />} title="Professional Summary" color="from-blue-500 to-indigo-600" />
-                        <p className="mt-3 text-sm text-slate-600 leading-relaxed bg-blue-50/50 border border-blue-100 rounded-xl p-4 italic">
-                          {pd.summary}
-                        </p>
+                        <div className="mt-3 bg-blue-50/50 border border-blue-100 rounded-xl p-4">
+                          {pd.summary.includes('\n') ? (
+                            <ul className="space-y-1.5 text-sm text-slate-600">
+                              {pd.summary.split('\n').filter((l: string) => l.trim()).map((line: string, i: number) => (
+                                <li key={i} className="flex items-start gap-2 leading-relaxed">
+                                  <ChevronRight className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                                  <span>{line.replace(/^[•\-*▪◦›]\s*/, '')}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-slate-600 italic leading-relaxed">{pd.summary}</p>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -871,15 +882,23 @@ export default function ResumeDetailPage() {
                       <div>
                         <SectionHeader icon={<Award className="h-4 w-4 text-white" />} title="Certifications" color="from-amber-500 to-orange-500" />
                         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {pd.certifications.map((cert, i: number) => (
-                            <div key={i} className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
-                              <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                          {pd.certifications.map((cert: any, i: number) => (
+                            <div key={i} className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-100 rounded-xl hover:border-amber-300 transition-colors">
+                              <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <Award className="h-3.5 w-3.5 text-white" />
                               </div>
-                              <span className="text-xs text-slate-700 font-medium leading-tight">
-                                {typeof cert === 'string' ? cert : cert.name}
-                                {typeof cert !== 'string' && cert.issuer && <span className="text-slate-500"> • {cert.issuer}</span>}
-                              </span>
+                              <div className="min-w-0">
+                                <p className="text-xs text-slate-700 font-medium leading-tight">
+                                  {typeof cert === 'string' ? cert : cert.name}
+                                </p>
+                                {typeof cert !== 'string' && (cert.issuer || cert.date) && (
+                                  <p className="text-xs text-slate-500 mt-0.5">
+                                    {cert.issuer && <span>{cert.issuer}</span>}
+                                    {cert.issuer && cert.date && <span> · </span>}
+                                    {cert.date && <span>{cert.date}</span>}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -891,36 +910,67 @@ export default function ResumeDetailPage() {
                       <div>
                         <SectionHeader icon={<FolderKanban className="h-4 w-4 text-white" />} title="Projects" color="bg-blue-600" />
                         <div className="mt-3 space-y-3">
-                          {pd.projects.map((project: any, i: number) => (
-                            <div key={i} className="p-4 rounded-xl border border-purple-100 bg-purple-50 hover:border-purple-300 transition-colors">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className="font-semibold text-slate-900 text-sm">{project.name}</p>
-                                {project.url && (
-                                  <a
-                                    href={`https://${project.url.replace(/^https?:\/\//, '')}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 font-medium flex-shrink-0 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    View
-                                  </a>
+                          {pd.projects.map((project: any, i: number) => {
+                            const projectUrl = project.url || project.link;
+                            // description may be a string (possibly multiline) or an array (from AI)
+                            const descLines: string[] = Array.isArray(project.description)
+                              ? project.description
+                              : project.description
+                              ? project.description.split('\n').filter((l: string) => l.trim())
+                              : [];
+                            const highlights: string[] = Array.isArray(project.highlights) ? project.highlights : [];
+                            const allBullets = [...descLines, ...highlights];
+                            return (
+                              <div key={i} className="p-4 rounded-xl border border-purple-100 bg-purple-50 hover:border-purple-300 transition-colors">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-slate-900 text-sm">{project.name}</p>
+                                    {project.dates && (
+                                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />{project.dates}
+                                      </p>
+                                    )}
+                                  </div>
+                                  {projectUrl && (
+                                    <a
+                                      href={`https://${projectUrl.replace(/^https?:\/\//, '')}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 font-medium flex-shrink-0 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200"
+                                    >
+                                      <ExternalLink className="h-3 w-3" />
+                                      View
+                                    </a>
+                                  )}
+                                </div>
+                                {allBullets.length > 0 && (
+                                  allBullets.length === 1 ? (
+                                    <p className="text-sm text-slate-600 mt-1.5 leading-relaxed">
+                                      {allBullets[0].replace(/^[•\-*▪◦›]\s*/, '')}
+                                    </p>
+                                  ) : (
+                                    <ul className="mt-2 space-y-1 text-sm text-slate-600">
+                                      {allBullets.map((line: string, j: number) => (
+                                        <li key={j} className="flex items-start gap-2">
+                                          <ChevronRight className="h-3.5 w-3.5 text-purple-400 mt-0.5 flex-shrink-0" />
+                                          <span className="leading-relaxed">{line.replace(/^[•\-*▪◦›]\s*/, '')}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )
+                                )}
+                                {project.technologies && project.technologies.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2.5">
+                                    {project.technologies.map((tech: string, j: number) => (
+                                      <span key={j} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white text-purple-700 border border-purple-200">
+                                        {tech}
+                                      </span>
+                                    ))}
+                                  </div>
                                 )}
                               </div>
-                              {project.description && (
-                                <p className="text-sm text-slate-600 mt-1.5 leading-relaxed">{project.description}</p>
-                              )}
-                              {project.technologies && project.technologies.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2.5">
-                                  {project.technologies.map((tech: string, j: number) => (
-                                    <span key={j} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-white text-purple-700 border border-purple-200">
-                                      {tech}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
