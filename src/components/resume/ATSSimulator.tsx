@@ -64,8 +64,8 @@ function isSkillsAnalysis(data: SectionAnalysis | SkillsAnalysis): data is Skill
   return 'matched' in data;
 }
 
-function isBulletImprovement(imp: SectionImprovement | BulletImprovement): imp is BulletImprovement {
-  return 'bulletPoint' in imp;
+function isBulletImprovement(imp: SectionImprovement | BulletImprovement | string): imp is BulletImprovement {
+  return typeof imp === 'object' && imp !== null && 'bulletPoint' in imp;
 }
 
 export default function ATSSimulator({
@@ -725,6 +725,13 @@ export default function ATSSimulator({
                             </p>
                             <div className="space-y-3">
                               {sectionData.improvements.slice(0, 3).map((imp, i) => {
+                                if (typeof imp === 'string') {
+                                  return (
+                                    <div key={i} className="text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                                      • {imp}
+                                    </div>
+                                  );
+                                }
                                 if (isBulletImprovement(imp)) {
                                   return (
                                     <div key={i} className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm">
