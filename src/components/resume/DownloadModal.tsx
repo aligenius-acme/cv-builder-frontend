@@ -232,12 +232,15 @@ export default function DownloadModal({
     }
   }, [selectedTemplate, isOpen]);
 
-  // Keep iframe scale in sync with the container width
+  // Keep iframe scale in sync with the container width.
+  // 16px horizontal padding (8px each side) is subtracted so the paper
+  // has breathing room and its drop-shadow is visible on all sides.
   useEffect(() => {
     const el = previewContainerRef.current;
     if (!el) return;
     const obs = new ResizeObserver(([entry]) => {
-      setPreviewScale(entry.contentRect.width / 794);
+      const w = entry.contentRect.width;
+      setPreviewScale(Math.max(0.1, (w - 16) / 794));
     });
     obs.observe(el);
     return () => obs.disconnect();
@@ -671,68 +674,88 @@ export default function DownloadModal({
             </div>
 
             {/* Preview */}
-            <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
-              {/* Preview header bar */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-200 bg-white flex-shrink-0">
-                <Eye className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-gray-900 truncate">
-                    {selectedTemplateData ? selectedTemplateData.name : 'Live Preview'}
-                  </h3>
-                  {selectedTemplateData?.description && (
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{selectedTemplateData.description}</p>
-                  )}
-                </div>
+            <div className="flex-1 flex flex-col min-w-0">
+              {/* Thin header: template name + description */}
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white border-b border-slate-200 flex-shrink-0">
+                <Eye className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
+                <span className="text-sm font-semibold text-slate-800 truncate">
+                  {selectedTemplateData?.name ?? 'Live Preview'}
+                </span>
+                {selectedTemplateData?.description && (
+                  <span className="text-xs text-slate-400 truncate hidden sm:block">
+                    — {selectedTemplateData.description}
+                  </span>
+                )}
               </div>
 
-              {/* Scrollable preview — fills remaining space edge-to-edge */}
+              {/*
+               * Document viewer: slate-gray background (like a PDF viewer),
+               * 8px horizontal padding so the white paper has visible side shadows,
+               * vertically scrollable when the resume exceeds the panel height.
+               */}
               <div
                 ref={previewContainerRef}
-                className="flex-1 bg-white relative"
-                style={{ overflowY: 'auto', overflowX: 'hidden' }}
+                className="flex-1"
+                style={{
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  background: '#94a3b8',   /* slate-400 — neutral paper-desk tone */
+                  position: 'relative',
+                }}
               >
-                {/* Loading overlay */}
+                {/* Loading pill */}
                 {isPreviewLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full" />
-                      <span className="text-sm font-medium">Loading preview...</span>
+                  <div className="absolute inset-0 flex items-center justify-center z-10" style={{ background: 'rgba(148,163,184,0.6)', backdropFilter: 'blur(2px)' }}>
+                    <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 shadow-lg">
+                      <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
+                      <span className="text-sm font-medium text-slate-700">Loading preview…</span>
                     </div>
                   </div>
                 )}
+
                 {previewHtml ? (
-                  <div style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: `${Math.round(iframeHeight * previewScale)}px`,
-                  }}>
-                    <iframe
-                      ref={iframeRef}
-                      srcDoc={previewHtml}
-                      title="Resume Preview"
-                      sandbox="allow-same-origin"
-                      onLoad={handleIframeLoad}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '794px',
-                        height: `${iframeHeight}px`,
-                        border: 'none',
-                        transform: `scale(${previewScale})`,
-                        transformOrigin: 'top left',
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                    <div className="bg-slate-50 p-8 rounded-2xl mb-4">
-                      <FileText className="h-14 w-14 text-slate-300" />
+                  /* 8px side padding, 12px top/bottom — paper floats on the gray desk */
+                  <div style={{ padding: '12px 8px' }}>
+                    {/*
+                     * Scale wrapper: visual dimensions = iframe dimensions × scale.
+                     * The absolutely-positioned iframe overflows its layout box,
+                     * so this wrapper provides the correct scroll height.
+                     */}
+                    <div style={{
+                      position: 'relative',
+                      width: '100%',
+                      height: `${Math.round(iframeHeight * previewScale)}px`,
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
+                      borderRadius: '2px',
+                      overflow: 'hidden',  /* clips any sub-pixel overhang */
+                    }}>
+                      <iframe
+                        ref={iframeRef}
+                        srcDoc={previewHtml}
+                        title="Resume Preview"
+                        sandbox="allow-same-origin"
+                        onLoad={handleIframeLoad}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '794px',
+                          height: `${iframeHeight}px`,
+                          border: 'none',
+                          transform: `scale(${previewScale})`,
+                          transformOrigin: 'top left',
+                        }}
+                      />
                     </div>
-                    <p className="text-sm font-medium text-slate-500">Select a template to preview</p>
-                    <p className="text-xs text-slate-400 mt-1">Choose from the list on the left</p>
                   </div>
-                )}
+                ) : !isPreviewLoading ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3">
+                    <div className="bg-white/30 p-8 rounded-2xl">
+                      <FileText className="h-12 w-12 text-white/70" />
+                    </div>
+                    <p className="text-sm font-medium text-white/80">Select a template to see a live preview</p>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
