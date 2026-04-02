@@ -721,6 +721,14 @@ class ApiClient {
     return response.data;
   }
 
+  async renderSharedResume(token: string, template = 'london-navy'): Promise<string> {
+    const response = await this.client.get(`/shared/${token}/render`, {
+      params: { template },
+      responseType: 'text',
+    });
+    return response.data;
+  }
+
   // AI Writing endpoints
   async getAISuggestions(data: {
     text: string;
@@ -1004,6 +1012,38 @@ class ApiClient {
     const response = await this.client.get(`/resumes/${id}/preview`, {
       params: { template },
       responseType: 'blob',
+    });
+    return response.data;
+  }
+
+  async renderResume(id: string, template: string): Promise<string> {
+    const response = await this.client.get(`/resumes/${id}/render`, {
+      params: { template },
+      responseType: 'text',
+    });
+    return response.data;
+  }
+
+  async renderVersion(
+    resumeId: string,
+    versionId: string,
+    template: string,
+    anonymize = false
+  ): Promise<string> {
+    const response = await this.client.get(`/resumes/${resumeId}/versions/${versionId}/render`, {
+      params: { template, anonymize: anonymize.toString() },
+      responseType: 'text',
+    });
+    return response.data;
+  }
+
+  async renderTemplate(templateId: string, resumeId?: string, versionId?: string): Promise<string> {
+    const params: Record<string, string> = {};
+    if (resumeId) params.resumeId = resumeId;
+    if (versionId) params.versionId = versionId;
+    const response = await this.client.get(`/templates/${templateId}/render`, {
+      params,
+      responseType: 'text',
     });
     return response.data;
   }

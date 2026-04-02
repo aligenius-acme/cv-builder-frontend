@@ -90,10 +90,45 @@ export default function SharedResumePage() {
   };
 
   const handleDownload = async (format: 'pdf' | 'docx') => {
+    const filename = `resume-${data?.companyName || 'shared'}.${format}`;
+
+    if (format === 'pdf') {
+      // Open window first (before async) to avoid popup blockers
+      const printWindow = window.open('', '_blank', 'width=900,height=1200');
+      if (!printWindow) {
+        toast.error('Please allow popups for this site to download PDFs');
+        return;
+      }
+      printWindow.document.write(
+        '<html><body style="display:flex;align-items:center;justify-content:center;' +
+        'height:100vh;font-family:sans-serif;color:#555;background:#f8f9fa">' +
+        '<p style="font-size:16px">Preparing your PDF\u2026</p></body></html>'
+      );
+
+      setIsDownloading(true);
+      try {
+        const html = await api.renderSharedResume(token);
+        const docTitle = filename.replace(/\.pdf$/, '');
+        const printScript =
+          `<script>document.title=${JSON.stringify(docTitle)};` +
+          `window.addEventListener('load',function(){setTimeout(window.print,400);});<\/script>`;
+        const printHtml = html.replace('</head>', printScript + '\n</head>');
+        printWindow.document.open();
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        toast.success('Print dialog opened — choose "Save as PDF"', { duration: 5000 });
+      } catch (err) {
+        printWindow.close();
+        toast.error('Failed to prepare PDF');
+      } finally {
+        setIsDownloading(false);
+      }
+      return;
+    }
+
     setIsDownloading(true);
     try {
-      const blob = await api.downloadSharedResume(token, format);
-      const filename = `resume-${data?.companyName || 'shared'}.${format}`;
+      const blob = await api.downloadSharedResume(token, 'docx');
       downloadBlob(blob, filename);
       toast.success('Download started');
     } catch (err) {

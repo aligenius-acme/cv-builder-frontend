@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { X, Download, FileText, Eye, Check, EyeOff, Shield, Search, Filter, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -51,8 +51,10 @@ export default function DownloadModal({
   const [isLoading, setIsLoading] = useState(false);
   const [downloadingFormat, setDownloadingFormat] = useState<'pdf' | 'docx' | null>(null);
   const isDownloading = downloadingFormat !== null;
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = useState(0.5);
   const [anonymize, setAnonymize] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -220,17 +222,24 @@ export default function DownloadModal({
   }, [isOpen]);
 
   useEffect(() => {
-    // Load preview when template changes
     if (isOpen && selectedTemplate) {
       loadPreview();
     }
-    // Cleanup preview URL on unmount
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
+    if (!isOpen) {
+      setPreviewHtml(null);
+    }
   }, [selectedTemplate, isOpen]);
+
+  // Keep iframe scale in sync with the container width
+  useEffect(() => {
+    const el = previewContainerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      setPreviewScale(entry.contentRect.width / 794);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const loadTemplates = async () => {
     try {
@@ -268,19 +277,15 @@ export default function DownloadModal({
   const loadPreview = async () => {
     try {
       setIsPreviewLoading(true);
-      // Revoke and clear previous preview immediately so old template doesn't linger
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(null);
+      setPreviewHtml(null);
 
-      // Use different API method based on context (versionId presence determines mode)
-      const blob = versionId
-        ? await api.previewTemplate(selectedTemplate, resumeId, versionId)
-        : await api.previewBuiltResume(resumeId, selectedTemplate);
+      // Render HTML — used for both iframe preview and browser-print PDF download.
+      // No Puppeteer involved; the backend returns the same HTML used for PDF generation.
+      const html = versionId
+        ? await api.renderTemplate(selectedTemplate, resumeId, versionId)
+        : await api.renderResume(resumeId, selectedTemplate);
 
-      const url = URL.createObjectURL(blob);
-      setPreviewUrl(url);
+      setPreviewHtml(html);
     } catch (error) {
       toast.error('Failed to load preview');
     } finally {
@@ -289,21 +294,62 @@ export default function DownloadModal({
   };
 
   const handleDownload = async (format: 'pdf' | 'docx') => {
+    const prefix = anonymize ? 'anonymous-resume' : 'resume';
+    const filename = versionId
+      ? `${prefix}-${label || 'tailored'}-v${versionNumber}.${format}`
+      : `${label || 'resume'}.${format}`;
+
+    if (format === 'pdf') {
+      // PDF: use the browser's own print-to-PDF — no server-side Puppeteer needed.
+      // Open the window immediately (before the async fetch) to avoid popup blockers.
+      const printWindow = window.open('', '_blank', 'width=900,height=1200');
+      if (!printWindow) {
+        toast.error('Please allow popups for this site to download PDFs');
+        return;
+      }
+      printWindow.document.write(
+        '<html><body style="display:flex;align-items:center;justify-content:center;' +
+        'height:100vh;font-family:sans-serif;color:#555;background:#f8f9fa">' +
+        '<p style="font-size:16px">Preparing your PDF\u2026</p></body></html>'
+      );
+
+      setDownloadingFormat('pdf');
+      try {
+        const html = versionId
+          ? await api.renderVersion(resumeId, versionId, selectedTemplate, anonymize)
+          : await api.renderResume(resumeId, selectedTemplate);
+
+        // Inject document title + auto-print script before </head>
+        const docTitle = filename.replace(/\.pdf$/, '');
+        const printScript =
+          `<script>document.title=${JSON.stringify(docTitle)};` +
+          `window.addEventListener('load',function(){setTimeout(window.print,400);});<\/script>`;
+        const printHtml = html.replace('</head>', printScript + '\n</head>');
+
+        printWindow.document.open();
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+
+        toast.success('Print dialog opened — choose "Save as PDF"', { duration: 5000 });
+        onClose();
+      } catch (error) {
+        printWindow.close();
+        toast.error('Failed to prepare PDF');
+      } finally {
+        setDownloadingFormat(null);
+      }
+      return;
+    }
+
+    // DOCX: unchanged — server generates it directly
     try {
-      setDownloadingFormat(format);
-
-      // Use different API method based on context (versionId presence determines mode)
+      setDownloadingFormat('docx');
       const blob = versionId
-        ? await api.downloadVersion(resumeId, versionId, format, selectedTemplate, anonymize)
-        : await api.downloadBuiltResume(resumeId, format, selectedTemplate);
-
-      const prefix = anonymize ? 'anonymous-resume' : 'resume';
-      const filename = versionId
-        ? `${prefix}-${label || 'tailored'}-v${versionNumber}.${format}`
-        : `${label || 'resume'}.${format}`;
+        ? await api.downloadVersion(resumeId, versionId, 'docx', selectedTemplate, anonymize)
+        : await api.downloadBuiltResume(resumeId, 'docx', selectedTemplate);
 
       downloadBlob(blob, filename);
-      toast.success(`Downloaded ${anonymize ? 'anonymized ' : ''}${format.toUpperCase()}`);
+      toast.success(`Downloaded ${anonymize ? 'anonymized ' : ''}DOCX`);
       onClose();
     } catch (error) {
       toast.error('Failed to download resume');
@@ -622,7 +668,10 @@ export default function DownloadModal({
                 </div>
               </div>
 
-              <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden relative">
+              <div
+                ref={previewContainerRef}
+                className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden relative"
+              >
                 {/* Loading overlay */}
                 {isPreviewLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
@@ -632,12 +681,23 @@ export default function DownloadModal({
                     </div>
                   </div>
                 )}
-                {previewUrl ? (
-                  <iframe
-                    src={previewUrl}
-                    className="w-full h-full"
-                    title="Resume Preview"
-                  />
+                {previewHtml ? (
+                  /* Scale the A4 resume (794px) to fit the preview container width */
+                  <div style={{ width: '100%', height: `${Math.round(1123 * previewScale)}px`, overflow: 'hidden' }}>
+                    <iframe
+                      srcDoc={previewHtml}
+                      title="Resume Preview"
+                      sandbox="allow-same-origin"
+                      style={{
+                        width: '794px',
+                        height: '1123px',
+                        border: 'none',
+                        display: 'block',
+                        transform: `scale(${previewScale})`,
+                        transformOrigin: 'top left',
+                      }}
+                    />
+                  </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <div className="bg-slate-50 p-8 rounded-2xl mb-4">
