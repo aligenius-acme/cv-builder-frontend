@@ -55,7 +55,7 @@ export default function DownloadModal({
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [previewScale, setPreviewScale] = useState(0.5);
+  const [previewScale, setPreviewScale] = useState(0.75);
   const [iframeHeight, setIframeHeight] = useState(1400);
   const [anonymize, setAnonymize] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -671,8 +671,9 @@ export default function DownloadModal({
             </div>
 
             {/* Preview */}
-            <div className="flex-1 p-6 bg-slate-50 flex flex-col">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
+              {/* Preview header bar */}
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-200 bg-white flex-shrink-0">
                 <Eye className="h-4 w-4 text-blue-600 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-gray-900 truncate">
@@ -684,9 +685,10 @@ export default function DownloadModal({
                 </div>
               </div>
 
+              {/* Scrollable preview — fills remaining space edge-to-edge */}
               <div
                 ref={previewContainerRef}
-                className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm relative"
+                className="flex-1 bg-white relative"
                 style={{ overflowY: 'auto', overflowX: 'hidden' }}
               >
                 {/* Loading overlay */}
@@ -699,15 +701,9 @@ export default function DownloadModal({
                   </div>
                 )}
                 {previewHtml ? (
-                  /*
-                   * CSS transform scales the visual appearance but NOT the layout box.
-                   * The sizing wrapper is set to the visual (post-scale) dimensions so
-                   * the scrollable outer container knows the true scroll height.
-                   * The iframe is absolutely positioned inside so it doesn't push layout.
-                   */
                   <div style={{
                     position: 'relative',
-                    width: `${Math.round(794 * previewScale)}px`,
+                    width: '100%',
                     height: `${Math.round(iframeHeight * previewScale)}px`,
                   }}>
                     <iframe
