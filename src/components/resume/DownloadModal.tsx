@@ -232,15 +232,13 @@ export default function DownloadModal({
     }
   }, [selectedTemplate, isOpen]);
 
-  // Keep iframe scale in sync with the container width.
-  // 16px horizontal padding (8px each side) is subtracted so the paper
-  // has breathing room and its drop-shadow is visible on all sides.
+  // Keep iframe scale in sync with the container width (no padding — fills edge to edge).
   useEffect(() => {
     const el = previewContainerRef.current;
     if (!el) return;
     const obs = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      setPreviewScale(Math.max(0.1, (w - 16) / 794));
+      setPreviewScale(Math.max(0.1, w / 794));
     });
     obs.observe(el);
     return () => obs.disconnect();
@@ -673,40 +671,45 @@ export default function DownloadModal({
               </div>
             </div>
 
-            {/* Preview */}
-            <div className="flex-1 flex flex-col min-w-0">
-              {/* Thin header: template name + description */}
-              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white border-b border-slate-200 flex-shrink-0">
-                <Eye className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
-                <span className="text-sm font-semibold text-slate-800 truncate">
+            {/* Preview — fills the entire right panel */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+              {/* Slim header bar */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-slate-900 flex-shrink-0">
+                <Eye className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
+                <span className="text-xs font-semibold text-white truncate">
                   {selectedTemplateData?.name ?? 'Live Preview'}
                 </span>
-                {selectedTemplateData?.description && (
-                  <span className="text-xs text-slate-400 truncate hidden sm:block">
-                    — {selectedTemplateData.description}
+                {selectedTemplateData?.atsCompatibility && (
+                  <span className={cn(
+                    'ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0',
+                    selectedTemplateData.atsCompatibility === 'ATS-Safe'
+                      ? 'bg-emerald-500 text-white'
+                      : selectedTemplateData.atsCompatibility === 'ATS-Friendly'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-orange-500 text-white'
+                  )}>
+                    {selectedTemplateData.atsCompatibility}
                   </span>
                 )}
               </div>
 
               {/*
-               * Document viewer: slate-gray background (like a PDF viewer),
-               * 8px horizontal padding so the white paper has visible side shadows,
-               * vertically scrollable when the resume exceeds the panel height.
+               * Scrollable viewer — iframe scaled to fill the full width edge-to-edge.
+               * previewScale = containerWidth / 794 so the 794px-wide iframe pixel-
+               * perfectly fills every horizontal pixel of the panel.
+               * The scale wrapper height = iframeHeight × scale gives the scroll
+               * container the correct scroll height even though the iframe uses
+               * CSS transform (which doesn't affect layout flow).
                */}
               <div
                 ref={previewContainerRef}
-                className="flex-1"
-                style={{
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  background: '#94a3b8',   /* slate-400 — neutral paper-desk tone */
-                  position: 'relative',
-                }}
+                className="flex-1 relative bg-white"
+                style={{ overflowY: 'auto', overflowX: 'hidden' }}
               >
-                {/* Loading pill */}
+                {/* Loading overlay */}
                 {isPreviewLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10" style={{ background: 'rgba(148,163,184,0.6)', backdropFilter: 'blur(2px)' }}>
-                    <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 shadow-lg">
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-10">
+                    <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 shadow-lg border border-slate-100">
                       <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
                       <span className="text-sm font-medium text-slate-700">Loading preview…</span>
                     </div>
@@ -714,46 +717,36 @@ export default function DownloadModal({
                 )}
 
                 {previewHtml ? (
-                  /* 8px side padding, 12px top/bottom — paper floats on the gray desk */
-                  <div style={{ padding: '12px 8px' }}>
-                    {/*
-                     * Scale wrapper: visual dimensions = iframe dimensions × scale.
-                     * The absolutely-positioned iframe overflows its layout box,
-                     * so this wrapper provides the correct scroll height.
-                     */}
-                    <div style={{
-                      position: 'relative',
-                      width: '100%',
-                      height: `${Math.round(iframeHeight * previewScale)}px`,
-                      boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
-                      borderRadius: '2px',
-                      overflow: 'hidden',  /* clips any sub-pixel overhang */
-                    }}>
-                      <iframe
-                        ref={iframeRef}
-                        srcDoc={previewHtml}
-                        title="Resume Preview"
-                        sandbox="allow-same-origin"
-                        onLoad={handleIframeLoad}
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '794px',
-                          height: `${iframeHeight}px`,
-                          border: 'none',
-                          transform: `scale(${previewScale})`,
-                          transformOrigin: 'top left',
-                        }}
-                      />
-                    </div>
+                  /* Wrapper gives the scrollable container its scroll height */
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: `${Math.round(iframeHeight * previewScale)}px`,
+                  }}>
+                    <iframe
+                      ref={iframeRef}
+                      srcDoc={previewHtml}
+                      title="Resume Preview"
+                      sandbox="allow-same-origin"
+                      onLoad={handleIframeLoad}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '794px',
+                        height: `${iframeHeight}px`,
+                        border: 'none',
+                        transform: `scale(${previewScale})`,
+                        transformOrigin: 'top left',
+                      }}
+                    />
                   </div>
                 ) : !isPreviewLoading ? (
-                  <div className="flex flex-col items-center justify-center h-full gap-3">
-                    <div className="bg-white/30 p-8 rounded-2xl">
-                      <FileText className="h-12 w-12 text-white/70" />
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
+                    <div className="bg-slate-50 p-8 rounded-2xl">
+                      <FileText className="h-12 w-12 text-slate-300" />
                     </div>
-                    <p className="text-sm font-medium text-white/80">Select a template to see a live preview</p>
+                    <p className="text-sm font-medium text-slate-500">Select a template to see a live preview</p>
                   </div>
                 ) : null}
               </div>
